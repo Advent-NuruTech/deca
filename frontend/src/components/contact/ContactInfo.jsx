@@ -115,7 +115,7 @@ const ContactInfo = () => {
   ];
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
       <h2 className="text-2xl font-bold mb-6">
         <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
           Connect With Us
@@ -148,16 +148,16 @@ const ContactInfo = () => {
 
             {/* Card */}
             <div
-              className={`relative bg-gradient-to-br ${social.bg} p-4 rounded-2xl border border-white/20 shadow-xl transform transition-all duration-300 group-hover:scale-[1.02]`}
+              className={`relative bg-gradient-to-br ${social.bg} p-4 rounded-2xl border border-gray-300 shadow-xl transform transition-all duration-300 group-hover:scale-[1.02]`}
             >
               <div className="flex flex-col items-center justify-center gap-2">
-                <div className="w-10 h-10 flex items-center justify-center text-white">
+                <div className="w-10 h-10 flex items-center justify-center text-gray-900">
                   <social.icon />
                 </div>
-                <span className="text-xs font-medium text-white">
+                <span className="text-xs font-medium text-gray-900">
                   {social.label}
                 </span>
-                <span className="text-[8px] text-white/70">Follow Us</span>
+                <span className="text-[8px] text-gray-900/70">Follow Us</span>
               </div>
             </div>
           </motion.a>
@@ -175,11 +175,11 @@ const ContactInfo = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="relative flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white text-xl">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-gray-900 text-xl">
             ⚡
           </div>
           <div>
-            <p className="text-sm text-white font-medium">
+            <p className="text-sm text-gray-900 font-medium">
               Quick Response Guaranteed
             </p>
             <p className="text-xs text-gray-400">

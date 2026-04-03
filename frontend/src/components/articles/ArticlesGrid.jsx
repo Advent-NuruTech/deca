@@ -35,7 +35,7 @@ const ArticlesGrid = ({ articles, loading }) => {
         >
           <Newspaper size={60} className="text-gray-600" />
         </motion.div>
-        <h3 className="text-2xl font-bold text-white mb-2">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
           No articles found
         </h3>
         <p className="text-gray-400">

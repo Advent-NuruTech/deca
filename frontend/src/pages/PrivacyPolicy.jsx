@@ -29,7 +29,7 @@ const PrivacyPolicy = () => {
             <Shield className="w-4 h-4 text-purple-400" />
             <span className="text-sm font-medium text-purple-400">Legal</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Privacy Policy
           </h1>
           <p className="text-xl text-gray-400">
@@ -42,15 +42,15 @@ const PrivacyPolicy = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 space-y-8"
+          className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 space-y-8"
         >
           {/* Introduction */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Lock className="w-5 h-5 text-purple-400" />
               Introduction
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               At Fancy Tech Integration, we take your privacy seriously. This
               Privacy Policy explains how we collect, use, disclose, and
               safeguard your information when you visit our website or use our
@@ -62,11 +62,11 @@ const PrivacyPolicy = () => {
 
           {/* Information Collection */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Database className="w-5 h-5 text-purple-400" />
               Information We Collect
             </h2>
-            <div className="space-y-4 text-gray-300">
+            <div className="space-y-4 text-gray-600">
               <p>
                 We may collect personal information that you voluntarily provide
                 to us when you:
@@ -96,11 +96,11 @@ const PrivacyPolicy = () => {
 
           {/* How We Use Information */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Eye className="w-5 h-5 text-purple-400" />
               How We Use Your Information
             </h2>
-            <div className="space-y-4 text-gray-300">
+            <div className="space-y-4 text-gray-600">
               <p>We use the information we collect to:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>
@@ -119,11 +119,11 @@ const PrivacyPolicy = () => {
 
           {/* Cookies */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Cookie className="w-5 h-5 text-purple-400" />
               Cookies and Tracking Technologies
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               We use cookies and similar tracking technologies to track activity
               on our website and store certain information. Cookies are files
               with small amount of data which may include an anonymous unique
@@ -134,10 +134,10 @@ const PrivacyPolicy = () => {
 
           {/* Third-Party Disclosure */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Third-Party Disclosure
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               We do not sell, trade, or otherwise transfer your personally
               identifiable information to outside parties unless we provide you
               with advance notice. This does not include website hosting
@@ -149,12 +149,12 @@ const PrivacyPolicy = () => {
 
           {/* Contact Information */}
           <section className="bg-purple-500/10 p-6 rounded-xl border border-purple-500/20">
-            <h2 className="text-xl font-bold text-white mb-3">Contact Us</h2>
-            <p className="text-gray-300 mb-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Contact Us</h2>
+            <p className="text-gray-600 mb-2">
               If you have questions about this Privacy Policy, please contact
               us:
             </p>
-            <ul className="text-gray-300 space-y-1">
+            <ul className="text-gray-600 space-y-1">
               <li>📧 Email: privacy@fancytechintegration.com</li>
               <li>📞 Phone: +211 929 097920</li>
               <li>💬 WhatsApp: +211 929 097920</li>

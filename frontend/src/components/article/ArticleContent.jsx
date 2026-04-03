@@ -10,7 +10,7 @@ const ArticleContent = ({ content, tags }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200"
     >
       {/* Article Content - Fixed with white text */}
       <div
@@ -34,8 +34,8 @@ const ArticleContent = ({ content, tags }) => {
 
       {/* Tags Section */}
       {tags && tags.length > 0 && (
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Related Topics
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -56,7 +56,7 @@ const ArticleContent = ({ content, tags }) => {
       )}
 
       {/* Back Button */}
-      <div className="mt-8 pt-8 border-t border-white/10">
+      <div className="mt-8 pt-8 border-t border-gray-200">
         <Link to="/articles">
           <motion.div
             whileHover={{ x: -5 }}

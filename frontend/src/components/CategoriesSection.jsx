@@ -19,7 +19,7 @@ const CategoriesSection = ({ categoryInfo }) => {
   };
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Animated background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -63,7 +63,7 @@ const CategoriesSection = ({ categoryInfo }) => {
             transition={{ delay: 0.2, type: "spring" }}
             className="inline-block mb-4"
           >
-            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
               ✦ PRODUCT CATEGORIES ✦
             </span>
           </motion.div>
@@ -94,7 +94,7 @@ const CategoriesSection = ({ categoryInfo }) => {
 
                 <Link
                   to={`/products?category=${key}`}
-                  className="relative block h-full bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group-hover:border-transparent transition-all duration-500"
+                  className="relative block h-full bg-gray-500 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200 group-hover:border-transparent transition-all duration-500"
                 >
                   {/* Image container */}
                   <div className="relative h-56 overflow-hidden">
@@ -128,7 +128,7 @@ const CategoriesSection = ({ categoryInfo }) => {
                       initial={{ x: -100 }}
                       animate={{ x: 0 }}
                       transition={{ delay: 0.5 }}
-                      className={`absolute top-4 left-4 bg-gradient-to-r ${categoryGradients[key] || "from-purple-500 to-blue-500"} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
+                      className={`absolute top-4 left-4 bg-gradient-to-r ${categoryGradients[key] || "from-purple-500 to-blue-500"} text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
                     >
                       {info.title}
                     </motion.div>
@@ -137,7 +137,7 @@ const CategoriesSection = ({ categoryInfo }) => {
                   {/* Content */}
                   <div className="p-6">
                     <h3
-                      className={`text-2xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${categoryGradients[key] || "from-purple-400 to-blue-400"} transition-all duration-300`}
+                      className={`text-2xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${categoryGradients[key] || "from-purple-400 to-blue-400"} transition-all duration-300`}
                     >
                       {info.title}
                     </h3>

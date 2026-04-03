@@ -38,7 +38,7 @@ const TermsOfService = () => {
               Legal Agreement
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Terms of Service
           </h1>
           <p className="text-xl text-gray-400">
@@ -51,15 +51,15 @@ const TermsOfService = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 space-y-8"
+          className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 space-y-8"
         >
           {/* Agreement to Terms */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Scale className="w-5 h-5 text-purple-400" />
               Agreement to Terms
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               By accessing or using Fancy Tech Integration's website, products,
               or services, you agree to be bound by these Terms of Service. If
               you disagree with any part of the terms, you may not access our
@@ -69,11 +69,11 @@ const TermsOfService = () => {
 
           {/* Products and Services */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Products and Services
             </h2>
-            <div className="space-y-4 text-gray-300">
-              <p className="font-semibold text-white">1. Laptop Sales</p>
+            <div className="space-y-4 text-gray-600">
+              <p className="font-semibold text-gray-900">1. Laptop Sales</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>
                   All laptops are sold as-is with warranty as specified at the
@@ -86,7 +86,7 @@ const TermsOfService = () => {
                 </li>
               </ul>
 
-              <p className="font-semibold text-white mt-4">
+              <p className="font-semibold text-gray-900 mt-4">
                 2. Software Services (Fancify Suite)
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
@@ -113,11 +113,11 @@ const TermsOfService = () => {
 
           {/* Payments */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-purple-400" />
               Payments and Billing
             </h2>
-            <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
+            <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4">
               <li>
                 All payments must be made in full before product delivery or
                 software access
@@ -137,11 +137,11 @@ const TermsOfService = () => {
 
           {/* Intellectual Property */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Shield className="w-5 h-5 text-purple-400" />
               Intellectual Property
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               The Fancify software suite (FancifyBusiness, FancifySchool,
               FancifyProperty), our website content, logos, and designs are the
               property of Fancy Tech Integration and are protected by copyright
@@ -153,11 +153,11 @@ const TermsOfService = () => {
 
           {/* Limitation of Liability */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-purple-400" />
               Limitation of Liability
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               Fancy Tech Integration shall not be liable for any indirect,
               incidental, special, consequential, or punitive damages resulting
               from your use or inability to use our products or services. This
@@ -168,10 +168,10 @@ const TermsOfService = () => {
 
           {/* Governing Law */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Governing Law
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               These Terms shall be governed by the laws of South Sudan, without
               regard to its conflict of law provisions. Any disputes arising
               from these terms shall be resolved in the courts of South Sudan.
@@ -180,10 +180,10 @@ const TermsOfService = () => {
 
           {/* Changes to Terms */}
           <section>
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Changes to Terms
             </h2>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed">
               We reserve the right to modify or replace these Terms at any time.
               We will provide notice of significant changes by posting the new
               Terms on this page and updating the "Last updated" date.
@@ -192,11 +192,11 @@ const TermsOfService = () => {
 
           {/* Contact Information */}
           <section className="bg-purple-500/10 p-6 rounded-xl border border-purple-500/20">
-            <h2 className="text-xl font-bold text-white mb-3">Contact Us</h2>
-            <p className="text-gray-300 mb-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Contact Us</h2>
+            <p className="text-gray-600 mb-2">
               For questions about these Terms, please contact us:
             </p>
-            <ul className="text-gray-300 space-y-1">
+            <ul className="text-gray-600 space-y-1">
               <li>📧 Email: legal@fancytechintegration.com</li>
               <li>📞 Phone: +211 929 097920</li>
               <li>💬 WhatsApp: +211 929 097920</li>

@@ -59,7 +59,7 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200">
       <h2 className="text-3xl font-bold mb-2">
         <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
           Send us a Message
@@ -76,7 +76,7 @@ const ContactForm = () => {
             Full Name *
           </label>
           <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               name="name"
@@ -85,7 +85,7 @@ const ContactForm = () => {
               onFocus={() => setFocusedField("name")}
               onBlur={() => setFocusedField(null)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="John Sebit"
             />
           </div>
@@ -106,7 +106,7 @@ const ContactForm = () => {
             Email Address *
           </label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="email"
               name="email"
@@ -115,7 +115,7 @@ const ContactForm = () => {
               onFocus={() => setFocusedField("email")}
               onBlur={() => setFocusedField(null)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="john@example.com"
             />
           </div>
@@ -127,7 +127,7 @@ const ContactForm = () => {
             Phone Number
           </label>
           <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="tel"
               name="phone"
@@ -135,7 +135,7 @@ const ContactForm = () => {
               onChange={handleChange}
               onFocus={() => setFocusedField("phone")}
               onBlur={() => setFocusedField(null)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="+211 929 097 920"
             />
           </div>
@@ -147,7 +147,7 @@ const ContactForm = () => {
             Subject *
           </label>
           <div className="relative">
-            <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               name="subject"
@@ -156,7 +156,7 @@ const ContactForm = () => {
               onFocus={() => setFocusedField("subject")}
               onBlur={() => setFocusedField(null)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="How can we help you?"
             />
           </div>
@@ -176,7 +176,7 @@ const ContactForm = () => {
               onBlur={() => setFocusedField(null)}
               required
               rows="5"
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-4 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-4 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="Tell us more about your needs..."
             />
           </div>
@@ -188,7 +188,7 @@ const ContactForm = () => {
           disabled={isSubmitting}
           whileHover={!isSubmitting ? { scale: 1.02 } : {}}
           whileTap={!isSubmitting ? { scale: 0.98 } : {}}
-          className={`w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden ${
+          className={`w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden ${
             isSubmitting ? "opacity-75 cursor-not-allowed" : ""
           }`}
         >

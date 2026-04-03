@@ -16,7 +16,7 @@ const ArticleHero = ({ article, categoryLabels, formatDate }) => {
     categoryColors[article.category] || "from-purple-400 to-blue-400";
 
   return (
-    <section className="relative pt-32 pb-16 overflow-hidden bg-gray-900">
+    <section className="relative pt-32 pb-16 overflow-hidden bg-gray-50">
       {/* Animated background */}
       <div className="absolute inset-0">
         <div
@@ -55,7 +55,7 @@ const ArticleHero = ({ article, categoryLabels, formatDate }) => {
           className="inline-block mb-6"
         >
           <span
-            className={`bg-gradient-to-r ${color} text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg`}
+            className={`bg-gradient-to-r ${color} text-gray-900 px-6 py-2 rounded-full text-sm font-semibold shadow-lg`}
           >
             {categoryLabels[article.category] || article.category}
           </span>
@@ -84,7 +84,7 @@ const ArticleHero = ({ article, categoryLabels, formatDate }) => {
             <User size={16} className="text-purple-400" />
             <span>
               By{" "}
-              <span className="text-white font-medium">
+              <span className="text-gray-900 font-medium">
                 {article.author?.name || "Admin"}
               </span>
             </span>
@@ -121,7 +121,7 @@ const ArticleHero = ({ article, categoryLabels, formatDate }) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+            className="flex items-center gap-2 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white/10 transition-all"
           >
             <Share2 size={16} />
             Share
@@ -130,7 +130,7 @@ const ArticleHero = ({ article, categoryLabels, formatDate }) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+            className="flex items-center gap-2 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white/10 transition-all"
           >
             <Bookmark size={16} />
             Save

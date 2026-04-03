@@ -16,7 +16,7 @@ const ActionButtons = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
+          className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
         >
           <span className="relative z-10 flex items-center gap-2">
             <ShoppingBag size={18} />
@@ -35,7 +35,7 @@ const ActionButtons = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full bg-white/5 border border-white/10 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
         >
           <Headphones size={18} />
           Contact Support

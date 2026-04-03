@@ -46,8 +46,8 @@ const ProductsPagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === 1}
         className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
           currentPage === 1
-            ? "bg-gray-800/50 text-gray-600 cursor-not-allowed"
-            : "bg-gray-800/50 text-white hover:bg-purple-500/20 border border-white/10 hover:border-purple-500"
+            ? "bg-gray-500 text-gray-600 cursor-not-allowed"
+            : "bg-gray-500 text-gray-900 hover:bg-purple-500/20 border border-gray-200 hover:border-purple-500"
         }`}
       >
         <ChevronLeft size={18} />
@@ -57,7 +57,7 @@ const ProductsPagination = ({ currentPage, totalPages, onPageChange }) => {
       {getPageNumbers().map((page, index) => (
         <React.Fragment key={index}>
           {page === "..." ? (
-            <span className="w-10 h-10 flex items-center justify-center text-gray-500">
+            <span className="w-10 h-10 flex items-center justify-center text-gray-400">
               ...
             </span>
           ) : (
@@ -67,8 +67,8 @@ const ProductsPagination = ({ currentPage, totalPages, onPageChange }) => {
               onClick={() => onPageChange(page)}
               className={`w-10 h-10 rounded-lg font-medium transition-all ${
                 currentPage === page
-                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30"
-                  : "bg-gray-800/50 text-gray-400 hover:text-white border border-white/10 hover:border-purple-500"
+                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 shadow-md"
+                  : "bg-gray-500 text-gray-400 hover:text-gray-900 border border-gray-200 hover:border-purple-500"
               }`}
             >
               {page}
@@ -85,8 +85,8 @@ const ProductsPagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === totalPages}
         className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
           currentPage === totalPages
-            ? "bg-gray-800/50 text-gray-600 cursor-not-allowed"
-            : "bg-gray-800/50 text-white hover:bg-purple-500/20 border border-white/10 hover:border-purple-500"
+            ? "bg-gray-500 text-gray-600 cursor-not-allowed"
+            : "bg-gray-500 text-gray-900 hover:bg-purple-500/20 border border-gray-200 hover:border-purple-500"
         }`}
       >
         <ChevronRight size={18} />

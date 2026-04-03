@@ -8,11 +8,11 @@ const OrderFilters = ({ filters, setFilters, onClear }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-6"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-6"
     >
       <div className="flex items-center gap-2 mb-4">
         <Filter className="w-5 h-5 text-purple-400" />
-        <h2 className="text-lg font-semibold text-white">Filter Orders</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Filter Orders</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -24,24 +24,24 @@ const OrderFilters = ({ filters, setFilters, onClear }) => {
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
           >
-            <option value="" className="bg-gray-800">
+            <option value="" className="bg-white">
               All Statuses
             </option>
-            <option value="pending" className="bg-gray-800">
+            <option value="pending" className="bg-white">
               Pending
             </option>
-            <option value="processing" className="bg-gray-800">
+            <option value="processing" className="bg-white">
               Processing
             </option>
-            <option value="shipped" className="bg-gray-800">
+            <option value="shipped" className="bg-white">
               Shipped
             </option>
-            <option value="delivered" className="bg-gray-800">
+            <option value="delivered" className="bg-white">
               Delivered
             </option>
-            <option value="cancelled" className="bg-gray-800">
+            <option value="cancelled" className="bg-white">
               Cancelled
             </option>
           </select>
@@ -57,21 +57,21 @@ const OrderFilters = ({ filters, setFilters, onClear }) => {
             onChange={(e) =>
               setFilters({ ...filters, paymentStatus: e.target.value })
             }
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
           >
-            <option value="" className="bg-gray-800">
+            <option value="" className="bg-white">
               All Payment Statuses
             </option>
-            <option value="pending" className="bg-gray-800">
+            <option value="pending" className="bg-white">
               Pending
             </option>
-            <option value="paid" className="bg-gray-800">
+            <option value="paid" className="bg-white">
               Paid
             </option>
-            <option value="failed" className="bg-gray-800">
+            <option value="failed" className="bg-white">
               Failed
             </option>
-            <option value="refunded" className="bg-gray-800">
+            <option value="refunded" className="bg-white">
               Refunded
             </option>
           </select>
@@ -83,7 +83,7 @@ const OrderFilters = ({ filters, setFilters, onClear }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClear}
-            className="w-full bg-white/5 border border-white/10 text-gray-300 px-4 py-3 rounded-lg font-medium hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
+            className="w-full bg-gray-50 border border-gray-200 text-gray-600 px-4 py-3 rounded-lg font-medium hover:bg-white/10 hover:text-gray-900 transition-all flex items-center justify-center gap-2"
           >
             <X size={18} />
             Clear Filters
@@ -96,7 +96,7 @@ const OrderFilters = ({ filters, setFilters, onClear }) => {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/10"
+          className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-200"
         >
           <span className="text-sm text-gray-400">Active filters:</span>
           {filters.status && (

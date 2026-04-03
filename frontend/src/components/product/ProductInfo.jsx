@@ -79,7 +79,7 @@ const ProductInfo = ({ product }) => {
         <motion.span
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400 mb-4"
+          className="inline-block bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400 mb-4"
         >
           {categoryLabels[product.category] || product.category}
         </motion.span>
@@ -145,8 +145,8 @@ const ProductInfo = ({ product }) => {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-purple-500/20">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-6 border border-purple-500/20">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full" />
                 Technical Specifications
               </h3>
@@ -160,7 +160,7 @@ const ProductInfo = ({ product }) => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors"
+                      className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 group hover:bg-white/10 transition-colors"
                     >
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 p-1.5 group-hover:scale-110 transition-transform">
                         <Icon className="w-full h-full text-purple-400" />
@@ -169,7 +169,7 @@ const ProductInfo = ({ product }) => {
                         <p className="text-xs text-gray-400 capitalize">
                           {key.replace(/([A-Z])/g, " $1").trim()}
                         </p>
-                        <p className="text-sm font-semibold text-white">
+                        <p className="text-sm font-semibold text-gray-900">
                           {value}
                         </p>
                       </div>
@@ -187,14 +187,14 @@ const ProductInfo = ({ product }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-xl p-6 border border-gray-200"
       >
         <div className="flex items-baseline gap-4 mb-4">
           <span className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
             $ {product.price?.toLocaleString()}
           </span>
           {product.originalPrice && (
-            <span className="text-xl text-gray-500 line-through">
+            <span className="text-xl text-gray-400 line-through">
               $ {product.originalPrice.toLocaleString()}
             </span>
           )}
@@ -239,8 +239,8 @@ const ProductInfo = ({ product }) => {
           disabled={!product.inStock}
           className={`w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 relative overflow-hidden group ${
             product.inStock
-              ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/30"
-              : "bg-gray-700 cursor-not-allowed text-gray-400"
+              ? "bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 hover:shadow-lg hover:shadow-purple-500/30"
+              : "bg-gray-100 cursor-not-allowed text-gray-400"
           } transition-all duration-300`}
         >
           {product.inStock ? (
@@ -270,12 +270,12 @@ const ProductInfo = ({ product }) => {
           <motion.div
             key={index}
             whileHover={{ y: -3 }}
-            className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 text-center group"
+            className="bg-gray-500 backdrop-blur-sm rounded-xl p-4 border border-gray-200 text-center group"
           >
             <div
               className={`w-10 h-10 rounded-full bg-gradient-to-r ${feature.color} p-2 mx-auto mb-2 group-hover:scale-110 transition-transform`}
             >
-              <feature.icon className="w-full h-full text-white" />
+              <feature.icon className="w-full h-full text-gray-900" />
             </div>
             <p className="text-xs text-gray-400">{feature.text}</p>
           </motion.div>

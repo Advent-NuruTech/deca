@@ -19,7 +19,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
     name: product?.name || "",
     description: product?.description || "",
     features: product?.features || "",
-    category: product?.category || "starlink",
+    category: product?.category || "seeds", // changed default
     price: product?.price || "",
     originalPrice: product?.originalPrice || "",
     inStock: product?.inStock !== false,
@@ -36,14 +36,13 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
 
-  // Update formData when product changes or modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData({
         name: product?.name || "",
         description: product?.description || "",
         features: product?.features || "",
-        category: product?.category || "starlink",
+        category: product?.category || "seeds",
         price: product?.price || "",
         originalPrice: product?.originalPrice || "",
         inStock: product?.inStock !== false,
@@ -74,7 +73,6 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
     if (files.length === 0) return;
 
     setUploading(true);
-
     try {
       const uploadPromises = files.map(async (file) => {
         const formData = new FormData();
@@ -82,24 +80,18 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
         const response = await api.post("/upload", formData);
         return response.data;
       });
-
       const responses = await Promise.all(uploadPromises);
       const imagePaths = responses
-        .map((res) => {
-          return (
+        .map(
+          (res) =>
             res.path ||
             res.url ||
             res.secure_url ||
             res.data?.path ||
-            res.data?.url
-          );
-        })
+            res.data?.url,
+        )
         .filter(Boolean);
-
-      if (imagePaths.length === 0) {
-        throw new Error("No image URLs returned from server");
-      }
-
+      if (imagePaths.length === 0) throw new Error("No image URLs returned");
       setFormData((prev) => ({
         ...prev,
         images: [...prev.images, ...imagePaths],
@@ -123,35 +115,27 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formData.name || !formData.name.trim()) {
+    if (!formData.name?.trim()) {
       toast.error("Product name is required");
       setActiveTab("basic");
       return;
     }
-
-    if (!formData.description || !formData.description.trim()) {
+    if (!formData.description?.trim()) {
       toast.error("Product description is required");
       setActiveTab("basic");
       return;
     }
-    if (!formData.features || !formData.features.trim()) {
+    if (!formData.features?.trim()) {
       toast.error("Product features are required");
       setActiveTab("basic");
       return;
     }
-
     if (!formData.price || formData.price === "") {
       toast.error("Product price is required");
       setActiveTab("pricing");
       return;
     }
-
-    // Parse price - use existing price if editing and new price is invalid
-    const priceValue = formData.price
-      ? parseFloat(formData.price)
-      : product?.price || 0;
-
+    const priceValue = parseFloat(formData.price);
     if (isNaN(priceValue) || priceValue <= 0) {
       toast.error("Please enter a valid price");
       setActiveTab("pricing");
@@ -164,22 +148,19 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
       description: formData.description.trim(),
       features: formData.features.trim(),
       price: priceValue,
-      originalPrice:
-        formData.originalPrice && formData.originalPrice !== ""
-          ? parseFloat(formData.originalPrice)
-          : undefined,
-      stockQuantity:
-        formData.stockQuantity && formData.stockQuantity !== ""
-          ? parseInt(formData.stockQuantity) || 0
-          : 0,
+      originalPrice: formData.originalPrice
+        ? parseFloat(formData.originalPrice)
+        : undefined,
+      stockQuantity: formData.stockQuantity
+        ? parseInt(formData.stockQuantity) || 0
+        : 0,
       seoKeywords: formData.seoKeywords
         ? formData.seoKeywords
             .split(",")
             .map((k) => k.trim())
-            .filter((k) => k)
+            .filter(Boolean)
         : [],
     };
-
     onSubmit(productData);
   };
 
@@ -202,7 +183,6 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
             onClick={onClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           />
-
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -210,9 +190,9 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
             className="fixed inset-4 md:inset-10 z-50 overflow-y-auto"
           >
             <div className="min-h-full flex items-center justify-center">
-              <div className="bg-gray-800/95 backdrop-blur-xl rounded-2xl border border-white/10 w-full max-w-4xl shadow-2xl">
+              <div className="bg-white/95  rounded-2xl border border-gray-200 w-full max-w-4xl shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold">
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                       {product ? "Edit Product" : "Add New Product"}
@@ -222,14 +202,14 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={onClose}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                    className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
                   >
                     <X size={20} />
                   </motion.button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b border-white/10 overflow-x-auto">
+                <div className="flex border-b border-gray-200 overflow-x-auto">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -237,7 +217,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                       className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                         activeTab === tab.id
                           ? "text-purple-400 border-b-2 border-purple-400"
-                          : "text-gray-400 hover:text-white"
+                          : "text-gray-400 hover:text-gray-900"
                       }`}
                     >
                       <tab.icon size={16} />
@@ -261,7 +241,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="Enter product name"
                           />
                         </div>
@@ -275,31 +255,16 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             value={formData.category}
                             onChange={handleChange}
                             required
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                           >
-                            <option value="starlink" className="bg-gray-800">
-                              Starlink
+                            <option value="seeds" className="bg-white">
+                              Organic Seeds
                             </option>
-                            <option value="networking" className="bg-gray-800">
-                              Networking
+                            <option value="produce" className="bg-white">
+                              Fresh Produce
                             </option>
-                            <option value="accesspoint" className="bg-gray-800">
-                              Access Point
-                            </option>
-                            <option value="router" className="bg-gray-800">
-                              Router
-                            </option>
-                            <option value="cctv" className="bg-gray-800">
-                              CCTV
-                            </option>
-                            <option value="laptop" className="bg-gray-800">
-                              Laptop
-                            </option>
-                            <option value="phone" className="bg-gray-800">
-                              Phone
-                            </option>
-                            <option value="software" className="bg-gray-800">
-                              Software
+                            <option value="other" className="bg-white">
+                              Other Products
                             </option>
                           </select>
                         </div>
@@ -314,7 +279,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             onChange={handleChange}
                             required
                             rows="4"
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="Enter product description"
                           />
                         </div>
@@ -329,7 +294,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             onChange={handleChange}
                             required
                             rows="4"
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="Enter product features (comma-separated or bullet points)"
                           />
                         </div>
@@ -337,28 +302,28 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-400 mb-2">
-                              Brand
+                              Brand (optional)
                             </label>
                             <input
                               type="text"
                               name="brand"
                               value={formData.brand}
                               onChange={handleChange}
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
-                              placeholder="e.g., Dell, HP, Starlink"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="e.g., Organic Farms"
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-400 mb-2">
-                              Model
+                              Variety / Model (optional)
                             </label>
                             <input
                               type="text"
                               name="model"
                               value={formData.model}
                               onChange={handleChange}
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
-                              placeholder="e.g., XPS 15, Gen 2"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="e.g., Heirloom Tomato"
                             />
                           </div>
                         </div>
@@ -380,7 +345,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                               onChange={handleChange}
                               required
                               step="0.01"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="0.00"
                             />
                           </div>
@@ -394,7 +359,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                               value={formData.originalPrice}
                               onChange={handleChange}
                               step="0.01"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="0.00"
                             />
                           </div>
@@ -410,7 +375,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                               name="stockQuantity"
                               value={formData.stockQuantity}
                               onChange={handleChange}
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="0"
                             />
                           </div>
@@ -421,9 +386,9 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                                 name="inStock"
                                 checked={formData.inStock}
                                 onChange={handleChange}
-                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500/50"
+                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
                               />
-                              <span className="text-sm text-gray-300">
+                              <span className="text-sm text-gray-600">
                                 In Stock
                               </span>
                             </label>
@@ -433,9 +398,9 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                                 name="featured"
                                 checked={formData.featured}
                                 onChange={handleChange}
-                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500/50"
+                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
                               />
-                              <span className="text-sm text-gray-300">
+                              <span className="text-sm text-gray-600">
                                 Featured
                               </span>
                             </label>
@@ -450,15 +415,15 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             name="status"
                             value={formData.status}
                             onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                           >
-                            <option value="active" className="bg-gray-800">
+                            <option value="active" className="bg-white">
                               Active
                             </option>
-                            <option value="inactive" className="bg-gray-800">
+                            <option value="inactive" className="bg-white">
                               Inactive
                             </option>
-                            <option value="draft" className="bg-gray-800">
+                            <option value="draft" className="bg-white">
                               Draft
                             </option>
                           </select>
@@ -466,14 +431,14 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                       </div>
                     )}
 
-                    {/* Media Tab */}
+                    {/* Media Tab (unchanged) */}
                     {activeTab === "media" && (
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-400 mb-2">
                             Product Images
                           </label>
-                          <div className="border-2 border-dashed border-white/10 rounded-lg p-6 text-center hover:border-purple-500/50 transition-colors">
+                          <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-purple-500/50 transition-colors">
                             <input
                               type="file"
                               multiple
@@ -491,7 +456,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                               <span className="text-sm text-gray-400">
                                 Click to upload or drag and drop
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-gray-400">
                                 PNG, JPG, GIF up to 10MB
                               </span>
                             </label>
@@ -503,7 +468,6 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             </div>
                           )}
                         </div>
-
                         {formData.images.length > 0 && (
                           <div className="grid grid-cols-4 gap-4">
                             {formData.images.map((img, index) => (
@@ -511,12 +475,12 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                                 <img
                                   src={getImageUrl(img)}
                                   alt={`Preview ${index + 1}`}
-                                  className="w-full h-24 object-cover rounded-lg border border-white/10"
+                                  className="w-full h-24 object-cover rounded-lg border border-gray-200"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveImage(index)}
-                                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-gray-900 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                   ×
                                 </button>
@@ -527,7 +491,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                       </div>
                     )}
 
-                    {/* SEO Tab */}
+                    {/* SEO Tab (unchanged) */}
                     {activeTab === "seo" && (
                       <div className="space-y-4">
                         <div>
@@ -539,11 +503,10 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             name="seoTitle"
                             value={formData.seoTitle}
                             onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="Enter SEO title"
                           />
                         </div>
-
                         <div>
                           <label className="block text-sm font-medium text-gray-400 mb-2">
                             SEO Description
@@ -553,11 +516,10 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             value={formData.seoDescription}
                             onChange={handleChange}
                             rows="3"
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="Enter SEO description"
                           />
                         </div>
-
                         <div>
                           <label className="block text-sm font-medium text-gray-400 mb-2">
                             SEO Keywords
@@ -567,17 +529,17 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             name="seoKeywords"
                             value={formData.seoKeywords}
                             onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             placeholder="keyword1, keyword2, keyword3"
                           />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             Comma-separated keywords
                           </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Advanced Tab */}
+                    {/* Advanced Tab (unchanged) */}
                     {activeTab === "advanced" && (
                       <div className="space-y-4">
                         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
@@ -586,7 +548,6 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             Incorrect configurations may affect product display.
                           </p>
                         </div>
-
                         <div>
                           <label className="block text-sm font-medium text-gray-400 mb-2">
                             Product Slug
@@ -595,14 +556,13 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             type="text"
                             value={product?.slug || ""}
                             disabled
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed"
                             placeholder="Auto-generated from name"
                           />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             Slug is auto-generated from product name
                           </p>
                         </div>
-
                         <div>
                           <label className="block text-sm font-medium text-gray-400 mb-2">
                             Product ID
@@ -611,7 +571,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                             type="text"
                             value={product?._id || "Will be generated"}
                             disabled
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed"
                           />
                         </div>
                       </div>
@@ -619,13 +579,13 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                   </div>
 
                   {/* Footer */}
-                  <div className="flex justify-end gap-4 p-6 border-t border-white/10">
+                  <div className="flex justify-end gap-4 p-6 border-t border-gray-200">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       type="button"
                       onClick={onClose}
-                      className="px-6 py-2 bg-white/5 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-white/10 hover:text-white transition-all"
+                      className="px-6 py-2 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-white/10 hover:text-gray-900 transition-all"
                     >
                       Cancel
                     </motion.button>
@@ -633,7 +593,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit }) => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       type="submit"
-                      className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                      className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 rounded-lg font-medium hover:shadow-lg transition-all"
                     >
                       {product ? "Update Product" : "Create Product"}
                     </motion.button>

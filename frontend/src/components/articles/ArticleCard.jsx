@@ -55,7 +55,7 @@ const ArticleCard = ({ article, index }) => {
 
       <Link
         to={`/articles/${article.slug}`}
-        className="relative block h-full bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group-hover:border-transparent transition-all duration-500"
+        className="relative block h-full bg-gray-500 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200 group-hover:border-transparent transition-all duration-500"
       >
         {/* Image Container */}
         {article.featuredImage && (
@@ -75,13 +75,13 @@ const ArticleCard = ({ article, index }) => {
             <motion.div
               initial={{ x: -100 }}
               animate={{ x: 0 }}
-              className={`absolute top-4 left-4 bg-gradient-to-r ${color} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
+              className={`absolute top-4 left-4 bg-gradient-to-r ${color} text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
             >
               {categoryLabels[article.category] || article.category}
             </motion.div>
 
             {/* Read Time */}
-            <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+            <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-gray-900 text-xs px-2 py-1 rounded-full flex items-center gap-1">
               <Clock size={12} />
               <span>{getReadTime(article.content)} min read</span>
             </div>
@@ -92,7 +92,7 @@ const ArticleCard = ({ article, index }) => {
         <div className="p-6">
           {/* Title */}
           <h3
-            className={`text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${color} transition-all duration-300 line-clamp-2`}
+            className={`text-xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${color} transition-all duration-300 line-clamp-2`}
           >
             {article.title}
           </h3>
@@ -103,7 +103,7 @@ const ArticleCard = ({ article, index }) => {
           </p>
 
           {/* Meta Info */}
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
             <div className="flex items-center gap-1">
               <User size={12} />
               <span>{article.author?.name || "Admin"}</span>
@@ -122,7 +122,7 @@ const ArticleCard = ({ article, index }) => {
               {article.tags.slice(0, 3).map((tag, tagIndex) => (
                 <span
                   key={tagIndex}
-                  className="text-xs bg-white/5 text-gray-400 px-2 py-1 rounded-full border border-white/10"
+                  className="text-xs bg-gray-50 text-gray-400 px-2 py-1 rounded-full border border-gray-200"
                 >
                   #{tag}
                 </span>

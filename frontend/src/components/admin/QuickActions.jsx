@@ -63,7 +63,7 @@ const QuickActions = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
     >
       <h2 className="text-xl font-bold mb-6">
         <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -82,15 +82,15 @@ const QuickActions = () => {
           >
             <Link
               to={action.path}
-              className="block p-4 bg-white/5 rounded-xl border border-white/10 hover:border-purple-500/50 transition-all group"
+              className="block p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-purple-500/50 transition-all group"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div
                   className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} p-2`}
                 >
-                  <action.icon className="w-full h-full text-white" />
+                  <action.icon className="w-full h-full text-gray-900" />
                 </div>
-                <span className="font-semibold text-white group-hover:text-purple-400 transition-colors">
+                <span className="font-semibold text-gray-900 group-hover:text-purple-400 transition-colors">
                   {action.label}
                 </span>
               </div>

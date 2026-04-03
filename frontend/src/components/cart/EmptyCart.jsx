@@ -10,7 +10,7 @@ const EmptyCart = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-16 text-center border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-16 text-center border border-gray-200"
     >
       <motion.div
         animate={{
@@ -40,7 +40,7 @@ const EmptyCart = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
+          className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
         >
           Browse Products
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

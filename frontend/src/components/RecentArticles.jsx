@@ -9,7 +9,7 @@ const RecentArticles = ({ recentArticles, articlesLoading }) => {
   if (!recentArticles.length && !articlesLoading) return null;
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Animated background */}
       <div className="absolute inset-0">
         <div
@@ -65,7 +65,7 @@ const RecentArticles = ({ recentArticles, articlesLoading }) => {
             transition={{ delay: 0.2, type: "spring" }}
             className="inline-block mb-4"
           >
-            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
               📰 LATEST UPDATES
             </span>
           </motion.div>
@@ -114,7 +114,7 @@ const RecentArticles = ({ recentArticles, articlesLoading }) => {
                 >
                   <Link
                     to="/articles"
-                    className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm border border-white/10 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/5 transition-all duration-300"
+                    className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm border border-gray-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-50 transition-all duration-300"
                   >
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                       Read All Articles
@@ -129,7 +129,7 @@ const RecentArticles = ({ recentArticles, articlesLoading }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
-                className="flex items-center justify-center gap-2 mt-8 text-gray-500"
+                className="flex items-center justify-center gap-2 mt-8 text-gray-400"
               >
                 <Calendar size={16} />
                 <span className="text-sm">

@@ -60,10 +60,10 @@ const ProductCard = ({ product }) => {
           className={`absolute -inset-0.5 bg-gradient-to-r ${gradient} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
         />
 
-        <div className="relative h-full bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 group-hover:border-transparent transition-all duration-500">
+        <div className="relative h-full bg-gray-500 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200 group-hover:border-transparent transition-all duration-500">
           {/* Image container */}
           <Link to={`/products/${product.slug}`} className="block">
-            <div className="relative h-56 overflow-hidden bg-gray-900">
+            <div className="relative h-56 overflow-hidden bg-gray-50">
               {product.images && product.images.length > 0 ? (
                 <motion.img
                   src={getImageUrl(product.images[0])}
@@ -88,7 +88,7 @@ const ProductCard = ({ product }) => {
                   animate={{ x: 0 }}
                   className="absolute top-4 right-4"
                 >
-                  <span className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                  <span className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                     <Star size={12} />
                     Featured
                   </span>
@@ -99,7 +99,7 @@ const ProductCard = ({ product }) => {
               <motion.div
                 initial={{ x: -100 }}
                 animate={{ x: 0 }}
-                className={`absolute top-4 left-4 bg-gradient-to-r ${gradient} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
+                className={`absolute top-4 left-4 bg-gradient-to-r ${gradient} text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
               >
                 {categoryLabels[product.category] || product.category}
               </motion.div>
@@ -107,7 +107,7 @@ const ProductCard = ({ product }) => {
               {/* Stock status badge */}
               {!product.inStock && (
                 <div className="absolute bottom-4 left-4 right-4">
-                  <span className="block bg-red-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full text-center">
+                  <span className="block bg-red-500/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-3 py-1 rounded-full text-center">
                     Out of Stock
                   </span>
                 </div>
@@ -119,7 +119,7 @@ const ProductCard = ({ product }) => {
           <div className="p-5">
             <Link to={`/products/${product.slug}`} className="block group/link">
               <h3
-                className={`text-lg font-bold mb-2 text-white group-hover/link:text-transparent group-hover/link:bg-clip-text group-hover/link:bg-gradient-to-r ${gradient} transition-all duration-300 line-clamp-2`}
+                className={`text-lg font-bold mb-2 text-gray-900 group-hover/link:text-transparent group-hover/link:bg-clip-text group-hover/link:bg-gradient-to-r ${gradient} transition-all duration-300 line-clamp-2`}
               >
                 {product.name}
               </h3>
@@ -138,7 +138,7 @@ const ProductCard = ({ product }) => {
                   ${product.price?.toLocaleString()}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-sm text-gray-500 line-through ml-2">
+                  <span className="text-sm text-gray-400 line-through ml-2">
                     ${product.originalPrice.toLocaleString()}
                   </span>
                 )}
@@ -160,10 +160,10 @@ const ProductCard = ({ product }) => {
               disabled={!product.inStock}
               whileHover={product.inStock ? { scale: 1.02 } : {}}
               whileTap={product.inStock ? { scale: 0.98 } : {}}
-              className={`w-full py-3 rounded-lg font-medium text-white transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`w-full py-3 rounded-lg font-medium text-gray-900 transition-all duration-300 flex items-center justify-center gap-2 ${
                 product.inStock
                   ? `bg-gradient-to-r ${gradient} hover:shadow-lg hover:shadow-purple-500/30`
-                  : "bg-gray-700 cursor-not-allowed opacity-50"
+                  : "bg-gray-100 cursor-not-allowed opacity-50"
               }`}
             >
               <ShoppingCart size={18} />

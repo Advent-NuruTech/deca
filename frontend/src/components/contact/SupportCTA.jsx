@@ -5,7 +5,7 @@ import { Headphones, Phone } from "lucide-react";
 
 const SupportCTA = () => {
   return (
-    <section className="py-20 bg-gray-800">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -15,7 +15,7 @@ const SupportCTA = () => {
             className="inline-block mb-6"
           >
             <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-4 mx-auto">
-              <Headphones className="w-full h-full text-white" />
+              <Headphones className="w-full h-full text-gray-900" />
             </div>
           </motion.div>
 
@@ -33,7 +33,7 @@ const SupportCTA = () => {
           <motion.a
             href="tel:+254759466446"
             whileHover={{ scale: 1.05 }}
-            className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
           >
             <Phone size={20} />
             Call Us Now: +211 920 532 819

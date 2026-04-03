@@ -7,7 +7,7 @@ import AnimatedSection from "./AnimatedSection";
 
 const CTASection = () => {
   return (
-    <section className="relative py-32 overflow-hidden bg-gray-900">
+    <section className="relative py-32 overflow-hidden bg-gray-50">
       {/* Animated gradient background */}
       <div className="absolute inset-0">
         <motion.div
@@ -70,7 +70,7 @@ const CTASection = () => {
             transition={{ delay: 0.2, type: "spring" }}
             className="inline-block mb-8"
           >
-            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-6 py-3 rounded-full text-sm font-semibold text-purple-400">
+            <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-6 py-3 rounded-full text-sm font-semibold text-purple-400">
               ✦ READY TO GET STARTED? ✦
             </span>
           </motion.div>
@@ -86,7 +86,7 @@ const CTASection = () => {
               Ready to Transform
             </span>
             <br />
-            <span className="text-white">Your Technology?</span>
+            <span className="text-gray-900">Your Technology?</span>
           </motion.h2>
 
           {/* Description */}
@@ -111,7 +111,7 @@ const CTASection = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 to="/contact"
-                className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-10 py-5 rounded-full text-lg font-semibold shadow-2xl shadow-purple-500/30 hover:shadow-blue-500/40 transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-10 py-5 rounded-full text-lg font-semibold shadow-2xl shadow-purple-500/30 hover:shadow-blue-500/40 transition-all duration-300 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Phone size={20} />
@@ -133,7 +133,7 @@ const CTASection = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 to="/products"
-                className="group inline-flex items-center gap-3 bg-transparent border-2 border-purple-500/50 hover:border-purple-500 text-white px-10 py-5 rounded-full text-lg font-semibold backdrop-blur-sm hover:bg-white/5 transition-all duration-300"
+                className="group inline-flex items-center gap-3 bg-transparent border-2 border-purple-500/50 hover:border-purple-500 text-gray-900 px-10 py-5 rounded-full text-lg font-semibold backdrop-blur-sm hover:bg-gray-50 transition-all duration-300"
               >
                 <span>Browse Products</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -146,7 +146,7 @@ const CTASection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
-            className="flex items-center justify-center gap-8 mt-16 text-sm text-gray-500"
+            className="flex items-center justify-center gap-8 mt-16 text-sm text-gray-400"
           >
             <span className="flex items-center gap-2">
               <Sparkles size={16} className="text-purple-400" />

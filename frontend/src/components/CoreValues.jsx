@@ -65,7 +65,7 @@ const CoreValues = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Background with tech pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -110,7 +110,7 @@ const CoreValues = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="inline-block mb-4"
             >
-              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
                 ⚡ OUR PRINCIPLES ⚡
               </span>
             </motion.div>
@@ -139,7 +139,7 @@ const CoreValues = () => {
                     className={`absolute inset-0 bg-gradient-to-r ${value.color} rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500`}
                   />
 
-                  <div className="relative h-full bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300">
+                  <div className="relative h-full bg-gray-500 backdrop-blur-sm rounded-xl p-8 border border-gray-200 hover:border-gray-300 transition-all duration-300">
                     {/* Icon with gradient circle */}
                     <motion.div
                       whileHover={{ rotate: 360 }}
@@ -152,13 +152,13 @@ const CoreValues = () => {
                       <div
                         className={`relative w-16 h-16 rounded-full bg-gradient-to-r ${value.color} p-3 flex items-center justify-center`}
                       >
-                        <value.icon className="w-8 h-8 text-white" />
+                        <value.icon className="w-8 h-8 text-gray-900" />
                       </div>
                     </motion.div>
 
                     {/* Title with gradient on hover */}
                     <h3
-                      className={`text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${value.color} transition-all duration-300`}
+                      className={`text-xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${value.color} transition-all duration-300`}
                     >
                       {value.title}
                     </h3>

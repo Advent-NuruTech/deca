@@ -12,18 +12,20 @@ const RecentProductsTable = ({ products }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 text-center"
       >
         <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
           <Package className="w-8 h-8 text-purple-400" />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">No Products Yet</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          No Products Yet
+        </h3>
         <p className="text-gray-400 mb-6">
           Create your first product to get started
         </p>
         <Link
           to="/admin/products/create"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
         >
           Create Product
         </Link>
@@ -36,7 +38,7 @@ const RecentProductsTable = ({ products }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold">
@@ -55,7 +57,7 @@ const RecentProductsTable = ({ products }) => {
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead>
-            <tr className="border-b border-white/10">
+            <tr className="border-b border-gray-200">
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Product
               </th>
@@ -80,7 +82,7 @@ const RecentProductsTable = ({ products }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="hover:bg-white/5 transition-colors"
+                className="hover:bg-gray-50 transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
@@ -98,10 +100,10 @@ const RecentProductsTable = ({ products }) => {
                       )}
                     </div>
                     <div>
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-gray-900">
                         {product.name}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-400">
                         ID: {product._id.slice(-6)}
                       </div>
                     </div>

@@ -109,20 +109,22 @@ const FloatingActions = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="absolute bottom-20 right-0 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 w-72 overflow-hidden mb-2"
+              className="absolute bottom-20 right-0 bg-gray-50 rounded-2xl shadow-2xl border border-gray-700 w-72 overflow-hidden mb-2"
             >
               {/* Header */}
               <div className="bg-gradient-to-r from-green-600 to-green-500 p-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-white font-semibold">Chat with us</h3>
+                    <h3 className="text-gray-900 font-semibold">
+                      Chat with us
+                    </h3>
                     <p className="text-green-100 text-sm">
                       How can we help you today?
                     </p>
                   </div>
                   <button
                     onClick={() => setIsWhatsAppOpen(false)}
-                    className="text-white/80 hover:text-white bg-black/20 rounded-full p-1"
+                    className="text-gray-900/80 hover:text-gray-900 bg-black/20 rounded-full p-1"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -138,12 +140,12 @@ const FloatingActions = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => openWhatsApp(reply.message)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition-colors text-left group"
+                    className="w-full flex items-center gap-3 p-3 hover:bg-white rounded-xl transition-colors text-left group"
                   >
-                    <div className="p-2 bg-green-500/10 rounded-lg text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                    <div className="p-2 bg-green-500/10 rounded-lg text-green-400 group-hover:bg-green-500 group-hover:text-gray-900 transition-colors">
                       {reply.icon}
                     </div>
-                    <span className="text-gray-300 group-hover:text-white flex-1 text-sm">
+                    <span className="text-gray-600 group-hover:text-gray-900 flex-1 text-sm">
                       {reply.text}
                     </span>
                     <MessageCircle className="w-4 h-4 text-gray-600 group-hover:text-green-400" />
@@ -152,7 +154,7 @@ const FloatingActions = () => {
               </div>
 
               {/* Footer with direct chat option */}
-              <div className="p-3 border-t border-gray-800">
+              <div className="p-3 border-t border-gray-200">
                 <button
                   onClick={() => openWhatsApp("Hello! I have a question.")}
                   className="w-full text-center text-sm text-gray-400 hover:text-green-400 transition-colors"
@@ -169,7 +171,7 @@ const FloatingActions = () => {
           onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className={`bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg shadow-green-500/25 relative transition-all ${
+          className={`bg-green-500 hover:bg-green-600 text-gray-900 rounded-full p-4 shadow-lg shadow-green-500/25 relative transition-all ${
             isWhatsAppOpen ? "rotate-45 bg-green-600" : ""
           }`}
           aria-label="Chat on WhatsApp"
@@ -198,7 +200,7 @@ const FloatingActions = () => {
 
           {/* Unread indicator */}
           {!isWhatsAppOpen && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white text-[10px] flex items-center justify-center text-white font-bold">
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white text-[10px] flex items-center justify-center text-gray-900 font-bold">
               1
             </span>
           )}
@@ -219,7 +221,7 @@ const FloatingActions = () => {
               onClick={scrollToTop}
               whileHover={{ scale: 1.1, y: -5 }}
               whileTap={{ scale: 0.9 }}
-              className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-3 shadow-lg shadow-purple-600/25 group relative"
+              className="bg-purple-600 hover:bg-purple-700 text-gray-900 rounded-full p-3 shadow-lg shadow-purple-600/25 group relative"
               aria-label="Back to top"
             >
               <ChevronUp className="w-5 h-5 md:w-6 md:h-6" />
@@ -242,9 +244,9 @@ const FloatingActions = () => {
               </svg>
 
               {/* Tooltip */}
-              <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-3 py-1.5 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-gray-700">
+              <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-gray-50 text-gray-900 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-gray-700">
                 Back to top
-                <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-gray-900 border-l border-b border-gray-700 rotate-45" />
+                <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-gray-50 border-l border-b border-gray-700 rotate-45" />
               </span>
             </motion.button>
           </motion.div>

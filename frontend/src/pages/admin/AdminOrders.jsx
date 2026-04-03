@@ -62,7 +62,7 @@ const AdminOrders = () => {
         description="Manage customer orders for Fancy Tech Integration South Sudan"
       />
 
-      <div className="min-h-screen bg-gray-900 pt-24 pb-16">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}
           <motion.div
@@ -113,12 +113,12 @@ const AdminOrders = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-16 text-center border border-white/10"
+              className="bg-gray-500 backdrop-blur-sm rounded-2xl p-16 text-center border border-gray-200"
             >
               <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
                 <ShoppingBag size={32} className="text-purple-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 No Orders Found
               </h3>
               <p className="text-gray-400">

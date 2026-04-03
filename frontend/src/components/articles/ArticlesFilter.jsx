@@ -15,11 +15,13 @@ const ArticlesFilter = ({
   const [showFilters, setShowFilters] = React.useState(false);
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Filter className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg font-semibold text-white">Filter Articles</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Filter Articles
+          </h2>
         </div>
         {totalArticles > 0 && (
           <span className="text-sm text-gray-400">
@@ -35,19 +37,19 @@ const ArticlesFilter = ({
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
             <input
               type="text"
               placeholder="Search articles..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
               >
                 <X size={16} />
               </button>
@@ -59,14 +61,10 @@ const ArticlesFilter = ({
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
             >
               {categories.map((cat) => (
-                <option
-                  key={cat.value}
-                  value={cat.value}
-                  className="bg-gray-800"
-                >
+                <option key={cat.value} value={cat.value} className="bg-white">
                   {cat.label}
                 </option>
               ))}
@@ -77,7 +75,7 @@ const ArticlesFilter = ({
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className="md:hidden flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white hover:bg-white/10 transition-colors"
+            className="md:hidden flex items-center justify-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 hover:bg-white/10 transition-colors"
           >
             <Filter size={18} />
             {showFilters ? "Hide Categories" : "Show Categories"}
@@ -88,7 +86,7 @@ const ArticlesFilter = ({
             type="submit"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
+            className="bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
               <Search size={18} />
@@ -116,14 +114,10 @@ const ArticlesFilter = ({
                 setCategory(e.target.value);
                 setShowFilters(false);
               }}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
             >
               {categories.map((cat) => (
-                <option
-                  key={cat.value}
-                  value={cat.value}
-                  className="bg-gray-800"
-                >
+                <option key={cat.value} value={cat.value} className="bg-white">
                   {cat.label}
                 </option>
               ))}
@@ -137,7 +131,7 @@ const ArticlesFilter = ({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/10"
+          className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-200"
         >
           <span className="text-sm text-gray-400">Active filters:</span>
           {category && (
@@ -161,7 +155,7 @@ const ArticlesFilter = ({
               setCategory("");
               setSearch("");
             }}
-            className="text-sm text-gray-500 hover:text-white transition-colors ml-2"
+            className="text-sm text-gray-400 hover:text-gray-900 transition-colors ml-2"
           >
             Clear all
           </button>

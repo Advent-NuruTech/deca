@@ -20,6 +20,8 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import PrivateRoute from "./components/PrivateRoute";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import StudyMaterialsPage from "./pages/StudyMaterialsPage";
+import DonatePage from "./pages/DonatePage";
 
 function App() {
   return (
@@ -76,6 +78,26 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/faith" element={<ArticlesPage category="faith" />} />
+          <Route path="/recipes" element={<ArticlesPage category="recipe" />} />
+          <Route
+            path="/agriculture"
+            element={<ArticlesPage category="agriculture" />}
+          />
+          <Route
+            path="/homeschooling"
+            element={<ArticlesPage category="homeschooling" />}
+          />
+          <Route path="/study-materials" element={<StudyMaterialsPage />} />
+          <Route
+            path="/shop/seeds"
+            element={<ProductsPage category="seeds" />}
+          />
+          <Route
+            path="/shop/produce"
+            element={<ProductsPage category="produce" />}
+          />
+          <Route path="/donate" element={<DonatePage />} />
         </Routes>
       </main>
       <Footer />

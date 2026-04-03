@@ -17,7 +17,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
       transition={{ duration: 0.5 }}
       className="sticky top-24"
     >
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
             Order Summary
@@ -29,7 +29,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <span>
               Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
             </span>
-            <span className="text-white font-medium">
+            <span className="text-gray-900 font-medium">
               $ {subtotal.toLocaleString()}
             </span>
           </div>
@@ -39,9 +39,9 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <span className="text-green-400">Free</span>
           </div>
 
-          <div className="border-t border-white/10 pt-4">
+          <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between text-lg">
-              <span className="text-white font-semibold">Total</span>
+              <span className="text-gray-900 font-semibold">Total</span>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                 $ {subtotal.toLocaleString()}
               </span>
@@ -68,7 +68,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden"
+              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Proceed to Checkout
@@ -86,7 +86,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-white/5 border border-white/10 text-white py-4 rounded-xl font-semibold hover:bg-white/10 transition-all"
+              className="w-full bg-gray-50 border border-gray-200 text-gray-900 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all"
             >
               Continue Shopping
             </motion.button>

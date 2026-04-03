@@ -10,6 +10,9 @@ import {
   Globe,
   Settings,
   Eye,
+  Download,
+  Link as LinkIcon,
+  File,
 } from "lucide-react";
 import { getImageUrl } from "../../utils/constants";
 import api from "../../services/api";
@@ -20,13 +23,15 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     title: article?.title || "",
     content: article?.content || "",
     excerpt: article?.excerpt || "",
-    category: article?.category || "news",
+    category: article?.category || "faith",
     tags: article?.tags?.join(", ") || "",
     published: article?.published || false,
     seoTitle: article?.seoTitle || "",
     seoDescription: article?.seoDescription || "",
     seoKeywords: article?.seoKeywords?.join(", ") || "",
     featuredImage: article?.featuredImage || "",
+    isDownloadable: article?.isDownloadable || false,
+    fileUrl: article?.fileUrl || "",
   });
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
@@ -40,6 +45,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     });
   };
 
+  // Image upload (for featured image)
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -59,6 +65,30 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
       toast.error("Failed to upload image");
     } finally {
       setUploading(false);
+    }
+  };
+
+  // Document upload (for downloadable files)
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", file); // reuse same endpoint
+      const response = await api.post("/upload", uploadFormData);
+      const fileUrl = response.data.secure_url || response.data.url;
+      setFormData((prev) => ({
+        ...prev,
+        fileUrl: fileUrl,
+      }));
+      toast.success("Document uploaded successfully");
+    } catch (error) {
+      toast.error("Failed to upload document");
+    } finally {
+      setUploading(false);
+      e.target.value = ""; // clear input
     }
   };
 
@@ -99,9 +129,9 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
             className="fixed inset-4 md:inset-10 z-50 overflow-y-auto"
           >
             <div className="min-h-full flex items-center justify-center">
-              <div className="bg-gray-800/95 backdrop-blur-xl rounded-2xl border border-white/10 w-full max-w-4xl shadow-2xl">
+              <div className="bg-white/95  rounded-2xl border border-gray-200 w-full max-w-4xl shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold">
                     <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                       {article ? "Edit Article" : "Create New Article"}
@@ -121,7 +151,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={onClose}
-                      className="p-2 text-gray-400 hover:text-white transition-colors"
+                      className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
                     >
                       <X size={20} />
                     </motion.button>
@@ -130,7 +160,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
 
                 {/* Tabs (only show in edit mode) */}
                 {!previewMode && (
-                  <div className="flex border-b border-white/10">
+                  <div className="flex border-b border-gray-200">
                     {tabs.map((tab) => (
                       <button
                         key={tab.id}
@@ -138,7 +168,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors ${
                           activeTab === tab.id
                             ? "text-purple-400 border-b-2 border-purple-400"
-                            : "text-gray-400 hover:text-white"
+                            : "text-gray-400 hover:text-gray-900"
                         }`}
                       >
                         <tab.icon size={16} />
@@ -152,7 +182,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                   /* Preview Mode */
                   <div className="p-6 max-h-[70vh] overflow-y-auto">
                     <div className="prose prose-invert max-w-none">
-                      <h1 className="text-3xl font-bold text-white mb-4">
+                      <h1 className="text-3xl font-bold text-gray-900 mb-4">
                         {formData.title}
                       </h1>
                       {formData.featuredImage && (
@@ -163,9 +193,21 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         />
                       )}
                       <div
-                        className="text-gray-300 whitespace-pre-wrap"
+                        className="text-gray-600 whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{ __html: formData.content }}
                       />
+                      {formData.isDownloadable && formData.fileUrl && (
+                        <div className="mt-6 p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                          <a
+                            href={formData.fileUrl}
+                            download
+                            className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300"
+                          >
+                            <Download size={20} />
+                            Download Study Material
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -185,7 +227,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.title}
                               onChange={handleChange}
                               required
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="Enter article title"
                             />
                           </div>
@@ -199,30 +241,97 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.category}
                               onChange={handleChange}
                               required
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             >
-                              <option value="news" className="bg-gray-800">
-                                News
+                              <option value="faith" className="bg-white">
+                                Faith Blogs
                               </option>
-                              <option value="tutorial" className="bg-gray-800">
-                                Tutorial
+                              <option value="recipe" className="bg-white">
+                                Recipes
                               </option>
-                              <option
-                                value="product-review"
-                                className="bg-gray-800"
-                              >
-                                Product Review
+                              <option value="agriculture" className="bg-white">
+                                Agriculture Tips
                               </option>
                               <option
-                                value="company-update"
-                                className="bg-gray-800"
+                                value="homeschooling"
+                                className="bg-white"
                               >
-                                Company Update
+                                Homeschooling
                               </option>
-                              <option value="tech-tips" className="bg-gray-800">
-                                Tech Tips
+                              <option value="study" className="bg-white">
+                                Study Materials
                               </option>
                             </select>
+                          </div>
+
+                          {/* Downloadable Section */}
+                          <div className="border-t border-gray-200 pt-4">
+                            <label className="flex items-center gap-2 cursor-pointer mb-3">
+                              <input
+                                type="checkbox"
+                                name="isDownloadable"
+                                checked={formData.isDownloadable}
+                                onChange={handleChange}
+                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
+                              />
+                              <span className="text-sm text-gray-600">
+                                This is a downloadable resource (e.g., PDF, DOC,
+                                PPT)
+                              </span>
+                            </label>
+
+                            {formData.isDownloadable && (
+                              <div className="ml-6 space-y-3">
+                                {/* Document Upload Button */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                                    Upload Document (PDF, DOC, DOCX, PPT, PPTX)
+                                  </label>
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="file"
+                                      accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                      onChange={handleDocumentUpload}
+                                      disabled={uploading}
+                                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-400 hover:file:bg-purple-500/30"
+                                    />
+                                    {uploading && (
+                                      <div className="text-purple-400 text-sm animate-pulse">
+                                        Uploading...
+                                      </div>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    Upload to Cloudinary (supports PDF, Word,
+                                    PowerPoint)
+                                  </p>
+                                </div>
+
+                                {/* Or enter URL manually */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                                    Or enter File URL directly
+                                  </label>
+                                  <div className="flex items-center gap-2">
+                                    <LinkIcon
+                                      size={16}
+                                      className="text-gray-400"
+                                    />
+                                    <input
+                                      type="url"
+                                      name="fileUrl"
+                                      value={formData.fileUrl}
+                                      onChange={handleChange}
+                                      placeholder="https://res.cloudinary.com/..."
+                                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                                    />
+                                  </div>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    Paste a direct link to PDF, DOC, etc.
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           <div>
@@ -235,7 +344,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               onChange={handleChange}
                               required
                               rows="3"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="Short description of the article"
                             />
                           </div>
@@ -250,10 +359,10 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               onChange={handleChange}
                               required
                               rows="10"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-sm focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="<p>Your article content here...</p>"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               HTML tags supported: &lt;p&gt;, &lt;h2&gt;,
                               &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;,
                               &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;img&gt;
@@ -269,8 +378,8 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               name="tags"
                               value={formData.tags}
                               onChange={handleChange}
-                              placeholder="technology, tutorial, guide"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="faith, bible, prayer"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             />
                           </div>
 
@@ -278,7 +387,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                             <label className="block text-sm font-medium text-gray-400 mb-2">
                               Featured Image
                             </label>
-                            <div className="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:border-purple-500/50 transition-colors">
+                            <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-purple-500/50 transition-colors">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -312,7 +421,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         </div>
                       )}
 
-                      {/* SEO Tab */}
+                      {/* SEO Tab (unchanged) */}
                       {activeTab === "seo" && (
                         <div className="space-y-4">
                           <div>
@@ -324,11 +433,10 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               name="seoTitle"
                               value={formData.seoTitle}
                               onChange={handleChange}
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="SEO optimized title"
                             />
                           </div>
-
                           <div>
                             <label className="block text-sm font-medium text-gray-400 mb-2">
                               SEO Description
@@ -338,11 +446,10 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.seoDescription}
                               onChange={handleChange}
                               rows="3"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                               placeholder="Meta description for search engines"
                             />
                           </div>
-
                           <div>
                             <label className="block text-sm font-medium text-gray-400 mb-2">
                               SEO Keywords
@@ -353,16 +460,16 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.seoKeywords}
                               onChange={handleChange}
                               placeholder="keyword1, keyword2, keyword3"
-                              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               Comma-separated keywords for search engines
                             </p>
                           </div>
                         </div>
                       )}
 
-                      {/* Settings Tab */}
+                      {/* Settings Tab (unchanged) */}
                       {activeTab === "settings" && (
                         <div className="space-y-4">
                           <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
@@ -370,7 +477,6 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               ⚠️ Publishing settings affect article visibility
                             </p>
                           </div>
-
                           <div>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -378,42 +484,41 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                 name="published"
                                 checked={formData.published}
                                 onChange={handleChange}
-                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500/50"
+                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
                               />
-                              <span className="text-sm text-gray-300">
+                              <span className="text-sm text-gray-600">
                                 Publish immediately
                               </span>
                             </label>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               If unchecked, article will be saved as draft
                             </p>
                           </div>
-
                           {article && (
-                            <div className="pt-4 border-t border-white/10">
+                            <div className="pt-4 border-t border-gray-200">
                               <h3 className="text-sm font-medium text-gray-400 mb-3">
                                 Article Info
                               </h3>
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">Slug:</span>
-                                  <span className="text-gray-300">
+                                  <span className="text-gray-400">Slug:</span>
+                                  <span className="text-gray-600">
                                     {article.slug}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">
+                                  <span className="text-gray-400">
                                     Created:
                                   </span>
-                                  <span className="text-gray-300">
+                                  <span className="text-gray-600">
                                     {new Date(
                                       article.createdAt,
                                     ).toLocaleDateString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">Views:</span>
-                                  <span className="text-gray-300">
+                                  <span className="text-gray-400">Views:</span>
+                                  <span className="text-gray-600">
                                     {article.views || 0}
                                   </span>
                                 </div>
@@ -425,13 +530,13 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end gap-4 p-6 border-t border-white/10">
+                    <div className="flex justify-end gap-4 p-6 border-t border-gray-200">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2 bg-white/5 border border-white/10 text-gray-300 rounded-lg font-medium hover:bg-white/10 hover:text-white transition-all"
+                        className="px-6 py-2 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-white/10 hover:text-gray-900 transition-all"
                       >
                         Cancel
                       </motion.button>
@@ -439,7 +544,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="submit"
-                        className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                        className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 rounded-lg font-medium hover:shadow-lg transition-all"
                       >
                         {article ? "Update Article" : "Create Article"}
                       </motion.button>

@@ -10,7 +10,7 @@ const ProductGallery = ({ images, name }) => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl h-96 flex items-center justify-center text-gray-400 border border-white/10">
+      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl h-96 flex items-center justify-center text-gray-400 border border-gray-200">
         No Image Available
       </div>
     );
@@ -18,7 +18,7 @@ const ProductGallery = ({ images, name }) => {
 
   return (
     <>
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
         {/* Main Image */}
         <div className="relative group">
           <motion.img
@@ -37,7 +37,7 @@ const ProductGallery = ({ images, name }) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsZoomed(true)}
-            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <ZoomIn size={20} />
           </motion.button>
@@ -53,7 +53,7 @@ const ProductGallery = ({ images, name }) => {
                     prev === 0 ? images.length - 1 : prev - 1,
                   )
                 }
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <ChevronLeft size={20} />
               </motion.button>
@@ -65,7 +65,7 @@ const ProductGallery = ({ images, name }) => {
                     prev === images.length - 1 ? 0 : prev + 1,
                   )
                 }
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <ChevronRight size={20} />
               </motion.button>
@@ -113,14 +113,14 @@ const ProductGallery = ({ images, name }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsZoomed(false)}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/90  flex items-center justify-center p-4"
           >
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
               onClick={() => setIsZoomed(false)}
-              className="absolute top-4 right-4 bg-white/10 text-white p-2 rounded-full hover:bg-white/20 transition-colors"
+              className="absolute top-4 right-4 bg-white/10 text-gray-900 p-2 rounded-full hover:bg-white/20 transition-colors"
             >
               <X size={24} />
             </motion.button>

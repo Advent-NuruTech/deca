@@ -53,7 +53,7 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           className="inline-block mb-6"
         >
           <div className="w-24 h-24 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center">
-            <CheckCircle size={48} className="text-white" />
+            <CheckCircle size={48} className="text-gray-900" />
           </div>
         </motion.div>
 
@@ -72,7 +72,7 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-gray-300 text-lg mb-4 max-w-2xl mx-auto"
+          className="text-gray-600 text-lg mb-4 max-w-2xl mx-auto"
         >
           Thank you for your order. We've received your order and will begin
           processing it right away.
@@ -82,13 +82,15 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3"
+          className="inline-flex items-center gap-3 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3"
         >
           <Package size={18} className="text-purple-400" />
-          <span className="text-white font-medium">Order #{orderNumber}</span>
+          <span className="text-gray-900 font-medium">
+            Order #{orderNumber}
+          </span>
           <span className="w-1 h-1 bg-gray-500 rounded-full" />
           <Clock size={18} className="text-blue-400" />
-          <span className="text-gray-300">{formatDate(createdAt)}</span>
+          <span className="text-gray-600">{formatDate(createdAt)}</span>
         </motion.div>
 
         {/* Email notification */}

@@ -68,12 +68,10 @@ const AdminProducts = () => {
     <>
       <SEO
         title="Product Management"
-        description="Manage products for Fancy Tech Integration South Sudan"
+        description="Manage products for Sami Ministry – organic seeds, fresh produce, and other farm products."
       />
-
-      <div className="min-h-screen bg-gray-900 pt-24 pb-16">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -86,7 +84,8 @@ const AdminProducts = () => {
                 </span>
               </h1>
               <p className="text-gray-400">
-                Manage your product inventory, pricing, and availability
+                Manage your organic seeds, fresh produce, and other agricultural
+                products.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -104,7 +103,7 @@ const AdminProducts = () => {
                   setEditingProduct(null);
                   setShowModal(true);
                 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 <Plus size={20} />
                 Add New Product
@@ -112,18 +111,13 @@ const AdminProducts = () => {
             </div>
           </motion.div>
 
-          {/* Stats Cards */}
           <ProductStats products={products} />
-
-          {/* Products Table */}
           <ProductTable
             products={products}
             onEdit={handleEdit}
             onDelete={handleDelete}
             loading={loading}
           />
-
-          {/* Product Modal */}
           <ProductModal
             isOpen={showModal}
             onClose={handleCloseModal}

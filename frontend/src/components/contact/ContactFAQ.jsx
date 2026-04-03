@@ -35,10 +35,10 @@ const ContactFAQ = () => {
   ];
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-2">
-          <HelpCircle className="w-full h-full text-white" />
+          <HelpCircle className="w-full h-full text-gray-900" />
         </div>
         <h2 className="text-2xl font-bold">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -54,13 +54,13 @@ const ContactFAQ = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="border border-white/10 rounded-lg overflow-hidden"
+            className="border border-gray-200 rounded-lg overflow-hidden"
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
             >
-              <span className="text-gray-300 font-medium">{faq.question}</span>
+              <span className="text-gray-600 font-medium">{faq.question}</span>
               <motion.div
                 animate={{ rotate: openIndex === index ? 180 : 0 }}
                 transition={{ duration: 0.2 }}

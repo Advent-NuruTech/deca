@@ -54,7 +54,7 @@ const WhatWeDo = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-20">
         <div
@@ -99,7 +99,7 @@ const WhatWeDo = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="inline-block mb-4"
             >
-              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
                 ✦ OUR SERVICES ✦
               </span>
             </motion.div>
@@ -130,18 +130,18 @@ const WhatWeDo = () => {
                   {/* Animated border gradient */}
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
 
-                  <div className="relative h-full bg-gray-800/90 backdrop-blur-sm rounded-xl p-8 border border-white/10 group-hover:border-transparent transition-all duration-500">
+                  <div className="relative h-full bg-white/90 backdrop-blur-sm rounded-xl p-8 border border-gray-200 group-hover:border-transparent transition-all duration-500">
                     {/* Icon with gradient background */}
                     <motion.div
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.5 }}
                       className={`w-16 h-16 mb-6 rounded-xl bg-gradient-to-r ${service.color} p-3 group-hover:scale-110 transition-transform duration-300`}
                     >
-                      <service.icon className="w-full h-full text-white" />
+                      <service.icon className="w-full h-full text-gray-900" />
                     </motion.div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 transition-all duration-300">
+                    <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 transition-all duration-300">
                       {service.title}
                     </h3>
 
@@ -152,7 +152,7 @@ const WhatWeDo = () => {
                     {/* Learn more link */}
                     <motion.a
                       href="#"
-                      className="inline-flex items-center gap-2 text-sm text-gray-500 group-hover:text-purple-400 transition-colors"
+                      className="inline-flex items-center gap-2 text-sm text-gray-400 group-hover:text-purple-400 transition-colors"
                       whileHover={{ x: 5 }}
                     >
                       Learn more <ArrowRight size={14} />
@@ -181,7 +181,7 @@ const WhatWeDo = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300"
+              className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300"
             >
               Explore All Services
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

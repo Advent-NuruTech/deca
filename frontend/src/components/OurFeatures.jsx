@@ -44,7 +44,7 @@ const OurFeatures = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Animated background */}
       <div className="absolute inset-0">
         <div
@@ -85,7 +85,7 @@ const OurFeatures = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="inline-block mb-4"
             >
-              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
                 ⚡ WHY CHOOSE US ⚡
               </span>
             </motion.div>
@@ -115,7 +115,7 @@ const OurFeatures = () => {
                   className={`absolute -inset-0.5 bg-gradient-to-r ${feature.color} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
                 />
 
-                <div className="relative h-full bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-white/10 group-hover:border-transparent transition-all duration-500 overflow-hidden">
+                <div className="relative h-full bg-gray-500 backdrop-blur-sm rounded-xl p-8 border border-gray-200 group-hover:border-transparent transition-all duration-500 overflow-hidden">
                   {/* Background shine effect */}
                   <motion.div
                     animate={{ x: ["0%", "200%"] }}
@@ -139,13 +139,13 @@ const OurFeatures = () => {
                     <div
                       className={`relative w-20 h-20 rounded-full bg-gradient-to-r ${feature.color} p-4 flex items-center justify-center`}
                     >
-                      <feature.icon className="w-full h-full text-white" />
+                      <feature.icon className="w-full h-full text-gray-900" />
                     </div>
                   </motion.div>
 
                   {/* Content */}
                   <h3
-                    className={`text-2xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${feature.color} transition-all duration-300`}
+                    className={`text-2xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${feature.color} transition-all duration-300`}
                   >
                     {feature.title}
                   </h3>
@@ -173,7 +173,7 @@ const OurFeatures = () => {
 
         {/* Stats bar */}
         <AnimatedSection delay={0.5} direction="up" className="mt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-white/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-gray-200">
             {[
               { value: "500+", label: "Happy Customers" },
               { value: "1000+", label: "Products Sold" },
@@ -188,7 +188,7 @@ const OurFeatures = () => {
                 <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
           </div>

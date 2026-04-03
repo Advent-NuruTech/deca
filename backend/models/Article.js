@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const articleSchema = new mongoose.Schema(
   {
@@ -25,8 +25,8 @@ const articleSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['news', 'tutorial', 'product-review', 'company-update', 'tech-tips'],
-      default: 'news',
+      enum: ["faith", "recipe", "agriculture", "homeschooling", "study"],
+      default: "faith",
     },
     tags: [
       {
@@ -35,7 +35,7 @@ const articleSchema = new mongoose.Schema(
     ],
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     seoTitle: {
@@ -60,16 +60,24 @@ const articleSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // NEW FIELDS for study materials
+    isDownloadable: {
+      type: Boolean,
+      default: false,
+    },
+    fileUrl: {
+      type: String, // URL to PDF, DOC, etc. (stored on Cloudinary or local)
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-// Index for search
-articleSchema.index({ title: 'text', content: 'text' });
+// Index for search (keep as is)
+articleSchema.index({ title: "text", content: "text" });
 articleSchema.index({ category: 1, published: 1 });
 
-const Article = mongoose.model('Article', articleSchema);
+const Article = mongoose.model("Article", articleSchema);
 
 export default Article;

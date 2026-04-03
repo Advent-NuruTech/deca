@@ -58,30 +58,30 @@ const ArticlesPage = () => {
 
   const categories = [
     { value: "", label: "All Articles" },
-    { value: "news", label: "News" },
-    { value: "tutorial", label: "Tutorials" },
-    { value: "product-review", label: "Product Reviews" },
-    { value: "company-update", label: "Company Updates" },
-    { value: "tech-tips", label: "Tech Tips" },
+    { value: "faith", label: "Faith Blogs" },
+    { value: "recipe", label: "Cookery & Recipes" },
+    { value: "agriculture", label: "Agriculture Tips" },
+    { value: "homeschooling", label: "Homeschooling" },
+    { value: "study", label: "Study Materials" },
   ];
 
   return (
     <>
       <SEO
-        title="Articles"
-        description="Read the latest articles, tutorials, product reviews, and tech tips from Fancy Tech Integration South Sudan. Stay updated with technology trends and solutions."
+        title="Articles | Sami Ministry"
+        description="Explore faith-based blogs, recipes, agriculture tips, homeschooling resources, and study materials."
         keywords={[
-          "Articles",
-          "Tech News",
-          "Tutorials",
-          "Product Reviews",
-          "Tech Tips",
+          "Faith",
+          "Recipes",
+          "Agriculture",
+          "Homeschooling",
+          "Study Materials",
         ]}
       />
 
       <ArticlesHero />
 
-      <section className="py-12 bg-gray-900">
+      <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <AnimatedSection delay={0.1} direction="up">
             <ArticlesFilter

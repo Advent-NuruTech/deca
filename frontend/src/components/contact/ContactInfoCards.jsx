@@ -58,11 +58,11 @@ const ContactInfoCards = () => {
               <div
                 className={`absolute inset-0 bg-gradient-to-r ${info.color} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
               />
-              <div className="relative bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-white/10 group-hover:border-transparent transition-all duration-500">
+              <div className="relative bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-gray-200 group-hover:border-transparent transition-all duration-500">
                 <div
                   className={`w-14 h-14 rounded-xl bg-gradient-to-r ${info.color} p-3 mb-4 group-hover:scale-110 transition-transform`}
                 >
-                  <info.icon className="w-full h-full text-white" />
+                  <info.icon className="w-full h-full text-gray-900" />
                 </div>
 
                 <h3

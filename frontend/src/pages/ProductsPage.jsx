@@ -58,36 +58,22 @@ const ProductsPage = () => {
 
   const categories = [
     { value: "", label: "All Products" },
-    { value: "starlink", label: "Starlink Kits" },
-    { value: "networking", label: "Networking Equipment" },
-    { value: "laptop", label: "Laptop" },
-    { value: "phone", label: "Phone" },
-    { value: "software", label: "Software" },
-    { value: "cctv", label: "CCTV Equipment" },
-    { value: "router", label: "Routers" },
-    { value: "accesspoint", label: "Access point" },
+    { value: "seeds", label: "Organic Seeds" },
+    { value: "produce", label: "Fresh Produce" },
+    { value: "other", label: "Other Products" },
   ];
 
   return (
     <>
       <SEO
-        title="Products"
-        description="Browse our wide range of technology products including Starlink Kits, Networking Equipment, Laptops, Phones, and Software Solutions in South Sudan."
-        keywords={[
-          "Products",
-          "Starlink",
-          "Networking Equipment",
-          "Laptop",
-          "Phone",
-          "Software",
-          "Access point",
-          "Router",
-        ]}
+        title="Shop | Sami Ministry"
+        description="Buy organic seeds, fresh produce, and other agricultural products from our farm."
+        keywords={["Organic Seeds", "Fresh Produce", "Farm Products"]}
       />
 
       <ProductsHero />
 
-      <section className="py-12 bg-gray-900">
+      <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <AnimatedSection delay={0.1} direction="up">
             <ProductsFilter

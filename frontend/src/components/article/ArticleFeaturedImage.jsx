@@ -19,7 +19,7 @@ const ArticleFeaturedImage = ({ image, title }) => {
         onClick={() => setIsZoomed(true)}
       >
         {/* Image Container */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/10">
+        <div className="relative rounded-2xl overflow-hidden border border-gray-200">
           <motion.img
             src={getImageUrl(image)}
             alt={title}
@@ -35,7 +35,7 @@ const ArticleFeaturedImage = ({ image, title }) => {
           <motion.div
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
-            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full"
+            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full"
           >
             <ZoomIn size={20} />
           </motion.div>
@@ -50,14 +50,14 @@ const ArticleFeaturedImage = ({ image, title }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsZoomed(false)}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/90  flex items-center justify-center p-4"
           >
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
               onClick={() => setIsZoomed(false)}
-              className="absolute top-4 right-4 bg-white/10 text-white p-2 rounded-full hover:bg-white/20 transition-colors"
+              className="absolute top-4 right-4 bg-white/10 text-gray-900 p-2 rounded-full hover:bg-white/20 transition-colors"
             >
               <X size={24} />
             </motion.button>

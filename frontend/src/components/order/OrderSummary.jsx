@@ -57,7 +57,7 @@ const OrderSummary = ({ order }) => {
       transition={{ duration: 0.5 }}
       className="sticky top-24"
     >
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
         <h2 className="text-xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
             Order Summary
@@ -90,10 +90,10 @@ const OrderSummary = ({ order }) => {
         </div>
 
         {/* Price Breakdown */}
-        <div className="space-y-3 mb-6 pt-4 border-t border-white/10">
+        <div className="space-y-3 mb-6 pt-4 border-t border-gray-200">
           <div className="flex justify-between text-gray-400">
             <span>Subtotal</span>
-            <span className="text-white font-medium">
+            <span className="text-gray-900 font-medium">
               $ {order.subtotal.toLocaleString()}
             </span>
           </div>
@@ -101,7 +101,9 @@ const OrderSummary = ({ order }) => {
           <div className="flex justify-between text-gray-400">
             <span>Shipping</span>
             <span
-              className={order.shipping === 0 ? "text-green-400" : "text-white"}
+              className={
+                order.shipping === 0 ? "text-green-400" : "text-gray-900"
+              }
             >
               {order.shipping === 0
                 ? "Free"
@@ -111,14 +113,14 @@ const OrderSummary = ({ order }) => {
 
           <div className="flex justify-between text-gray-400">
             <span>Payment Method</span>
-            <span className="text-white font-medium capitalize">
+            <span className="text-gray-900 font-medium capitalize">
               {order.paymentMethod.replace("_", " ")}
             </span>
           </div>
 
           <div className="flex justify-between text-gray-400">
             <span>Shipping Method</span>
-            <span className="text-white font-medium capitalize">
+            <span className="text-gray-900 font-medium capitalize">
               {order.shippingMethod === "standard"
                 ? "Standard Delivery"
                 : order.shippingMethod === "express"
@@ -127,8 +129,8 @@ const OrderSummary = ({ order }) => {
             </span>
           </div>
 
-          <div className="border-t border-white/10 pt-3 flex justify-between text-lg font-bold">
-            <span className="text-white">Total</span>
+          <div className="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold">
+            <span className="text-gray-900">Total</span>
             <span className="text-2xl bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
               $ {order.total.toLocaleString()}
             </span>
@@ -136,8 +138,8 @@ const OrderSummary = ({ order }) => {
         </div>
 
         {/* Timeline/Next Steps */}
-        <div className="pt-4 border-t border-white/10">
-          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="pt-4 border-t border-gray-200">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Clock size={16} className="text-purple-400" />
             What's Next?
           </h3>
@@ -153,7 +155,7 @@ const OrderSummary = ({ order }) => {
                 <span className="text-xs text-purple-400">1</span>
               </div>
               <div>
-                <p className="text-sm text-white">Order Confirmation</p>
+                <p className="text-sm text-gray-900">Order Confirmation</p>
                 <p className="text-xs text-gray-400">
                   You'll receive an email confirmation shortly
                 </p>
@@ -170,7 +172,7 @@ const OrderSummary = ({ order }) => {
                 <span className="text-xs text-blue-400">2</span>
               </div>
               <div>
-                <p className="text-sm text-white">Payment</p>
+                <p className="text-sm text-gray-900">Payment</p>
                 <p className="text-xs text-gray-400">
                   {order.paymentMethod === "mpesa"
                     ? "Complete M-Pesa payment when prompted"
@@ -191,7 +193,7 @@ const OrderSummary = ({ order }) => {
                 <span className="text-xs text-green-400">3</span>
               </div>
               <div>
-                <p className="text-sm text-white">Shipping</p>
+                <p className="text-sm text-gray-900">Shipping</p>
                 <p className="text-xs text-gray-400">
                   We'll notify you when your order ships
                 </p>

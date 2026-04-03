@@ -50,7 +50,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0">
         {/* Grid Pattern */}
@@ -133,7 +133,7 @@ const AdminLogin = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl"
+          className="bg-gray-500  rounded-2xl p-8 border border-gray-200 shadow-2xl"
         >
           {/* Header */}
           <div className="text-center mb-8">
@@ -144,7 +144,7 @@ const AdminLogin = () => {
               className="inline-block mb-4"
             >
               <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-3">
-                <Shield className="w-full h-full text-white" />
+                <Shield className="w-full h-full text-gray-900" />
               </div>
             </motion.div>
 
@@ -166,7 +166,7 @@ const AdminLogin = () => {
                 Email Address
               </label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
                 <input
                   id="email"
                   name="email"
@@ -177,7 +177,7 @@ const AdminLogin = () => {
                   onChange={handleChange}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
                   placeholder="admin@example.com"
                 />
                 {focusedField === "email" && (
@@ -198,7 +198,7 @@ const AdminLogin = () => {
                 Password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
                 <input
                   id="password"
                   name="password"
@@ -209,7 +209,7 @@ const AdminLogin = () => {
                   onChange={handleChange}
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
                   placeholder="••••••••"
                 />
                 {focusedField === "password" && (
@@ -229,9 +229,9 @@ const AdminLogin = () => {
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-white/10 bg-white/5 text-purple-500 focus:ring-purple-500/50 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50 focus:ring-offset-0"
                 />
-                <span className="text-sm text-gray-400 group-hover:text-white transition-colors">
+                <span className="text-sm text-gray-400 group-hover:text-gray-900 transition-colors">
                   Remember me
                 </span>
               </label>
@@ -249,7 +249,7 @@ const AdminLogin = () => {
               disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -322,7 +322,7 @@ const AdminLogin = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center mt-8 text-sm text-gray-500"
+          className="text-center mt-8 text-sm text-gray-400"
         >
           © {new Date().getFullYear()} Fancy Tech Integration South Sudan. All
           rights reserved.

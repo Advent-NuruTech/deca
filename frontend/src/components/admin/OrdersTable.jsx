@@ -103,10 +103,10 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/10 p-12 text-center"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl border border-gray-200 p-12 text-center"
       >
         <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
           No Orders Found
         </h3>
         <p className="text-gray-400">
@@ -122,12 +122,12 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden"
       >
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
-              <tr className="border-b border-white/10 bg-white/5">
+              <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Order Info
                 </th>
@@ -165,7 +165,7 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-white/5 transition-colors cursor-pointer"
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() =>
                         setExpandedRow(
                           expandedRow === order._id ? null : order._id,
@@ -175,24 +175,24 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Package size={16} className="text-purple-400" />
-                          <span className="text-sm font-medium text-white">
+                          <span className="text-sm font-medium text-gray-900">
                             {getOrderNumber(order)}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <User size={16} className="text-gray-500" />
-                          <span className="text-sm text-gray-300">
+                          <User size={16} className="text-gray-400" />
+                          <span className="text-sm text-gray-600">
                             {getCustomerName(order)}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-300">
+                        <div className="text-sm text-gray-600">
                           {getItemsList(order).length} item(s)
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-400">
                           {getItemsList(order)
                             .slice(0, 2)
                             .map((item) => item?.name || "Unknown")
@@ -221,19 +221,19 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                             order.orderStatus,
                           )} focus:outline-none cursor-pointer`}
                         >
-                          <option value="pending" className="bg-gray-800">
+                          <option value="pending" className="bg-white">
                             Pending
                           </option>
-                          <option value="processing" className="bg-gray-800">
+                          <option value="processing" className="bg-white">
                             Processing
                           </option>
-                          <option value="shipped" className="bg-gray-800">
+                          <option value="shipped" className="bg-white">
                             Shipped
                           </option>
-                          <option value="delivered" className="bg-gray-800">
+                          <option value="delivered" className="bg-white">
                             Delivered
                           </option>
-                          <option value="cancelled" className="bg-gray-800">
+                          <option value="cancelled" className="bg-white">
                             Cancelled
                           </option>
                         </select>
@@ -254,22 +254,22 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                             order.paymentStatus,
                           )} focus:outline-none cursor-pointer`}
                         >
-                          <option value="pending" className="bg-gray-800">
+                          <option value="pending" className="bg-white">
                             Pending
                           </option>
-                          <option value="paid" className="bg-gray-800">
+                          <option value="paid" className="bg-white">
                             Paid
                           </option>
-                          <option value="failed" className="bg-gray-800">
+                          <option value="failed" className="bg-white">
                             Failed
                           </option>
-                          <option value="refunded" className="bg-gray-800">
+                          <option value="refunded" className="bg-white">
                             Refunded
                           </option>
                         </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <div className="flex items-center gap-1 text-sm text-gray-400">
                           <Calendar size={14} />
                           {formatDate(order.createdAt)}
                         </div>
@@ -316,36 +316,36 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <td colSpan="8" className="px-6 py-4 bg-white/5">
+                          <td colSpan="8" className="px-6 py-4 bg-gray-50">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                               {/* Customer Details */}
                               <div>
-                                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                   <User size={16} className="text-purple-400" />
                                   Customer Details
                                 </h4>
                                 <div className="space-y-2">
                                   <div className="flex items-center gap-2 text-sm">
-                                    <Mail size={14} className="text-gray-500" />
-                                    <span className="text-gray-300">
+                                    <Mail size={14} className="text-gray-400" />
+                                    <span className="text-gray-600">
                                       {getCustomerEmail(order)}
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 text-sm">
                                     <Phone
                                       size={14}
-                                      className="text-gray-500"
+                                      className="text-gray-400"
                                     />
-                                    <span className="text-gray-300">
+                                    <span className="text-gray-600">
                                       {getCustomerPhone(order)}
                                     </span>
                                   </div>
                                   <div className="flex items-start gap-2 text-sm">
                                     <MapPin
                                       size={14}
-                                      className="text-gray-500 mt-1"
+                                      className="text-gray-400 mt-1"
                                     />
-                                    <span className="text-gray-300">
+                                    <span className="text-gray-600">
                                       {getCustomerAddress(order)}
                                     </span>
                                   </div>
@@ -354,7 +354,7 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
 
                               {/* Payment & Shipping */}
                               <div>
-                                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                   <CreditCard
                                     size={16}
                                     className="text-purple-400"
@@ -365,9 +365,9 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                                   <div className="flex items-center gap-2 text-sm">
                                     <CreditCard
                                       size={14}
-                                      className="text-gray-500"
+                                      className="text-gray-400"
                                     />
-                                    <span className="text-gray-300 capitalize">
+                                    <span className="text-gray-600 capitalize">
                                       {order.paymentMethod?.replace("_", " ") ||
                                         "N/A"}
                                     </span>
@@ -375,9 +375,9 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                                   <div className="flex items-center gap-2 text-sm">
                                     <Truck
                                       size={14}
-                                      className="text-gray-500"
+                                      className="text-gray-400"
                                     />
-                                    <span className="text-gray-300 capitalize">
+                                    <span className="text-gray-600 capitalize">
                                       {order.shippingMethod || "N/A"}
                                     </span>
                                   </div>
@@ -386,7 +386,7 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
 
                               {/* Order Items */}
                               <div>
-                                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                   <Package
                                     size={16}
                                     className="text-purple-400"
@@ -413,7 +413,7 @@ const OrdersTable = ({ orders = [], onUpdateStatus }) => {
                                     </div>
                                   ))}
                                   {getItemsList(order).length === 0 && (
-                                    <span className="text-gray-500">
+                                    <span className="text-gray-400">
                                       No items
                                     </span>
                                   )}

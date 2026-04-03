@@ -50,7 +50,7 @@ const StatCard = ({
         className={`absolute inset-0 bg-gradient-to-r ${gradient} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
       />
 
-      <div className="relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 group-hover:border-transparent transition-all duration-500">
+      <div className="relative bg-gray-500 backdrop-blur-sm rounded-xl p-6 border border-gray-200 group-hover:border-transparent transition-all duration-500">
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-sm font-medium text-gray-400 mb-1">{title}</p>

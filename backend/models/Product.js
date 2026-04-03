@@ -19,16 +19,8 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: [
-        "starlink",
-        "networking",
-        "laptop",
-        "accesspoint",
-        "cctv",
-        "router",
-        "phone",
-        "software",
-      ],
+      enum: ["seeds", "produce", "other"], // changed for organic shop
+      default: "seeds",
     },
     price: {
       type: Number,
@@ -79,6 +71,17 @@ const productSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "inactive", "draft"],
       default: "active",
+    },
+    // NEW FIELDS for organic products
+    organicCertified: {
+      type: Boolean,
+      default: false,
+    },
+    harvestDate: {
+      type: Date,
+    },
+    seedType: {
+      type: String, // e.g., "heirloom", "hybrid", "organic"
     },
   },
   {

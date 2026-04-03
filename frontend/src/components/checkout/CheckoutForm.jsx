@@ -14,12 +14,12 @@ import {
 
 const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
   const inputClasses = (fieldError) => `
-    w-full bg-white/5 border rounded-lg px-4 py-4 text-white placeholder-gray-500 
+    w-full bg-gray-50 border rounded-lg px-4 py-4 text-gray-900 placeholder-gray-500 
     focus:outline-none focus:ring-2 transition-all
     ${
       fieldError
         ? "border-red-500 focus:ring-red-500/50"
-        : "border-white/10 focus:border-purple-500 focus:ring-purple-500/50"
+        : "border-gray-200 focus:border-purple-500 focus:ring-purple-500/50"
     }
   `;
 
@@ -30,7 +30,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
       >
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -45,7 +45,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               Full Name *
             </label>
             <div className="relative group">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
               <input
                 type="text"
                 name="name"
@@ -67,7 +67,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               Email *
             </label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
               <input
                 type="email"
                 name="email"
@@ -89,7 +89,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               Phone Number *
             </label>
             <div className="relative group">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
               <input
                 type="tel"
                 name="phone"
@@ -112,7 +112,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
       >
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -127,7 +127,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               Street Address *
             </label>
             <div className="relative group">
-              <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+              <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
               <input
                 type="text"
                 name="address.street"
@@ -152,7 +152,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
                 City *
               </label>
               <div className="relative group">
-                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
                 <input
                   type="text"
                   name="address.city"
@@ -176,7 +176,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
                 County *
               </label>
               <div className="relative group">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
                 <input
                   type="text"
                   name="address.county"
@@ -200,7 +200,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
                 Postal Code
               </label>
               <div className="relative group">
-                <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
                 <input
                   type="text"
                   name="address.postalCode"
@@ -220,7 +220,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
       >
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -257,7 +257,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all group ${
                 formData.shippingMethod === option.method
                   ? "border-purple-500 bg-purple-500/10"
-                  : "border-white/10 hover:border-purple-500/50"
+                  : "border-gray-200 hover:border-purple-500/50"
               }`}
             >
               <input
@@ -271,7 +271,9 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               <div className="flex items-center gap-4 flex-grow">
                 <span className="text-3xl">{option.icon}</span>
                 <div className="flex-grow">
-                  <div className="font-semibold text-white">{option.label}</div>
+                  <div className="font-semibold text-gray-900">
+                    {option.label}
+                  </div>
                   <div className="text-sm text-gray-400">{option.time}</div>
                 </div>
                 <div className="font-bold text-purple-400">
@@ -297,7 +299,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
       >
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -331,7 +333,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
                 formData.paymentMethod === method.value
                   ? "border-purple-500 bg-purple-500/10"
-                  : "border-white/10 hover:border-purple-500/50"
+                  : "border-gray-200 hover:border-purple-500/50"
               }`}
             >
               <input
@@ -345,7 +347,9 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               <div className="flex items-center gap-4">
                 <span className="text-3xl">{method.icon}</span>
                 <div>
-                  <div className="font-semibold text-white">{method.label}</div>
+                  <div className="font-semibold text-gray-900">
+                    {method.label}
+                  </div>
                   <div className="text-sm text-gray-400">{method.desc}</div>
                 </div>
               </div>
@@ -366,7 +370,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
       >
         <h2 className="text-2xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -374,13 +378,13 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
           </span>
         </h2>
         <div className="relative group">
-          <FileText className="absolute left-4 top-4 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+          <FileText className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
           <textarea
             name="notes"
             value={formData.notes}
             onChange={onChange}
             rows="4"
-            className="w-full bg-white/5 border border-white/10 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
             placeholder="Any special instructions or notes for your order..."
           />
         </div>
@@ -395,7 +399,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         whileTap={{ scale: 0.98 }}
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-5 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+        className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-5 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-3">

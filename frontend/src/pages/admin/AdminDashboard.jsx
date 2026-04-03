@@ -78,7 +78,7 @@ const AdminDashboard = () => {
         description="Admin dashboard for Fancy Tech Integration South Sudan"
       />
 
-      <div className="min-h-screen bg-gray-900 pt-24 pb-16">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}
           <motion.div
@@ -190,11 +190,11 @@ const AdminDashboard = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 p-2">
-                  <TrendingUp className="w-full h-full text-white" />
+                  <TrendingUp className="w-full h-full text-gray-900" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Conversion Rate</p>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-2xl font-bold text-gray-900">
                     {stats.conversionRate}%
                   </p>
                 </div>
@@ -218,7 +218,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/10">
+                <div className="pt-3 border-t border-gray-200">
                   <div className="flex items-center gap-2 text-sm">
                     <Award size={14} className="text-yellow-400" />
                     <span className="text-gray-400">

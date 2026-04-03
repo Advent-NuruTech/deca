@@ -24,7 +24,7 @@ const ProductSpecs = ({ specifications, brand, model }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
     >
       <h2 className="text-2xl font-bold mb-6">
         <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
@@ -37,15 +37,15 @@ const ProductSpecs = ({ specifications, brand, model }) => {
         {(brand || model) && (
           <div className="grid grid-cols-2 gap-4">
             {brand && (
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-400 mb-1">Brand</p>
-                <p className="text-lg font-semibold text-white">{brand}</p>
+                <p className="text-lg font-semibold text-gray-900">{brand}</p>
               </div>
             )}
             {model && (
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-400 mb-1">Model</p>
-                <p className="text-lg font-semibold text-white">{model}</p>
+                <p className="text-lg font-semibold text-gray-900">{model}</p>
               </div>
             )}
           </div>
@@ -62,7 +62,7 @@ const ProductSpecs = ({ specifications, brand, model }) => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + index * 0.05 }}
-                  className="flex items-center gap-3 bg-white/5 rounded-lg p-4 group hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 group hover:bg-white/10 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 p-2 group-hover:scale-110 transition-transform">
                     <Icon className="w-full h-full text-purple-400" />
@@ -71,7 +71,7 @@ const ProductSpecs = ({ specifications, brand, model }) => {
                     <p className="text-sm text-gray-400 capitalize">
                       {key.replace(/([A-Z])/g, " $1").trim()}
                     </p>
-                    <p className="text-base font-semibold text-white">
+                    <p className="text-base font-semibold text-gray-900">
                       {value}
                     </p>
                   </div>

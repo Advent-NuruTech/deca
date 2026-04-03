@@ -54,12 +54,12 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden"
     >
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead>
-            <tr className="border-b border-white/10 bg-white/5">
+            <tr className="border-b border-gray-200 bg-gray-50">
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Product
               </th>
@@ -90,7 +90,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="hover:bg-white/5 transition-colors"
+                className="hover:bg-gray-50 transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
@@ -108,10 +108,10 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
                       )}
                     </div>
                     <div>
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-gray-900">
                         {product.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-400">
                         ID: {product._id.slice(-6)}
                       </div>
                     </div>
@@ -129,7 +129,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
                     $ {product.price?.toLocaleString()}
                   </div>
                   {product.originalPrice && (
-                    <div className="text-xs text-gray-500 line-through">
+                    <div className="text-xs text-gray-400 line-through">
                       $ {product.originalPrice.toLocaleString()}
                     </div>
                   )}
@@ -139,7 +139,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
                     <div
                       className={`w-2 h-2 rounded-full ${product.inStock ? "bg-green-400" : "bg-red-400"}`}
                     />
-                    <span className="text-sm text-gray-300">
+                    <span className="text-sm text-gray-600">
                       {product.inStock
                         ? product.stockQuantity || "In Stock"
                         : "Out of Stock"}
@@ -208,7 +208,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-white/10">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
           <div className="text-sm text-gray-400">
             Showing {indexOfFirstItem + 1} to{" "}
             {Math.min(indexOfLastItem, products.length)} of {products.length}{" "}
@@ -223,7 +223,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
               className={`p-2 rounded-lg transition-colors ${
                 currentPage === 1
                   ? "text-gray-600 cursor-not-allowed"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               <ChevronLeft size={18} />
@@ -241,7 +241,7 @@ const ProductTable = ({ products, onEdit, onDelete, loading }) => {
               className={`p-2 rounded-lg transition-colors ${
                 currentPage === totalPages
                   ? "text-gray-600 cursor-not-allowed"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               <ChevronRight size={18} />

@@ -84,7 +84,7 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden bg-gray-900">
+    <section className="relative py-24 overflow-hidden bg-gray-50">
       {/* Premium animated background */}
       <div className="absolute inset-0">
         {/* Grid pattern */}
@@ -140,7 +140,7 @@ const WhyChooseUs = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="inline-block mb-4"
             >
-              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+              <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
                 ⭐ WHY PARTNER WITH US ⭐
               </span>
             </motion.div>
@@ -173,7 +173,7 @@ const WhyChooseUs = () => {
                     className={`absolute inset-0 bg-gradient-to-r ${reason.color} rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-500`}
                   />
 
-                  <div className="relative h-full bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 border border-white/10 group-hover:border-transparent transition-all duration-500 overflow-hidden">
+                  <div className="relative h-full bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-gray-200 group-hover:border-transparent transition-all duration-500 overflow-hidden">
                     {/* Background shine effect */}
                     <motion.div
                       animate={{ x: ["0%", "200%"] }}
@@ -192,7 +192,7 @@ const WhyChooseUs = () => {
                         transition={{ duration: 0.5 }}
                         className={`w-14 h-14 rounded-xl bg-gradient-to-r ${reason.color} p-3 shadow-lg`}
                       >
-                        <reason.icon className="w-full h-full text-white" />
+                        <reason.icon className="w-full h-full text-gray-900" />
                       </motion.div>
 
                       {/* Stats badge */}
@@ -200,7 +200,7 @@ const WhyChooseUs = () => {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.5 + index * 0.1 }}
-                        className={`absolute -top-2 -right-2 bg-gradient-to-r ${reason.color} text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg`}
+                        className={`absolute -top-2 -right-2 bg-gradient-to-r ${reason.color} text-gray-900 text-xs font-bold px-2 py-1 rounded-full shadow-lg`}
                       >
                         {reason.stats}
                       </motion.div>
@@ -208,7 +208,7 @@ const WhyChooseUs = () => {
 
                     {/* Content */}
                     <h3
-                      className={`text-lg font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${reason.color} transition-all duration-300`}
+                      className={`text-lg font-bold mb-2 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${reason.color} transition-all duration-300`}
                     >
                       {reason.title}
                     </h3>
@@ -239,12 +239,12 @@ const WhyChooseUs = () => {
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm border border-white/10 rounded-full p-1"
+              className="inline-flex items-center gap-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm border border-gray-200 rounded-full p-1"
             >
               <span className="text-gray-400 pl-6">Ready to get started?</span>
               <motion.button
                 whileHover={{ x: 5 }}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 shadow-lg"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-6 py-3 rounded-full font-semibold flex items-center gap-2 shadow-lg"
               >
                 Contact Us Today
                 <Rocket className="w-4 h-4" />

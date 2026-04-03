@@ -59,9 +59,9 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
             className="fixed inset-4 md:inset-10 z-50 overflow-y-auto"
           >
             <div className="min-h-full flex items-center justify-center">
-              <div className="bg-gray-800/95 backdrop-blur-xl rounded-2xl border border-white/10 w-full max-w-4xl shadow-2xl">
+              <div className="bg-white/95  rounded-2xl border border-gray-200 w-full max-w-4xl shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
                   <div className="flex items-center gap-3">
                     <Package className="w-6 h-6 text-purple-400" />
                     <h2 className="text-2xl font-bold">
@@ -74,7 +74,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={onClose}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                    className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
                   >
                     <X size={20} />
                   </motion.button>
@@ -86,7 +86,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-400">Order Number</p>
-                      <p className="text-xl font-bold text-white">
+                      <p className="text-xl font-bold text-gray-900">
                         {order.orderNumber}
                       </p>
                     </div>
@@ -113,19 +113,19 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                           order.orderStatus,
                         )} focus:outline-none cursor-pointer`}
                       >
-                        <option value="pending" className="bg-gray-800">
+                        <option value="pending" className="bg-white">
                           Pending
                         </option>
-                        <option value="processing" className="bg-gray-800">
+                        <option value="processing" className="bg-white">
                           Processing
                         </option>
-                        <option value="shipped" className="bg-gray-800">
+                        <option value="shipped" className="bg-white">
                           Shipped
                         </option>
-                        <option value="delivered" className="bg-gray-800">
+                        <option value="delivered" className="bg-white">
                           Delivered
                         </option>
-                        <option value="cancelled" className="bg-gray-800">
+                        <option value="cancelled" className="bg-white">
                           Cancelled
                         </option>
                       </select>
@@ -147,16 +147,16 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                           order.paymentStatus,
                         )} focus:outline-none cursor-pointer`}
                       >
-                        <option value="pending" className="bg-gray-800">
+                        <option value="pending" className="bg-white">
                           Pending
                         </option>
-                        <option value="paid" className="bg-gray-800">
+                        <option value="paid" className="bg-white">
                           Paid
                         </option>
-                        <option value="failed" className="bg-gray-800">
+                        <option value="failed" className="bg-white">
                           Failed
                         </option>
-                        <option value="refunded" className="bg-gray-800">
+                        <option value="refunded" className="bg-white">
                           Refunded
                         </option>
                       </select>
@@ -165,36 +165,36 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
 
                   {/* Customer Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <User size={16} className="text-purple-400" />
                         Customer Details
                       </h3>
                       <div className="space-y-2">
-                        <p className="text-white font-medium">
+                        <p className="text-gray-900 font-medium">
                           {order.customer.name}
                         </p>
                         <div className="flex items-center gap-2 text-sm">
-                          <Mail size={14} className="text-gray-500" />
-                          <span className="text-gray-300">
+                          <Mail size={14} className="text-gray-400" />
+                          <span className="text-gray-600">
                             {order.customer.email}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
-                          <Phone size={14} className="text-gray-500" />
-                          <span className="text-gray-300">
+                          <Phone size={14} className="text-gray-400" />
+                          <span className="text-gray-600">
                             {order.customer.phone}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <MapPin size={16} className="text-purple-400" />
                         Shipping Address
                       </h3>
-                      <div className="space-y-1 text-sm text-gray-300">
+                      <div className="space-y-1 text-sm text-gray-600">
                         <p>{order.customer.address.street}</p>
                         <p>
                           {order.customer.address.city},{" "}
@@ -210,22 +210,22 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
 
                   {/* Payment & Shipping */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <CreditCard size={16} className="text-purple-400" />
                         Payment Method
                       </h3>
-                      <p className="text-white capitalize">
+                      <p className="text-gray-900 capitalize">
                         {order.paymentMethod.replace("_", " ")}
                       </p>
                     </div>
 
-                    <div className="bg-white/5 rounded-xl p-4">
-                      <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <Truck size={16} className="text-purple-400" />
                         Shipping Method
                       </h3>
-                      <p className="text-white capitalize">
+                      <p className="text-gray-900 capitalize">
                         {order.shippingMethod === "standard"
                           ? "Standard Delivery"
                           : order.shippingMethod === "express"
@@ -236,8 +236,8 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                   </div>
 
                   {/* Order Items */}
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                       <Package size={16} className="text-purple-400" />
                       Order Items
                     </h3>
@@ -245,10 +245,10 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                       {order.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex justify-between items-center py-2 border-b border-white/10 last:border-0"
+                          className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0"
                         >
                           <div>
-                            <p className="text-white font-medium">
+                            <p className="text-gray-900 font-medium">
                               {item.name}
                             </p>
                             <p className="text-sm text-gray-400">
@@ -268,20 +268,20 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Subtotal</span>
-                        <span className="text-white">
+                        <span className="text-gray-900">
                           $ {order.subtotal.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Shipping</span>
-                        <span className="text-white">
+                        <span className="text-gray-900">
                           {order.shipping === 0
                             ? "Free"
                             : `$ ${order.shipping.toLocaleString()}`}
                         </span>
                       </div>
-                      <div className="border-t border-white/10 pt-2 flex justify-between text-lg font-bold">
-                        <span className="text-white">Total</span>
+                      <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold">
+                        <span className="text-gray-900">Total</span>
                         <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
                           $ {order.total.toLocaleString()}
                         </span>
@@ -291,12 +291,12 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end p-6 border-t border-white/10">
+                <div className="flex justify-end p-6 border-t border-gray-200">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={onClose}
-                    className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg font-medium"
+                    className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 rounded-lg font-medium"
                   >
                     Close
                   </motion.button>

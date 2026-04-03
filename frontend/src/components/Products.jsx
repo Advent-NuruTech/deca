@@ -25,7 +25,7 @@ const Products = ({ products = [] }) => {
     <>
       {/* Featured Products Section */}
       {featuredProducts.length > 0 && (
-        <section className="relative py-24 overflow-hidden bg-gray-900">
+        <section className="relative py-24 overflow-hidden bg-gray-50">
           {/* Animated background */}
           <div className="absolute inset-0 opacity-20">
             <div
@@ -63,7 +63,7 @@ const Products = ({ products = [] }) => {
                 transition={{ delay: 0.2, type: "spring" }}
                 className="inline-block mb-4"
               >
-                <span className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-yellow-400">
+                <span className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-yellow-400">
                   ⭐ FEATURED PRODUCTS ⭐
                 </span>
               </motion.div>
@@ -90,7 +90,7 @@ const Products = ({ products = [] }) => {
               <motion.div whileHover={{ scale: 1.05 }} className="inline-block">
                 <Link
                   to="/products"
-                  className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-orange-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-all duration-300 overflow-hidden"
+                  className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-orange-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-all duration-300 overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     View All Products
@@ -114,7 +114,7 @@ const Products = ({ products = [] }) => {
 
       {/* All Products Section */}
       {allActiveProducts.length > 0 && (
-        <section className="relative py-24 overflow-hidden bg-gray-800">
+        <section className="relative py-24 overflow-hidden bg-white">
           {/* Background pattern */}
           <div
             className="absolute inset-0 opacity-10"
@@ -148,7 +148,7 @@ const Products = ({ products = [] }) => {
                 transition={{ delay: 0.2, type: "spring" }}
                 className="inline-block mb-4"
               >
-                <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
+                <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-4 py-2 rounded-full text-sm font-semibold text-purple-400">
                   ✦ OUR COLLECTION ✦
                 </span>
               </motion.div>
@@ -192,7 +192,7 @@ const Products = ({ products = [] }) => {
                   >
                     <Link
                       to="/products"
-                      className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300"
+                      className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300"
                     >
                       <span>Browse All Products</span>
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

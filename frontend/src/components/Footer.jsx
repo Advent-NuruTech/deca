@@ -68,7 +68,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-gray-900 text-white overflow-hidden">
+    <footer className="relative bg-gray-50 text-gray-900 overflow-hidden">
       {/* Animated background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -146,7 +146,7 @@ const Footer = () => {
               </motion.div>
 
               <div className="flex flex-col">
-                <span className="text-lg font-semibold text-white">
+                <span className="text-lg font-semibold text-gray-900">
                   Fancy Tech
                 </span>
                 <span className="text-s text-gray-400">Integration</span>
@@ -166,7 +166,7 @@ const Footer = () => {
                   key={index}
                   href={social.href}
                   whileHover={{ y: -3, scale: 1.1 }}
-                  className={`w-10 h-10 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-gray-400 ${social.color} hover:bg-white/10 transition-all duration-300`}
+                  className={`w-10 h-10 rounded-full bg-gray-50 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-gray-400 ${social.color} hover:bg-white/10 transition-all duration-300`}
                 >
                   <social.icon size={18} />
                 </motion.a>
@@ -192,7 +192,7 @@ const Footer = () => {
                 >
                   <Link
                     to={link.path}
-                    className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                    className="group flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors"
                   >
                     <ArrowRight
                       size={14}
@@ -225,7 +225,7 @@ const Footer = () => {
                 >
                   <Link
                     to={link.path}
-                    className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                    className="group flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors"
                   >
                     <span className="text-sm">{link.icon}</span>
                     <span className="group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 group-hover:text-transparent group-hover:bg-clip-text transition-all">
@@ -249,7 +249,7 @@ const Footer = () => {
             <ul className="space-y-4">
               <motion.li
                 whileHover={{ x: 5 }}
-                className="flex items-start gap-3 text-gray-400 hover:text-white transition-colors group"
+                className="flex items-start gap-3 text-gray-400 hover:text-gray-900 transition-colors group"
               >
                 <Mail
                   size={18}
@@ -257,7 +257,7 @@ const Footer = () => {
                 />
                 <a
                   href="mailto:sales@fancytechintegration.com"
-                  className="hover:text-white transition-colors break-all"
+                  className="hover:text-gray-900 transition-colors break-all"
                 >
                   sales@fancytechintegration.com
                 </a>
@@ -265,12 +265,12 @@ const Footer = () => {
 
               <motion.li
                 whileHover={{ x: 5 }}
-                className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
+                className="flex items-center gap-3 text-gray-400 hover:text-gray-900 transition-colors group"
               >
                 <Phone size={18} className="text-purple-400 flex-shrink-0" />
                 <a
                   href="tel:+254759466446"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-gray-900 transition-colors"
                 >
                   +211 929 097 920
                 </a>
@@ -294,12 +294,12 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 rounded-l-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                  className="flex-1 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-l-lg px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-r-lg text-sm font-medium"
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-4 py-2 rounded-r-lg text-sm font-medium"
                 >
                   Subscribe
                 </motion.button>
@@ -313,7 +313,7 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="border-t border-white/10 mt-12 pt-8"
+          className="border-t border-gray-200 mt-12 pt-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm flex items-center gap-2">

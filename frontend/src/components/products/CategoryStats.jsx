@@ -65,10 +65,10 @@ const CategoryStats = ({ products }) => {
   if (categories.length === 0) return null;
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-8">
+    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-8">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-purple-400" />
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold text-gray-900">
           Quick Category Stats
         </h3>
       </div>
@@ -86,16 +86,16 @@ const CategoryStats = ({ products }) => {
             <div
               className={`absolute inset-0 bg-gradient-to-r ${cat.color} rounded-lg opacity-0 group-hover:opacity-20 transition-opacity`}
             />
-            <div className="relative bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+            <div className="relative bg-gray-50 backdrop-blur-sm rounded-lg p-3 border border-gray-200">
               <div className="flex items-center gap-2">
                 <div
                   className={`w-8 h-8 rounded-lg bg-gradient-to-r ${cat.color} p-1.5`}
                 >
-                  <cat.icon className="w-full h-full text-white" />
+                  <cat.icon className="w-full h-full text-gray-900" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">{cat.name}</p>
-                  <p className="text-lg font-bold text-white">{cat.count}</p>
+                  <p className="text-lg font-bold text-gray-900">{cat.count}</p>
                 </div>
               </div>
             </div>

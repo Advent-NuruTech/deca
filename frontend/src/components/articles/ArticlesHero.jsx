@@ -5,7 +5,7 @@ import { Newspaper, Sparkles } from "lucide-react";
 
 const ArticlesHero = () => {
   return (
-    <section className="relative pt-32 pb-20 overflow-hidden bg-gray-900">
+    <section className="relative pt-32 pb-20 overflow-hidden bg-gray-50">
       {/* Animated background */}
       <div className="absolute inset-0">
         <div
@@ -54,7 +54,7 @@ const ArticlesHero = () => {
           transition={{ delay: 0.2, type: "spring" }}
           className="inline-block mb-6"
         >
-          <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10 px-6 py-3 rounded-full text-sm font-semibold text-purple-400">
+          <span className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-gray-200 px-6 py-3 rounded-full text-sm font-semibold text-purple-400">
             ✦ OUR BLOG ✦
           </span>
         </motion.div>

@@ -1,5 +1,6 @@
 {
-  "name": "fancytech-frontend",
+  "name": "sami-ministry-Frontend",
+  "description": "Frontend for Sami Ministry website - faith based content, e-commerce, donations",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

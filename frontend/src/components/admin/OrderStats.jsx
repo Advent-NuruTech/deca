@@ -86,7 +86,7 @@ const OrderStats = ({ orders }) => {
             className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
           />
 
-          <div className="relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 group-hover:border-transparent transition-all duration-500">
+          <div className="relative bg-gray-500 backdrop-blur-sm rounded-xl p-4 border border-gray-200 group-hover:border-transparent transition-all duration-500">
             <div className="flex items-center justify-between mb-2">
               <div
                 className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}

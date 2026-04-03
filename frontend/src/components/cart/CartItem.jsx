@@ -18,7 +18,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
       {/* Animated border */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
 
-      <div className="relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 group-hover:border-transparent transition-all duration-500">
+      <div className="relative bg-gray-500 backdrop-blur-sm rounded-xl p-6 border border-gray-200 group-hover:border-transparent transition-all duration-500">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Product Image */}
           <div className="relative w-full md:w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
@@ -42,7 +42,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
           <div className="flex-grow">
             <Link
               to={`/products/${item.slug}`}
-              className="text-xl font-semibold text-white hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-blue-400 mb-2 inline-block transition-all"
+              className="text-xl font-semibold text-gray-900 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-blue-400 mb-2 inline-block transition-all"
             >
               {item.name}
             </Link>
@@ -55,7 +55,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
               {/* Quantity Controls */}
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-400">Quantity:</span>
-                <div className="flex items-center bg-white/5 border border-white/10 rounded-lg">
+                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() =>
@@ -65,7 +65,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
                     className={`px-3 py-2 rounded-l-lg transition-colors ${
                       item.quantity <= 1
                         ? "text-gray-600 cursor-not-allowed"
-                        : "text-white hover:bg-white/10"
+                        : "text-gray-900 hover:bg-white/10"
                     }`}
                   >
                     <Minus size={16} />
@@ -78,7 +78,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
                     onChange={(e) =>
                       onQuantityChange(item._id, parseInt(e.target.value) || 1)
                     }
-                    className="w-16 text-center bg-transparent border-0 text-white focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-16 text-center bg-transparent border-0 text-gray-900 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
 
                   <motion.button
@@ -86,7 +86,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
                     onClick={() =>
                       onQuantityChange(item._id, item.quantity + 1)
                     }
-                    className="px-3 py-2 rounded-r-lg text-white hover:bg-white/10 transition-colors"
+                    className="px-3 py-2 rounded-r-lg text-gray-900 hover:bg-white/10 transition-colors"
                   >
                     <Plus size={16} />
                   </motion.button>
@@ -99,7 +99,7 @@ const CartItem = ({ item, onRemove, onQuantityChange, index }) => {
                   $ {(item.price * item.quantity).toLocaleString()}
                 </p>
                 {item.quantity > 1 && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     $ {item.price.toLocaleString()} each
                   </p>
                 )}

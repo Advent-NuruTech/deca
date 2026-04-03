@@ -159,7 +159,7 @@ const SoftwareServices = () => {
               </span>
             </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Powerful Software for{" "}
               <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Every Business Need
@@ -169,7 +169,7 @@ const SoftwareServices = () => {
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
               From custom web development to specialized business management
               systems. All solutions work{" "}
-              <span className="text-white font-semibold">
+              <span className="text-gray-900 font-semibold">
                 online or offline
               </span>
               — because your business never stops.
@@ -184,15 +184,15 @@ const SoftwareServices = () => {
             viewport={{ once: true }}
             className="flex justify-center mb-12"
           >
-            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-6 py-3 inline-flex items-center gap-4">
+            <div className="bg-gray-500 backdrop-blur-sm border border-gray-700 rounded-full px-6 py-3 inline-flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Wifi className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-gray-300">Online</span>
+                <span className="text-sm text-gray-600">Online</span>
               </div>
-              <div className="w-px h-4 bg-gray-700" />
+              <div className="w-px h-4 bg-gray-100" />
               <div className="flex items-center gap-2">
                 <WifiOff className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm text-gray-300">Offline</span>
+                <span className="text-sm text-gray-600">Offline</span>
               </div>
               <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
                 Syncs when connected
@@ -213,7 +213,7 @@ const SoftwareServices = () => {
                 className="group cursor-pointer"
                 onClick={() => openServiceModal(service)}
               >
-                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 h-full hover:border-purple-500/50 transition-all duration-300">
+                <div className="bg-gray-500 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 h-full hover:border-purple-500/50 transition-all duration-300">
                   {/* Icon with gradient */}
                   <div
                     className={`inline-flex p-4 rounded-xl ${service.iconBg} mb-4 group-hover:scale-110 transition-transform duration-300`}
@@ -222,12 +222,12 @@ const SoftwareServices = () => {
                     <div
                       className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${service.color} mb-4 group-hover:scale-110 transition-transform duration-300`}
                     >
-                      <div className="text-white">{service.icon}</div>
+                      <div className="text-gray-900">{service.icon}</div>
                     </div>
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all">
                     {service.title}
                   </h3>
                   <p className="text-gray-400 mb-4 line-clamp-2">
@@ -240,13 +240,13 @@ const SoftwareServices = () => {
                       {service.industries.slice(0, 3).map((item) => (
                         <span
                           key={item}
-                          className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded-full"
+                          className="text-xs bg-gray-100/50 text-gray-600 px-2 py-1 rounded-full"
                         >
                           {item}
                         </span>
                       ))}
                       {service.industries.length > 3 && (
-                        <span className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-gray-100/50 text-gray-600 px-2 py-1 rounded-full">
                           +{service.industries.length - 3}
                         </span>
                       )}
@@ -258,13 +258,13 @@ const SoftwareServices = () => {
                       {service.institutions.slice(0, 2).map((item) => (
                         <span
                           key={item}
-                          className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded-full"
+                          className="text-xs bg-gray-100/50 text-gray-600 px-2 py-1 rounded-full"
                         >
                           {item}
                         </span>
                       ))}
                       {service.institutions.length > 2 && (
-                        <span className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-gray-100/50 text-gray-600 px-2 py-1 rounded-full">
                           +{service.institutions.length - 2}
                         </span>
                       )}
@@ -290,7 +290,7 @@ const SoftwareServices = () => {
             className="mt-12 text-center"
           >
             <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 Need Something Custom?
               </h3>
               <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
@@ -300,7 +300,7 @@ const SoftwareServices = () => {
                 covered.
               </p>
               <Link to="/contact">
-                <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
+                <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-gray-900 px-8 py-3 rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
                   Request Custom Solution
                 </button>
               </Link>

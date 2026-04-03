@@ -9,7 +9,7 @@ const ShippingInfo = ({ customer, address }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
     >
       <div className="flex items-center gap-2 mb-6">
         <MapPin className="w-5 h-5 text-purple-400" />
@@ -35,7 +35,7 @@ const ShippingInfo = ({ customer, address }) => {
               <User size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">Full Name</p>
-                <p className="text-white font-medium">{customer.name}</p>
+                <p className="text-gray-900 font-medium">{customer.name}</p>
               </div>
             </motion.div>
 
@@ -46,7 +46,7 @@ const ShippingInfo = ({ customer, address }) => {
               <Mail size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">Email</p>
-                <p className="text-white">{customer.email}</p>
+                <p className="text-gray-900">{customer.email}</p>
               </div>
             </motion.div>
 
@@ -57,7 +57,7 @@ const ShippingInfo = ({ customer, address }) => {
               <Phone size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">Phone</p>
-                <p className="text-white">{customer.phone}</p>
+                <p className="text-gray-900">{customer.phone}</p>
               </div>
             </motion.div>
           </div>
@@ -77,7 +77,7 @@ const ShippingInfo = ({ customer, address }) => {
               <Home size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">Street Address</p>
-                <p className="text-white">{address.street}</p>
+                <p className="text-gray-900">{address.street}</p>
               </div>
             </motion.div>
 
@@ -88,7 +88,7 @@ const ShippingInfo = ({ customer, address }) => {
               <MapPin size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">City / County</p>
-                <p className="text-white">
+                <p className="text-gray-900">
                   {address.city}, {address.county}
                 </p>
               </div>
@@ -102,7 +102,7 @@ const ShippingInfo = ({ customer, address }) => {
                 <MapPin size={16} className="text-purple-400 mt-1" />
                 <div>
                   <p className="text-sm text-gray-400">Postal Code</p>
-                  <p className="text-white">{address.postalCode}</p>
+                  <p className="text-gray-900">{address.postalCode}</p>
                 </div>
               </motion.div>
             )}
@@ -114,7 +114,9 @@ const ShippingInfo = ({ customer, address }) => {
               <MapPin size={16} className="text-purple-400 mt-1" />
               <div>
                 <p className="text-sm text-gray-400">Country</p>
-                <p className="text-white">{address.country || "South Sudan"}</p>
+                <p className="text-gray-900">
+                  {address.country || "South Sudan"}
+                </p>
               </div>
             </motion.div>
           </div>
