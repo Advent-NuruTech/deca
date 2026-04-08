@@ -24,9 +24,8 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:3000",
-    // Add your production frontend URL later, e.g.:
-    // "https://sami-ministry.vercel.app",
-    // "https://www.samiministry.com"
+    "https://remsam.netlify.app/",
+    "https://sami-ministry.onrender.com",
   ],
   credentials: true,
   optionsSuccessStatus: 200,
