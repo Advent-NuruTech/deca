@@ -174,7 +174,7 @@ const StudyMaterialsPage = () => {
                         </div>
                         <div className="flex gap-3 mt-auto pt-4">
                           <a
-                            href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/download?url=${encodeURIComponent(material.fileUrl)}&filename=${encodeURIComponent(getDownloadFilename(material.title))}`}
+                            href={`${import.meta.env.VITE_API_URL}/api/download?url=${encodeURIComponent(material.fileUrl)}&filename=${encodeURIComponent(getDownloadFilename(material.title))}`}
                             download
                             className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg text-sm font-medium hover:shadow-md transition-all"
                           >

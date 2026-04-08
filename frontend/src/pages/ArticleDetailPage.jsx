@@ -141,7 +141,7 @@ const ArticleDetailPage = () => {
                     convenience.
                   </p>
                   <a
-                    href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/download?url=${encodeURIComponent(article.fileUrl)}&filename=${encodeURIComponent(getDownloadFilename())}`}
+                    href={`${import.meta.env.VITE_API_URL}/api/download?url=${encodeURIComponent(article.fileUrl)}&filename=${encodeURIComponent(getDownloadFilename())}`}
                     download
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg font-medium hover:shadow-md transition-all"
                   >

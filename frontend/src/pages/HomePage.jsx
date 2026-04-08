@@ -422,7 +422,7 @@ const HomePage = () => {
                             {study.excerpt}
                           </p>
                           <a
-                            href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/download?url=${encodeURIComponent(study.fileUrl)}&filename=${study.title.replace(/[^a-z0-9]/gi, "_")}.pdf`}
+                            href={`${import.meta.env.VITE_API_URL}/api/download?url=${encodeURIComponent(study.fileUrl)}&filename=${study.title.replace(/[^a-z0-9]/gi, "_")}.pdf`}
                             download
                             className="text-emerald-600 text-sm font-medium inline-flex items-center gap-1 mt-1"
                           >
