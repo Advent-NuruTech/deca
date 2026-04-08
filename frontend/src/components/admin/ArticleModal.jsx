@@ -1,4 +1,4 @@
-// components/admin/ArticleModal.jsx
+// src/components/admin/ArticleModal.jsx
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -45,11 +45,9 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     });
   };
 
-  // Image upload (for featured image)
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
     try {
       const uploadFormData = new FormData();
@@ -68,27 +66,22 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     }
   };
 
-  // Document upload (for downloadable files)
   const handleDocumentUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
     try {
       const uploadFormData = new FormData();
-      uploadFormData.append("image", file); // reuse same endpoint
+      uploadFormData.append("image", file);
       const response = await api.post("/upload", uploadFormData);
       const fileUrl = response.data.secure_url || response.data.url;
-      setFormData((prev) => ({
-        ...prev,
-        fileUrl: fileUrl,
-      }));
+      setFormData((prev) => ({ ...prev, fileUrl }));
       toast.success("Document uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload document");
     } finally {
       setUploading(false);
-      e.target.value = ""; // clear input
+      e.target.value = "";
     }
   };
 
@@ -129,11 +122,11 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
             className="fixed inset-4 md:inset-10 z-50 overflow-y-auto"
           >
             <div className="min-h-full flex items-center justify-center">
-              <div className="bg-white/95  rounded-2xl border border-gray-200 w-full max-w-4xl shadow-2xl">
+              <div className="bg-white rounded-2xl border border-gray-200 w-full max-w-4xl shadow-2xl">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold">
-                    <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                       {article ? "Edit Article" : "Create New Article"}
                     </span>
                   </h2>
@@ -142,7 +135,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setPreviewMode(!previewMode)}
-                      className="p-2 text-gray-400 hover:text-purple-400 transition-colors"
+                      className="p-2 text-gray-500 hover:text-emerald-600 transition-colors"
                       title={previewMode ? "Edit Mode" : "Preview Mode"}
                     >
                       <Eye size={20} />
@@ -151,14 +144,14 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={onClose}
-                      className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-800 transition-colors"
                     >
                       <X size={20} />
                     </motion.button>
                   </div>
                 </div>
 
-                {/* Tabs (only show in edit mode) */}
+                {/* Tabs */}
                 {!previewMode && (
                   <div className="flex border-b border-gray-200">
                     {tabs.map((tab) => (
@@ -167,8 +160,8 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors ${
                           activeTab === tab.id
-                            ? "text-purple-400 border-b-2 border-purple-400"
-                            : "text-gray-400 hover:text-gray-900"
+                            ? "text-emerald-600 border-b-2 border-emerald-600"
+                            : "text-gray-500 hover:text-gray-800"
                         }`}
                       >
                         <tab.icon size={16} />
@@ -181,7 +174,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                 {previewMode ? (
                   /* Preview Mode */
                   <div className="p-6 max-h-[70vh] overflow-y-auto">
-                    <div className="prose prose-invert max-w-none">
+                    <div className="prose prose-slate max-w-none">
                       <h1 className="text-3xl font-bold text-gray-900 mb-4">
                         {formData.title}
                       </h1>
@@ -193,15 +186,15 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         />
                       )}
                       <div
-                        className="text-gray-600 whitespace-pre-wrap"
+                        className="text-gray-700 whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{ __html: formData.content }}
                       />
                       {formData.isDownloadable && formData.fileUrl && (
-                        <div className="mt-6 p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                        <div className="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
                           <a
                             href={formData.fileUrl}
                             download
-                            className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300"
+                            className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800"
                           >
                             <Download size={20} />
                             Download Study Material
@@ -218,7 +211,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                       {activeTab === "content" && (
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Title *
                             </label>
                             <input
@@ -227,13 +220,13 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.title}
                               onChange={handleChange}
                               required
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors"
                               placeholder="Enter article title"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Category *
                             </label>
                             <select
@@ -241,26 +234,17 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.category}
                               onChange={handleChange}
                               required
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                             >
-                              <option value="faith" className="bg-white">
-                                Faith Blogs
-                              </option>
-                              <option value="recipe" className="bg-white">
-                                Recipes
-                              </option>
-                              <option value="agriculture" className="bg-white">
+                              <option value="faith">Faith Blogs</option>
+                              <option value="recipe">Recipes</option>
+                              <option value="agriculture">
                                 Agriculture Tips
                               </option>
-                              <option
-                                value="homeschooling"
-                                className="bg-white"
-                              >
+                              <option value="homeschooling">
                                 Homeschooling
                               </option>
-                              <option value="study" className="bg-white">
-                                Study Materials
-                              </option>
+                              <option value="study">Study Materials</option>
                             </select>
                           </div>
 
@@ -272,9 +256,9 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                 name="isDownloadable"
                                 checked={formData.isDownloadable}
                                 onChange={handleChange}
-                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
+                                className="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                               />
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-gray-700">
                                 This is a downloadable resource (e.g., PDF, DOC,
                                 PPT)
                               </span>
@@ -282,9 +266,8 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
 
                             {formData.isDownloadable && (
                               <div className="ml-6 space-y-3">
-                                {/* Document Upload Button */}
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Upload Document (PDF, DOC, DOCX, PPT, PPTX)
                                   </label>
                                   <div className="flex items-center gap-3">
@@ -293,23 +276,22 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                       accept=".pdf,.doc,.docx,.ppt,.pptx"
                                       onChange={handleDocumentUpload}
                                       disabled={uploading}
-                                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-400 hover:file:bg-purple-500/30"
+                                      className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
                                     />
                                     {uploading && (
-                                      <div className="text-purple-400 text-sm animate-pulse">
+                                      <div className="text-emerald-600 text-sm animate-pulse">
                                         Uploading...
                                       </div>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-400 mt-1">
+                                  <p className="text-xs text-gray-500 mt-1">
                                     Upload to Cloudinary (supports PDF, Word,
                                     PowerPoint)
                                   </p>
                                 </div>
 
-                                {/* Or enter URL manually */}
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Or enter File URL directly
                                   </label>
                                   <div className="flex items-center gap-2">
@@ -323,10 +305,10 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                       value={formData.fileUrl}
                                       onChange={handleChange}
                                       placeholder="https://res.cloudinary.com/..."
-                                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                                      className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                     />
                                   </div>
-                                  <p className="text-xs text-gray-400 mt-1">
+                                  <p className="text-xs text-gray-500 mt-1">
                                     Paste a direct link to PDF, DOC, etc.
                                   </p>
                                 </div>
@@ -335,7 +317,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Excerpt *
                             </label>
                             <textarea
@@ -344,13 +326,13 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               onChange={handleChange}
                               required
                               rows="3"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                               placeholder="Short description of the article"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Content * (HTML supported)
                             </label>
                             <textarea
@@ -359,10 +341,10 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               onChange={handleChange}
                               required
                               rows="10"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-sm focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 font-mono text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                               placeholder="<p>Your article content here...</p>"
                             />
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-500 mt-1">
                               HTML tags supported: &lt;p&gt;, &lt;h2&gt;,
                               &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;,
                               &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;img&gt;
@@ -370,7 +352,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Tags (comma-separated)
                             </label>
                             <input
@@ -379,15 +361,15 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.tags}
                               onChange={handleChange}
                               placeholder="faith, bible, prayer"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Featured Image
                             </label>
-                            <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-purple-500/50 transition-colors">
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-emerald-400 transition-colors">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -401,7 +383,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                 className="cursor-pointer flex flex-col items-center gap-2"
                               >
                                 <Upload size={24} className="text-gray-400" />
-                                <span className="text-sm text-gray-400">
+                                <span className="text-sm text-gray-500">
                                   {uploading
                                     ? "Uploading..."
                                     : "Click to upload featured image"}
@@ -421,11 +403,11 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         </div>
                       )}
 
-                      {/* SEO Tab (unchanged) */}
+                      {/* SEO Tab */}
                       {activeTab === "seo" && (
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               SEO Title
                             </label>
                             <input
@@ -433,12 +415,12 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               name="seoTitle"
                               value={formData.seoTitle}
                               onChange={handleChange}
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                               placeholder="SEO optimized title"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               SEO Description
                             </label>
                             <textarea
@@ -446,12 +428,12 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.seoDescription}
                               onChange={handleChange}
                               rows="3"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                               placeholder="Meta description for search engines"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               SEO Keywords
                             </label>
                             <input
@@ -460,20 +442,20 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               value={formData.seoKeywords}
                               onChange={handleChange}
                               placeholder="keyword1, keyword2, keyword3"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors"
+                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                             />
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-500 mt-1">
                               Comma-separated keywords for search engines
                             </p>
                           </div>
                         </div>
                       )}
 
-                      {/* Settings Tab (unchanged) */}
+                      {/* Settings Tab */}
                       {activeTab === "settings" && (
                         <div className="space-y-4">
-                          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-                            <p className="text-sm text-yellow-400">
+                          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                            <p className="text-sm text-amber-700">
                               ⚠️ Publishing settings affect article visibility
                             </p>
                           </div>
@@ -484,43 +466,39 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                                 name="published"
                                 checked={formData.published}
                                 onChange={handleChange}
-                                className="w-4 h-4 rounded border-gray-200 bg-gray-50 text-purple-500 focus:ring-purple-500/50"
+                                className="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                               />
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-gray-700">
                                 Publish immediately
                               </span>
                             </label>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-500 mt-1">
                               If unchecked, article will be saved as draft
                             </p>
                           </div>
                           {article && (
                             <div className="pt-4 border-t border-gray-200">
-                              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                              <h3 className="text-sm font-medium text-gray-700 mb-3">
                                 Article Info
                               </h3>
-                              <div className="space-y-2 text-sm">
+                              <div className="space-y-2 text-sm text-gray-600">
                                 <div className="flex justify-between">
-                                  <span className="text-gray-400">Slug:</span>
-                                  <span className="text-gray-600">
-                                    {article.slug}
-                                  </span>
+                                  <span className="text-gray-500">Slug:</span>
+                                  <span>{article.slug}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-400">
+                                  <span className="text-gray-500">
                                     Created:
                                   </span>
-                                  <span className="text-gray-600">
+                                  <span>
                                     {new Date(
                                       article.createdAt,
                                     ).toLocaleDateString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-400">Views:</span>
-                                  <span className="text-gray-600">
-                                    {article.views || 0}
-                                  </span>
+                                  <span className="text-gray-500">Views:</span>
+                                  <span>{article.views || 0}</span>
                                 </div>
                               </div>
                             </div>
@@ -536,7 +514,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         whileTap={{ scale: 0.95 }}
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-white/10 hover:text-gray-900 transition-all"
+                        className="px-6 py-2 bg-gray-100 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
                       >
                         Cancel
                       </motion.button>
@@ -544,7 +522,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="submit"
-                        className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 rounded-lg font-medium hover:shadow-lg transition-all"
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition shadow-sm"
                       >
                         {article ? "Update Article" : "Create Article"}
                       </motion.button>

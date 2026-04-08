@@ -1,4 +1,4 @@
-// components/order/ShippingInfo.jsx
+// src/components/order/ShippingInfo.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { MapPin, User, Phone, Mail, Home } from "lucide-react";
@@ -9,21 +9,19 @@ const ShippingInfo = ({ customer, address }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
     >
-      <div className="flex items-center gap-2 mb-6">
-        <MapPin className="w-5 h-5 text-purple-400" />
-        <h2 className="text-xl font-bold">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Shipping Information
-          </span>
+      <div className="flex items-center gap-2 mb-5">
+        <MapPin className="w-5 h-5 text-emerald-500" />
+        <h2 className="text-xl font-bold text-gray-800">
+          Shipping Information
         </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Customer Details */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
             Customer Details
           </h3>
 
@@ -32,10 +30,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <User size={16} className="text-purple-400 mt-1" />
+              <User size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">Full Name</p>
-                <p className="text-gray-900 font-medium">{customer.name}</p>
+                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="text-gray-800 font-medium">{customer.name}</p>
               </div>
             </motion.div>
 
@@ -43,10 +41,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <Mail size={16} className="text-purple-400 mt-1" />
+              <Mail size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">Email</p>
-                <p className="text-gray-900">{customer.email}</p>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-gray-800">{customer.email}</p>
               </div>
             </motion.div>
 
@@ -54,10 +52,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <Phone size={16} className="text-purple-400 mt-1" />
+              <Phone size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">Phone</p>
-                <p className="text-gray-900">{customer.phone}</p>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="text-gray-800">{customer.phone}</p>
               </div>
             </motion.div>
           </div>
@@ -65,7 +63,7 @@ const ShippingInfo = ({ customer, address }) => {
 
         {/* Address Details */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
             Delivery Address
           </h3>
 
@@ -74,10 +72,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <Home size={16} className="text-purple-400 mt-1" />
+              <Home size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">Street Address</p>
-                <p className="text-gray-900">{address.street}</p>
+                <p className="text-sm text-gray-500">Street Address</p>
+                <p className="text-gray-800">{address.street}</p>
               </div>
             </motion.div>
 
@@ -85,10 +83,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <MapPin size={16} className="text-purple-400 mt-1" />
+              <MapPin size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">City / County</p>
-                <p className="text-gray-900">
+                <p className="text-sm text-gray-500">City / County</p>
+                <p className="text-gray-800">
                   {address.city}, {address.county}
                 </p>
               </div>
@@ -99,10 +97,10 @@ const ShippingInfo = ({ customer, address }) => {
                 whileHover={{ x: 5 }}
                 className="flex items-start gap-3"
               >
-                <MapPin size={16} className="text-purple-400 mt-1" />
+                <MapPin size={16} className="text-emerald-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-400">Postal Code</p>
-                  <p className="text-gray-900">{address.postalCode}</p>
+                  <p className="text-sm text-gray-500">Postal Code</p>
+                  <p className="text-gray-800">{address.postalCode}</p>
                 </div>
               </motion.div>
             )}
@@ -111,12 +109,10 @@ const ShippingInfo = ({ customer, address }) => {
               whileHover={{ x: 5 }}
               className="flex items-start gap-3"
             >
-              <MapPin size={16} className="text-purple-400 mt-1" />
+              <MapPin size={16} className="text-emerald-500 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-400">Country</p>
-                <p className="text-gray-900">
-                  {address.country || "South Sudan"}
-                </p>
+                <p className="text-sm text-gray-500">Country</p>
+                <p className="text-gray-800">{address.country || "Kenya"}</p>
               </div>
             </motion.div>
           </div>

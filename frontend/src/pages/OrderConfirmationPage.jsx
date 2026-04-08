@@ -73,7 +73,7 @@ const OrderConfirmationPage = () => {
     <>
       <SEO
         title={`Order Confirmation - ${order.orderNumber}`}
-        description={`Order confirmation for ${order.orderNumber} at Fancy Tech Integration South Sudan`}
+        description={`Order confirmation for ${order.orderNumber} at Remsam Homestead. View your order details, shipping information, and summary of your purchase.`}
       />
 
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">

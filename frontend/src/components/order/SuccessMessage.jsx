@@ -1,4 +1,4 @@
-// components/order/SuccessMessage.jsx
+// src/components/order/SuccessMessage.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Package, Truck, Clock, Mail } from "lucide-react";
@@ -19,16 +19,16 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-sm rounded-2xl p-8 border border-green-500/30 text-center relative overflow-hidden"
+      className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-8 border border-emerald-100 text-center relative overflow-hidden shadow-sm"
     >
-      {/* Animated background circles */}
+      {/* Animated background circles (soft) */}
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
           rotate: [0, 90, 0],
         }}
         transition={{ duration: 10, repeat: Infinity }}
-        className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"
+        className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl"
       />
       <motion.div
         animate={{
@@ -36,7 +36,7 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           rotate: [0, -90, 0],
         }}
         transition={{ duration: 12, repeat: Infinity }}
-        className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"
+        className="absolute bottom-0 left-0 w-64 h-64 bg-teal-200/20 rounded-full blur-3xl"
       />
 
       <div className="relative z-10">
@@ -52,8 +52,8 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           }}
           className="inline-block mb-6"
         >
-          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center">
-            <CheckCircle size={48} className="text-gray-900" />
+          <div className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
+            <CheckCircle size={48} className="text-white" />
           </div>
         </motion.div>
 
@@ -61,11 +61,9 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-3xl md:text-4xl font-bold mb-3"
+          className="text-3xl md:text-4xl font-bold mb-3 text-gray-800"
         >
-          <span className="bg-gradient-to-r from-green-400 to-emerald-400 text-transparent bg-clip-text">
-            Order Placed Successfully!
-          </span>
+          Order Placed Successfully!
         </motion.h1>
 
         <motion.p
@@ -82,14 +80,14 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="inline-flex items-center gap-3 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3"
+          className="inline-flex items-center gap-3 bg-white border border-gray-200 rounded-full px-6 py-3 shadow-sm"
         >
-          <Package size={18} className="text-purple-400" />
-          <span className="text-gray-900 font-medium">
+          <Package size={18} className="text-emerald-500" />
+          <span className="text-gray-800 font-medium">
             Order #{orderNumber}
           </span>
-          <span className="w-1 h-1 bg-gray-500 rounded-full" />
-          <Clock size={18} className="text-blue-400" />
+          <span className="w-1 h-1 bg-gray-300 rounded-full" />
+          <Clock size={18} className="text-emerald-500" />
           <span className="text-gray-600">{formatDate(createdAt)}</span>
         </motion.div>
 
@@ -98,7 +96,7 @@ const SuccessMessage = ({ orderNumber, createdAt }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-400"
+          className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-500"
         >
           <Mail size={14} />
           <span>A confirmation email has been sent to your inbox</span>

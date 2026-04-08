@@ -1,4 +1,4 @@
-// components/cart/CartSummary.jsx
+// src/components/cart/CartSummary.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,7 +6,7 @@ import { ShoppingBag, Truck, Shield, ArrowRight } from "lucide-react";
 
 const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
   const features = [
-    { icon: Truck, text: "Free shipping on orders over $ 50,000" },
+    { icon: Truck, text: "Free shipping on orders over $50" },
     { icon: Shield, text: "Secure checkout guaranteed" },
   ];
 
@@ -17,32 +17,28 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
       transition={{ duration: 0.5 }}
       className="sticky top-24"
     >
-      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Order Summary
-          </span>
-        </h2>
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Order Summary</h2>
 
         <div className="space-y-4 mb-6">
-          <div className="flex justify-between text-gray-400">
+          <div className="flex justify-between text-gray-600">
             <span>
               Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
             </span>
-            <span className="text-gray-900 font-medium">
+            <span className="text-gray-800 font-medium">
               $ {subtotal.toLocaleString()}
             </span>
           </div>
 
-          <div className="flex justify-between text-gray-400">
+          <div className="flex justify-between text-gray-600">
             <span>Shipping</span>
-            <span className="text-green-400">Free</span>
+            <span className="text-emerald-600">Free</span>
           </div>
 
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-gray-100 pt-4">
             <div className="flex justify-between text-lg">
-              <span className="text-gray-900 font-semibold">Total</span>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
+              <span className="text-gray-800 font-semibold">Total</span>
+              <span className="text-2xl font-bold text-emerald-700">
                 $ {subtotal.toLocaleString()}
               </span>
             </div>
@@ -54,9 +50,9 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 text-sm text-gray-400"
+              className="flex items-center gap-2 text-sm text-gray-500"
             >
-              <feature.icon size={14} className="text-purple-400" />
+              <feature.icon size={14} className="text-emerald-500" />
               <span>{feature.text}</span>
             </div>
           ))}
@@ -68,17 +64,12 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden"
+              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden shadow-sm hover:bg-emerald-700 transition"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Proceed to Checkout
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
-              <motion.div
-                animate={{ x: ["0%", "200%"] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-              />
             </motion.button>
           </Link>
 
@@ -86,7 +77,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gray-50 border border-gray-200 text-gray-900 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all"
+              className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all"
             >
               Continue Shopping
             </motion.button>
@@ -98,7 +89,7 @@ const CartSummary = ({ subtotal, itemCount, onClearCart }) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onClearCart}
-          className="w-full text-sm text-red-400 hover:text-red-300 mt-4 transition-colors"
+          className="w-full text-sm text-red-500 hover:text-red-600 mt-4 transition-colors"
         >
           Clear Cart
         </motion.button>

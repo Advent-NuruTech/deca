@@ -1,4 +1,4 @@
-// components/checkout/EmptyCheckout.jsx
+// src/components/checkout/EmptyCheckout.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ const EmptyCheckout = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-16 text-center border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100"
     >
       <motion.div
         animate={{
@@ -22,29 +22,28 @@ const EmptyCheckout = () => {
         transition={{ duration: 4, repeat: Infinity }}
         className="inline-block mb-6"
       >
-        <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-          <ShoppingBag size={64} className="text-purple-400" />
+        <div className="w-28 h-28 rounded-full bg-emerald-50 flex items-center justify-center">
+          <ShoppingBag size={56} className="text-emerald-500" />
         </div>
       </motion.div>
 
-      <h2 className="text-3xl font-bold mb-4">
-        <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-          Your cart is empty
-        </span>
+      <h2 className="text-2xl font-bold mb-3 text-gray-800">
+        Your cart is empty
       </h2>
 
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">
-        Add some amazing products to your cart before proceeding to checkout
+      <p className="text-gray-500 mb-8 max-w-md mx-auto">
+        Add some amazing organic products to your cart before proceeding to
+        checkout
       </p>
 
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => navigate("/products")}
-        className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
+        className="group inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full font-semibold shadow-md hover:bg-emerald-700 transition-all"
       >
         Browse Products
-        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
       </motion.button>
     </motion.div>
   );

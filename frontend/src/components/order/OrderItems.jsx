@@ -1,4 +1,4 @@
-// components/order/OrderItems.jsx
+// src/components/order/OrderItems.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { Package, ShoppingBag } from "lucide-react";
@@ -10,15 +10,11 @@ const OrderItems = ({ items }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
     >
-      <div className="flex items-center gap-2 mb-6">
-        <Package className="w-5 h-5 text-purple-400" />
-        <h2 className="text-xl font-bold">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Order Items
-          </span>
-        </h2>
+      <div className="flex items-center gap-2 mb-5">
+        <Package className="w-5 h-5 text-emerald-500" />
+        <h2 className="text-xl font-bold text-gray-800">Order Items</h2>
       </div>
 
       <div className="space-y-4">
@@ -31,12 +27,12 @@ const OrderItems = ({ items }) => {
             whileHover={{ scale: 1.02 }}
             className="group relative"
           >
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
 
-            <div className="relative bg-gray-50/90 backdrop-blur-sm rounded-xl p-4 border border-gray-200 group-hover:border-transparent transition-all">
+            <div className="relative bg-white rounded-xl p-4 border border-gray-100 group-hover:border-transparent transition-all shadow-sm">
               <div className="flex gap-4">
                 {/* Product Image */}
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                   {item.image ? (
                     <img
                       src={getImageUrl(item.image)}
@@ -44,27 +40,27 @@ const OrderItems = ({ items }) => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                      <ShoppingBag size={24} className="text-purple-400" />
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <ShoppingBag size={24} className="text-gray-400" />
                     </div>
                   )}
-                  <div className="absolute top-0 right-0 bg-purple-500 text-gray-900 text-xs w-6 h-6 flex items-center justify-center rounded-bl-lg">
+                  <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs w-6 h-6 flex items-center justify-center rounded-bl-lg">
                     {item.quantity}
                   </div>
                 </div>
 
                 {/* Product Details */}
                 <div className="flex-grow">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-purple-400 transition-colors line-clamp-2">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors line-clamp-2">
                     {item.name}
                   </h3>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-gray-500 mt-1">
                     $ {item.price.toLocaleString()} each
                   </p>
                   <div className="flex justify-between items-center mt-2">
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-500">
                       Subtotal:{" "}
-                      <span className="text-gray-900 font-medium">
+                      <span className="text-gray-800 font-medium">
                         $ {(item.price * item.quantity).toLocaleString()}
                       </span>
                     </p>

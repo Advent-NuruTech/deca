@@ -1,4 +1,4 @@
-// pages/admin/AdminDashboard.jsx
+// src/pages/admin/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,12 +53,10 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      // You would typically fetch these from your API
-      // For now, we'll use sample data
       setStats({
-        totalRevenue: 1250000,
-        pendingOrders: 23,
-        totalCustomers: 450,
+        totalRevenue: 0,
+        pendingOrders: 0,
+        totalCustomers: 0,
         conversionRate: 3.2,
       });
     } catch (error) {
@@ -74,8 +72,8 @@ const AdminDashboard = () => {
   return (
     <>
       <SEO
-        title="Admin Dashboard"
-        description="Admin dashboard for Fancy Tech Integration South Sudan"
+        title="Admin Dashboard | RemSam Homestead"
+        description="Admin dashboard for RemSam Homestead – manage content, products, and orders."
       />
 
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
@@ -89,11 +87,11 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold mb-2">
-                  <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                     Admin Dashboard
                   </span>
                 </h1>
-                <p className="text-gray-400">
+                <p className="text-gray-600">
                   Welcome back! Here's what's happening with your store today.
                 </p>
               </div>
@@ -102,7 +100,7 @@ const AdminDashboard = () => {
                 transition={{ duration: 20, repeat: Infinity }}
                 className="hidden md:block"
               >
-                <Sparkles size={32} className="text-purple-400/30" />
+                <Sparkles size={32} className="text-emerald-400/50" />
               </motion.div>
             </div>
           </motion.div>
@@ -113,7 +111,7 @@ const AdminDashboard = () => {
               title="Total Products"
               value={products.length}
               icon={Package}
-              color="purple"
+              color="emerald"
               link="/admin/products"
             />
             <StatCard
@@ -148,7 +146,7 @@ const AdminDashboard = () => {
             />
             <StatCard
               title="Total Revenue"
-              value={`$ ${stats.totalRevenue.toLocaleString()}`}
+              value={`KSH ${stats.totalRevenue.toLocaleString()}`}
               icon={TrendingUp}
               color="green"
               link="/admin/analytics"
@@ -186,15 +184,15 @@ const AdminDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
+              className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 p-2">
-                  <TrendingUp className="w-full h-full text-gray-900" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 p-2">
+                  <TrendingUp className="w-full h-full text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Conversion Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm text-gray-500">Conversion Rate</p>
+                  <p className="text-2xl font-bold text-gray-800">
                     {stats.conversionRate}%
                   </p>
                 </div>
@@ -202,26 +200,26 @@ const AdminDashboard = () => {
 
               <div className="space-y-3">
                 <div>
-                  <div className="flex justify-between text-sm text-gray-400 mb-1">
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
                     <span>Monthly Goal</span>
                     <span>5%</span>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{
                         width: `${(stats.conversionRate / 5) * 100}%`,
                       }}
                       transition={{ delay: 0.5, duration: 1 }}
-                      className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                     />
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-gray-200">
+                <div className="pt-3 border-t border-gray-100">
                   <div className="flex items-center gap-2 text-sm">
-                    <Award size={14} className="text-yellow-400" />
-                    <span className="text-gray-400">
+                    <Award size={14} className="text-amber-500" />
+                    <span className="text-gray-600">
                       You're on track! Keep up the good work.
                     </span>
                   </div>

@@ -1,4 +1,4 @@
-// pages/admin/AdminOrders.jsx
+// src/pages/admin/AdminOrders.jsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
@@ -58,8 +58,8 @@ const AdminOrders = () => {
   return (
     <>
       <SEO
-        title="Order Management"
-        description="Manage customer orders for Fancy Tech Integration South Sudan"
+        title="Order Management | RemSam Homestead"
+        description="Manage customer orders for RemSam Homestead"
       />
 
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
@@ -72,11 +72,11 @@ const AdminOrders = () => {
           >
             <div>
               <h1 className="text-4xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
+                <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                   Order Management
                 </span>
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 View and manage all customer orders
               </p>
             </div>
@@ -85,7 +85,7 @@ const AdminOrders = () => {
               transition={{ duration: 20, repeat: Infinity }}
               className="hidden md:block"
             >
-              <ShoppingBag size={32} className="text-purple-400/30" />
+              <ShoppingBag size={32} className="text-emerald-400/50" />
             </motion.div>
           </motion.div>
 
@@ -105,23 +105,23 @@ const AdminOrders = () => {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="inline-block w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
+                className="inline-block w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full"
               />
-              <p className="mt-4 text-gray-400">Loading orders...</p>
+              <p className="mt-4 text-gray-500">Loading orders...</p>
             </div>
           ) : orders.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-500 backdrop-blur-sm rounded-2xl p-16 text-center border border-gray-200"
+              className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100"
             >
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
-                <ShoppingBag size={32} className="text-purple-400" />
+              <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag size={32} className="text-emerald-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
                 No Orders Found
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-500">
                 {filters.status || filters.paymentStatus
                   ? "No orders match your filter criteria"
                   : "There are no orders yet"}

@@ -12,14 +12,13 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 const createAdmin = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGODB_URI ||
-        "mongodb://localhost:27017/fancytech-South Sudan",
+      process.env.MONGODB_URI || "mongodb://localhost:27017/remsam-Kenya",
     );
     console.log("MongoDB Connected");
 
     const args = process.argv.slice(2);
     const name = args[0] || "Admin";
-    const email = args[1] || "admin@fancytech.com";
+    const email = args[1] || "admin@remsam.com";
     const password = args[2] || "admin123";
 
     // Check if admin already exists

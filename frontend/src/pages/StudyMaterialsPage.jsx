@@ -1,11 +1,12 @@
 // src/pages/StudyMaterialsPage.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Download, FileText, Calendar, User } from "lucide-react";
+import { motion } from "framer-motion";
+import { Download, FileText, Calendar, User, ChevronRight } from "lucide-react";
 import api from "../services/api";
 import SEO from "../components/SEO";
 import AnimatedSection from "../components/AnimatedSection";
-import HeroSection from "../components/HeroSection";
+import study from "../assets/study.jpg";
 
 const StudyMaterialsPage = () => {
   const [materials, setMaterials] = useState([]);
@@ -49,7 +50,7 @@ const StudyMaterialsPage = () => {
   return (
     <>
       <SEO
-        title="Study Materials | Sami Ministry"
+        title="Study Materials | RemSam Homestead"
         description="Download free study materials, PDFs, and resources for spiritual growth, homeschooling, and personal development."
         keywords={[
           "Study Materials",
@@ -59,18 +60,61 @@ const StudyMaterialsPage = () => {
         ]}
       />
 
-      {/* Hero Section */}
-      <HeroSection
-        badge="Free Resources"
-        title="Equipping You for <span class='text-emerald-600'>Every Good Work</span>"
-        subtitle="Downloadable PDFs, guides, and study materials – all free, to help you grow in faith, family, and farming."
-        primaryText="Browse Materials"
-        primaryLink="#materials"
-        secondaryText="Support Our Work"
-        secondaryLink="/donate"
-        imageSrc="https://images.unsplash.com/photo-1507837424269-7c0d4bb8f2c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-        imageAlt="Open book and study materials"
-      />
+      {/* Custom Hero – Study Theme (similar to homepage) */}
+      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden">
+        {/* Background Image (free Pexels CDN – reliable) */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={study}
+            alt="Study materials background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/40" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 text-center text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl mx-auto"
+          >
+            <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold mb-6 border border-white/30">
+              Free Resources
+            </span>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              Equipping You for{" "}
+              <span className="text-emerald-400">Every Good Work</span>
+            </h1>
+            <p className="text-lg md:text-xl mt-6 mb-8 text-gray-200">
+              Downloadable PDFs, guides, and study materials – all free, to help
+              you grow in faith, family, and farming.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <a
+                href="#materials"
+                className="group inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-full font-semibold shadow-lg hover:bg-emerald-700 transition-all"
+              >
+                Browse Materials{" "}
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition" />
+              </a>
+              <Link
+                to="/donate"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-full font-semibold hover:bg-white/30 transition-all"
+              >
+                Support Our Work
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+            <div className="w-1 h-2 bg-white/50 rounded-full mt-2 animate-pulse" />
+          </div>
+        </div>
+      </section>
 
       {/* Materials Grid Section */}
       <div id="materials" className="bg-gray-50 py-16">

@@ -1,7 +1,7 @@
 // src/pages/HomePage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Heart,
   BookOpen,
@@ -14,11 +14,12 @@ import {
   ArrowRight,
   Quote,
   ChevronRight,
+  Play,
 } from "lucide-react";
 import api from "../services/api";
 import SEO from "../components/SEO";
-import { Users } from "lucide-react";
-import HeroSection from "../components/HeroSection";
+import YouTubeVideos from "../components/YouTubeVideos";
+import ActivityCarousel from "../components/ActivityCarousel";
 
 const HomePage = () => {
   const [featuredFaith, setFeaturedFaith] = useState(null);
@@ -28,6 +29,13 @@ const HomePage = () => {
   const [latestStudies, setLatestStudies] = useState([]);
   const [featuredSeeds, setFeaturedSeeds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -82,7 +90,6 @@ const HomePage = () => {
     fetchHomeData();
   }, []);
 
-  // Animation variants
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -99,7 +106,7 @@ const HomePage = () => {
   return (
     <>
       <SEO
-        title="Sami Ministry – Faith, Family, Farming"
+        title="RemSam Homestead – Faith, Family, Farming"
         description="Inspiring faith, wholesome recipes, sustainable agriculture, homeschooling resources, and farm-fresh products."
         keywords={[
           "Faith",
@@ -111,89 +118,218 @@ const HomePage = () => {
         ]}
       />
       <div className="bg-white overflow-hidden">
-        {/* ========== HERO SECTION ========== */}
-        <HeroSection
-          badge="Welcome to Sami Ministry"
-          title="Growing in <span class='text-emerald-600'>Faith</span>,<br />Nurturing <span class='text-amber-600'>Family</span>,<br />Cultivating the <span class='text-blue-600'>Land</span>"
-          subtitle="A place where faith meets everyday life – through inspiring blogs, organic recipes, sustainable agriculture, homeschooling wisdom, and farm‑fresh products."
-          primaryText="Explore Faith"
-          primaryLink="/faith"
-          secondaryText="Support Our Work"
-          secondaryLink="/donate"
-          imageSrc="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-          imageAlt="Sunrise over farm"
-        />
-
-        {/* ========== MISSION (short & sweet) ========== */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4 text-center max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+        {/* ========== 1. VIDEO HERO ========== */}
+        <section
+          ref={heroRef}
+          className="relative h-screen flex items-center justify-center overflow-hidden"
+        >
+          <div className="absolute inset-0 z-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+              poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
             >
-              <Quote className="w-10 h-10 text-emerald-500 mx-auto mb-4" />
-              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
-                Our Simple Mission
-              </h2>
-              <p className="text-gray-600 mt-4 leading-relaxed">
-                To inspire families to grow spiritually, live healthily, learn
-                joyfully, and steward God’s creation.
-              </p>
+              <source
+                src="https://cdn.pixabay.com/video/2022/03/21/112890-693130067_large.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+            <div className="absolute inset-0 bg-black/40" />
+          </div>
+          <motion.div
+            style={{ opacity, scale }}
+            className="relative z-10 container mx-auto px-4 text-center text-white"
+          >
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="max-w-4xl mx-auto"
+            >
+              <motion.span
+                variants={fadeUp}
+                className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/30"
+              >
+                Welcome to RemSam Homestead
+              </motion.span>
+              <motion.h1
+                variants={fadeUp}
+                className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight"
+              >
+                Growing in <span className="text-emerald-400">Faith</span>,
+                <br />
+                Nurturing <span className="text-amber-400">Family</span>,<br />
+                Cultivating the <span className="text-blue-400">Land</span>
+              </motion.h1>
+              <motion.p
+                variants={fadeUp}
+                className="text-xl md:text-2xl mt-6 mb-8 max-w-2xl mx-auto text-gray-200"
+              >
+                A place where faith meets everyday life – inspiring blogs,
+                organic recipes, sustainable agriculture, homeschooling wisdom,
+                and farm‑fresh products.
+              </motion.p>
+              <motion.div
+                variants={fadeUp}
+                className="flex flex-wrap gap-4 justify-center"
+              >
+                <Link
+                  to="/faith"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-full font-semibold shadow-lg hover:bg-emerald-700 transition-all hover:shadow-xl"
+                >
+                  Explore Faith
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/donate"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-semibold hover:bg-white/30 transition-all"
+                >
+                  <Gift size={20} /> Support Our Work
+                </Link>
+              </motion.div>
             </motion.div>
+          </motion.div>
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+              <div className="w-1 h-2 bg-white/50 rounded-full mt-2 animate-pulse" />
+            </div>
           </div>
         </section>
 
-        {/* Core Values / What We Offer */}
-        <section className="py-16 bg-white">
+        {/* ========== 2. MODERN FEATURE CARDS ========== */}
+        <section className="py-20 bg-white relative -mt-20 z-20">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  icon: <Heart className="w-8 h-8 text-rose-500" />,
+                  icon: <Heart className="w-8 h-8" />,
                   title: "Faith",
-                  desc: "Daily devotionals and spiritual growth resources",
+                  description:
+                    "Daily devotionals and spiritual growth resources",
+                  color: "from-rose-500 to-pink-500",
+                  link: "/faith",
                 },
                 {
-                  icon: <Users className="w-8 h-8 text-blue-500" />,
+                  icon: <School className="w-8 h-8" />,
                   title: "Family",
-                  desc: "Homeschooling support and parenting wisdom",
+                  description: "Homeschooling support and parenting wisdom",
+                  color: "from-blue-500 to-indigo-500",
+                  link: "/homeschooling",
                 },
                 {
-                  icon: <Sprout className="w-8 h-8 text-green-500" />,
+                  icon: <Sprout className="w-8 h-8" />,
                   title: "Farming",
-                  desc: "Organic gardening and sustainable agriculture tips",
+                  description:
+                    "Organic gardening and sustainable agriculture tips",
+                  color: "from-green-500 to-emerald-500",
+                  link: "/agriculture",
                 },
                 {
-                  icon: <BookOpen className="w-8 h-8 text-amber-500" />,
+                  icon: <BookOpen className="w-8 h-8" />,
                   title: "Learning",
-                  desc: "Free study materials and educational content",
+                  description: "Free study materials and educational content",
+                  color: "from-purple-500 to-violet-500",
+                  link: "/study-materials",
                 },
-              ].map((item, idx) => (
+              ].map((card, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="text-center p-6 bg-gray-50 rounded-xl hover:shadow-md transition"
+                  whileHover={{ y: -8 }}
+                  className="group relative"
                 >
-                  <div className="inline-flex p-3 bg-white rounded-full shadow-sm mb-4">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600">{item.desc}</p>
+                  <div
+                    className={`absolute -inset-0.5 bg-gradient-to-r ${card.color} rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500`}
+                  />
+                  <Link
+                    to={card.link}
+                    className="relative block bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
+                  >
+                    <div
+                      className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${card.color} text-white shadow-md mb-4`}
+                    >
+                      {card.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-gray-600">{card.description}</p>
+                    <div className="mt-4 text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all">
+                      Learn more →
+                    </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ========== FEATURED CONTENT (cards) ========== */}
-        <section className="py-16 bg-gray-50">
+        {/* ========== 3. ACTIVITY CAROUSEL (Visual Story) ========== */}
+        <ActivityCarousel />
+
+        {/* ========== 4. MISSION STATEMENT (Now meaningful) ========== */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-8 md:p-12 shadow-lg border border-emerald-100"
+              >
+                <div className="absolute -top-5 left-8 bg-white rounded-full p-2 shadow-md">
+                  <Quote className="w-8 h-8 text-emerald-600" />
+                </div>
+                <div className="mt-6">
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">
+                    Our Mission
+                  </h2>
+                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4">
+                    <p>
+                      In new fields, where the work of God has yet to be
+                      established, medical missionary work is to be done. This
+                      work removes prejudice, and prepares the way for the
+                      proclamation of the third angel's message. It is the means
+                      by which doors are opened for the entrance of the special
+                      truths for this time. Medical missionary work and the
+                      gospel are one. If united, they make a complete whole.
+                    </p>
+                    <p className="text-sm text-gray-500 italic">
+                      — Letter 92, 1902, p. 2. ("To Brethren in Responsible
+                      Positions in the Medical Work," April 8, 1902.) ~ 1MR
+                      228.1
+                    </p>
+                    <p>
+                      God's purpose in giving the third angel's message to the
+                      world is to prepare a people to stand true to Him during
+                      the investigative judgment. This is the purpose for which
+                      we establish and maintain our publishing houses, our
+                      schools, our sanitariums, hygienic restaurants, treatment
+                      rooms, and food factories. This is our purpose in carrying
+                      forward every line of work in the cause.
+                    </p>
+                    <p className="text-sm text-gray-500 italic">
+                      — Ms 154, 1902, p. 4. ("Instruction to Men in Positions of
+                      Responsibility," October 24, 1902.) ~ 1MR 228.2
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-b-2xl" />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== 5. WHAT'S NEW (Featured Articles) ========== */}
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -248,8 +384,8 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ========== STUDY MATERIALS & SHOP (combined section, shorter) ========== */}
-        <section className="py-16 bg-white">
+        {/* ========== 6. STUDY MATERIALS & SHOP ========== */}
+        <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Left: Study Materials */}
@@ -269,7 +405,7 @@ const HomePage = () => {
                     {latestStudies.slice(0, 2).map((study) => (
                       <div
                         key={study._id}
-                        className="flex gap-4 p-3 bg-gray-50 rounded-xl hover:shadow-md transition"
+                        className="flex gap-4 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition"
                       >
                         {study.featuredImage && (
                           <img
@@ -323,7 +459,7 @@ const HomePage = () => {
                         to={`/products/${product.slug}`}
                         className="group"
                       >
-                        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+                        <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
                           {product.images?.[0] && (
                             <img
                               src={product.images[0]}
@@ -355,22 +491,10 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ========== DONATION CALLOUT (minimal) ========== */}
-        <section className="py-16 bg-gradient-to-r from-emerald-50 to-amber-50">
-          <div className="container mx-auto px-4 text-center max-w-2xl">
-            <Heart className="w-10 h-10 text-rose-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Support Our Ministry
-            </h2>
-            <p className="text-gray-700 mb-6">
-              Your gift helps us create free resources and serve families.
-            </p>
-            <Link
-              to="/donate"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold shadow-md hover:bg-rose-700 transition"
-            >
-              <Gift size={18} /> Donate Now
-            </Link>
+        {/* ========== 7. YOUTUBE VIDEOS ========== */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <YouTubeVideos />
           </div>
         </section>
       </div>
@@ -378,7 +502,7 @@ const HomePage = () => {
   );
 };
 
-// ========== REUSABLE FEATURE CARD (modern, gradient header) ==========
+// ========== REUSABLE FEATURE CARD ==========
 const FeatureCard = ({
   icon,
   bgGradient,

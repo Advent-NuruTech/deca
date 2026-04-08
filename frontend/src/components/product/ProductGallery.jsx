@@ -1,143 +1,63 @@
-// components/product/ProductGallery.jsx
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
-import { getImageUrl } from "../../utils/constants";
+// src/components/product/ProductGallery.jsx
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ProductGallery = ({ images, name }) => {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const validImages = images?.filter(Boolean) || [];
+  const mainImage =
+    validImages[selectedIndex] || "https://placehold.co/600x400?text=No+Image";
 
-  if (!images || images.length === 0) {
-    return (
-      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl h-96 flex items-center justify-center text-gray-400 border border-gray-200">
-        No Image Available
-      </div>
+  const next = () =>
+    setSelectedIndex((prev) => (prev + 1) % validImages.length);
+  const prev = () =>
+    setSelectedIndex(
+      (prev) => (prev - 1 + validImages.length) % validImages.length,
     );
-  }
 
   return (
-    <>
-      <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
-        {/* Main Image */}
-        <div className="relative group">
-          <motion.img
-            key={selectedImage}
-            src={getImageUrl(images[selectedImage])}
-            alt={name}
-            className="w-full h-96 object-contain rounded-lg cursor-zoom-in"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            onClick={() => setIsZoomed(true)}
-          />
-
-          {/* Zoom indicator */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsZoomed(true)}
-            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ZoomIn size={20} />
-          </motion.button>
-
-          {/* Image navigation arrows */}
-          {images.length > 1 && (
-            <>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === 0 ? images.length - 1 : prev - 1,
-                  )
-                }
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronLeft size={20} />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev === images.length - 1 ? 0 : prev + 1,
-                  )
-                }
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm text-gray-900 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronRight size={20} />
-              </motion.button>
-            </>
-          )}
-        </div>
-
-        {/* Thumbnail Grid */}
-        {images.length > 1 && (
-          <div className="grid grid-cols-5 gap-2 mt-4">
-            {images.slice(0, 5).map((image, index) => (
-              <motion.button
-                key={index}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedImage(index)}
-                className={`relative rounded-lg overflow-hidden border-2 transition-colors ${
-                  selectedImage === index
-                    ? "border-purple-500"
-                    : "border-transparent"
-                }`}
-              >
-                <img
-                  src={getImageUrl(image)}
-                  alt={`${name} ${index + 1}`}
-                  className="w-full h-20 object-cover"
-                />
-                {selectedImage === index && (
-                  <motion.div
-                    layoutId="selectedIndicator"
-                    className="absolute inset-0 bg-purple-500/20"
-                  />
-                )}
-              </motion.button>
-            ))}
-          </div>
+    <div className="space-y-4">
+      <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-square">
+        <img
+          src={mainImage}
+          alt={name}
+          className="w-full h-full object-cover"
+        />
+        {validImages.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
         )}
       </div>
-
-      {/* Zoom Modal */}
-      <AnimatePresence>
-        {isZoomed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsZoomed(false)}
-            className="fixed inset-0 z-50 bg-black/90  flex items-center justify-center p-4"
-          >
-            <motion.button
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              onClick={() => setIsZoomed(false)}
-              className="absolute top-4 right-4 bg-white/10 text-gray-900 p-2 rounded-full hover:bg-white/20 transition-colors"
+      {validImages.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto">
+          {validImages.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedIndex(idx)}
+              className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${idx === selectedIndex ? "border-emerald-500" : "border-transparent"}`}
             >
-              <X size={24} />
-            </motion.button>
-
-            <motion.img
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              src={getImageUrl(images[selectedImage])}
-              alt={name}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+              <img
+                src={img}
+                alt={`${name} ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

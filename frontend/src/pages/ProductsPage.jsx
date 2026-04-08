@@ -1,4 +1,4 @@
-// pages/ProductsPage.jsx
+// src/pages/ProductsPage.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,18 +25,14 @@ const ProductsPage = () => {
     if (category) params.category = category;
     if (search) params.search = search;
     params.page = searchParams.get("page") || 1;
-
     dispatch(fetchProducts(params));
   }, [dispatch, category, search, searchParams]);
 
   const handleCategoryChange = (cat) => {
     setCategory(cat);
     const params = new URLSearchParams(searchParams);
-    if (cat) {
-      params.set("category", cat);
-    } else {
-      params.delete("category");
-    }
+    if (cat) params.set("category", cat);
+    else params.delete("category");
     params.delete("page");
     setSearchParams(params);
   };
@@ -66,13 +62,11 @@ const ProductsPage = () => {
   return (
     <>
       <SEO
-        title="Shop | Sami Ministry"
+        title="Shop | RemSam Homestead"
         description="Buy organic seeds, fresh produce, and other agricultural products from our farm."
         keywords={["Organic Seeds", "Fresh Produce", "Farm Products"]}
       />
-
       <ProductsHero />
-
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <AnimatedSection delay={0.1} direction="up">
@@ -86,20 +80,14 @@ const ProductsPage = () => {
               totalProducts={products?.length || 0}
             />
           </AnimatedSection>
-
-          {/* Category Stats */}
           {products?.length > 0 && (
             <AnimatedSection delay={0.2} direction="up">
               <CategoryStats products={products} />
             </AnimatedSection>
           )}
-
-          {/* Products Grid */}
           <AnimatedSection delay={0.3} direction="up">
             <ProductsGrid products={products || []} loading={loading} />
           </AnimatedSection>
-
-          {/* Pagination */}
           {!loading && products?.length > 0 && (
             <AnimatedSection delay={0.4} direction="up">
               <ProductsPagination

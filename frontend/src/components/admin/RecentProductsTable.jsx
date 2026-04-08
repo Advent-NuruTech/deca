@@ -1,4 +1,4 @@
-// components/admin/RecentProductsTable.jsx
+// src/components/admin/RecentProductsTable.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -12,20 +12,20 @@ const RecentProductsTable = ({ products }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 text-center"
+        className="bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center"
       >
-        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
-          <Package className="w-8 h-8 text-purple-400" />
+        <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+          <Package className="w-8 h-8 text-emerald-600" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl font-bold text-gray-800 mb-2">
           No Products Yet
         </h3>
-        <p className="text-gray-400 mb-6">
+        <p className="text-gray-500 mb-6">
           Create your first product to get started
         </p>
         <Link
           to="/admin/products/create"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+          className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-sm"
         >
           Create Product
         </Link>
@@ -38,17 +38,15 @@ const RecentProductsTable = ({ products }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Recent Products
-          </span>
+        <h2 className="text-xl font-bold text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Recent Products
         </h2>
         <Link
           to="/admin/products"
-          className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
+          className="text-sm text-gray-500 hover:text-emerald-600 transition-colors"
         >
           View All
         </Link>
@@ -58,24 +56,24 @@ const RecentProductsTable = ({ products }) => {
         <table className="min-w-full">
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Product
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Category
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Price
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-gray-100">
             {products.slice(0, 5).map((product, index) => (
               <motion.tr
                 key={product._id}
@@ -86,7 +84,7 @@ const RecentProductsTable = ({ products }) => {
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-r from-purple-500/20 to-blue-500/20">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100">
                       {product.images?.[0] ? (
                         <img
                           src={getImageUrl(product.images[0])}
@@ -95,36 +93,36 @@ const RecentProductsTable = ({ products }) => {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package size={16} className="text-purple-400" />
+                          <Package size={16} className="text-gray-400" />
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-gray-800">
                         {product.name}
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-gray-500">
                         ID: {product._id.slice(-6)}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-400 capitalize">
+                  <span className="text-sm text-gray-600 capitalize">
                     {product.category}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm font-semibold text-purple-400">
-                    $ {product.price?.toLocaleString()}
+                  <span className="text-sm font-semibold text-emerald-700">
+                    KSH {product.price?.toLocaleString()}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       product.status === "active"
-                        ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                        : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                        ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                        : "bg-gray-100 text-gray-600 border border-gray-200"
                     }`}
                   >
                     {product.status}
@@ -134,14 +132,14 @@ const RecentProductsTable = ({ products }) => {
                   <div className="flex items-center gap-2">
                     <Link
                       to={`/admin/products/edit/${product._id}`}
-                      className="p-2 text-gray-400 hover:text-purple-400 transition-colors"
+                      className="p-2 text-gray-500 hover:text-emerald-600 transition-colors"
                     >
                       <Edit size={16} />
                     </Link>
                     <Link
                       to={`/products/${product.slug}`}
                       target="_blank"
-                      className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
+                      className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
                     >
                       <Eye size={16} />
                     </Link>

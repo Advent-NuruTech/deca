@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../services/api";
 
 const initialState = {
   articles: [],
@@ -13,96 +13,96 @@ const initialState = {
 
 // Get all articles
 export const fetchArticles = createAsyncThunk(
-  'articles/fetchArticles',
+  "articles/fetchArticles",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { data } = await api.get('/articles', { params });
+      const { data } = await api.get("/articles", { params });
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to fetch articles'
+        error.response?.data?.message || "Failed to fetch articles",
       );
     }
-  }
+  },
 );
 
 // Get single article
 export const fetchArticle = createAsyncThunk(
-  'articles/fetchArticle',
+  "articles/fetchArticle",
   async (slug, { rejectWithValue }) => {
     try {
       const { data } = await api.get(`/articles/${slug}`);
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to fetch article'
+        error.response?.data?.message || "Failed to fetch article",
       );
     }
-  }
+  },
 );
 
 // Get all articles (admin)
 export const fetchAllArticles = createAsyncThunk(
-  'articles/fetchAllArticles',
+  "articles/fetchAllArticles",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await api.get('/articles/admin/all');
+      const { data } = await api.get("/articles/admin/all");
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to fetch articles'
+        error.response?.data?.message || "Failed to fetch articles",
       );
     }
-  }
+  },
 );
 
 // Create article
 export const createArticle = createAsyncThunk(
-  'articles/createArticle',
+  "articles/createArticle",
   async (articleData, { rejectWithValue }) => {
     try {
-      const { data } = await api.post('/articles', articleData);
+      const { data } = await api.post("/articles", articleData);
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to create article'
+        error.response?.data?.message || "Failed to create article",
       );
     }
-  }
+  },
 );
 
 // Update article
 export const updateArticle = createAsyncThunk(
-  'articles/updateArticle',
+  "articles/updateArticle",
   async ({ id, articleData }, { rejectWithValue }) => {
     try {
       const { data } = await api.put(`/articles/${id}`, articleData);
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to update article'
+        error.response?.data?.message || "Failed to update article",
       );
     }
-  }
+  },
 );
 
 // Delete article
 export const deleteArticle = createAsyncThunk(
-  'articles/deleteArticle',
+  "articles/deleteArticle",
   async (id, { rejectWithValue }) => {
     try {
       await api.delete(`/articles/${id}`);
       return id;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to delete article'
+        error.response?.data?.message || "Failed to delete article",
       );
     }
-  }
+  },
 );
 
 const articleSlice = createSlice({
-  name: 'articles',
+  name: "articles",
   initialState,
   reducers: {
     clearArticle: (state) => {
@@ -154,7 +154,7 @@ const articleSlice = createSlice({
       // Update article
       .addCase(updateArticle.fulfilled, (state, action) => {
         const index = state.articles.findIndex(
-          (a) => a._id === action.payload._id
+          (a) => a._id === action.payload._id,
         );
         if (index !== -1) {
           state.articles[index] = action.payload;
@@ -165,9 +165,7 @@ const articleSlice = createSlice({
       })
       // Delete article
       .addCase(deleteArticle.fulfilled, (state, action) => {
-        state.articles = state.articles.filter(
-          (a) => a._id !== action.payload
-        );
+        state.articles = state.articles.filter((a) => a._id !== action.payload);
       });
   },
 });

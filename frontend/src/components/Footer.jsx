@@ -1,19 +1,17 @@
-// components/Footer.jsx
+// src/components/Footer.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Code2,
   Mail,
   Phone,
   MapPin,
   Facebook,
-  YoutubeIcon,
   Instagram,
-  ArrowRight,
-  Sparkles,
-  Heart,
   Youtube,
+  ArrowRight,
+  Heart,
+  Sprout,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -22,99 +20,77 @@ const Footer = () => {
 
   const quickLinks = [
     { name: "Home", path: "/" },
-    { name: "Products", path: "/products" },
-    { name: "Articles", path: "/articles" },
+    { name: "Faith Blogs", path: "/articles?category=faith" },
+    { name: "Recipes", path: "/articles?category=recipe" },
+    { name: "Agriculture", path: "/articles?category=agriculture" },
+    { name: "Homeschooling", path: "/articles?category=homeschooling" },
+    { name: "Study Materials", path: "/study-materials" },
+    { name: "Shop", path: "/products" },
+    { name: "Donate", path: "/donate" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
   const productLinks = [
-    { name: "Starlink Kits", path: "/products?category=starlink", icon: "🛰️" },
-    { name: "Networking", path: "/products?category=networking", icon: "🌐" },
-    { name: "Laptops", path: "/products?category=laptop", icon: "💻" },
-    { name: "Phones", path: "/products?category=phone", icon: "📱" },
-    { name: "Software", path: "/products?category=software", icon: "⚙️" },
-    {
-      name: "Access Points",
-      path: "/products?category=accesspoint",
-      icon: "📶",
-    },
-    { name: "CCTV", path: "/products?category=cctv", icon: "📹" },
-    { name: "ROUTER", path: "/products?category=router", icon: " 📡" },
+    { name: "Organic Seeds", path: "/products?category=seeds", icon: "🌱" },
+    { name: "Fresh Produce", path: "/products?category=produce", icon: "🍅" },
+    { name: "Other Products", path: "/products?category=other", icon: "🌿" },
   ];
 
   const socialLinks = [
     {
       icon: Facebook,
-      href: "https://www.facebook.com/share/1C5boUNkPB/?mibextid=wwXIfr&ref=share",
-      color: "hover:text-blue-400",
+      href: "https://facebook.com/samiministry",
+      color: "hover:text-blue-600",
     },
     {
       icon: Youtube,
-      href: "https://www.tiktok.com/@fancy_tech_integration?_r=1&_t=ZS-94BqRrCsEm9",
-      color: "hover:text-blue-300",
-    },
-    {
-      icon: YoutubeIcon,
-      href: "https://youtube.com/@fancytechintegration?si=Co4IE5-BIU5EW-Cx",
-      color: "hover:text-blue-500",
+      href: "https://youtube.com/@samiministry",
+      color: "hover:text-red-600",
     },
     {
       icon: Instagram,
-      href: "https://www.instagram.com/fancy_tech_juba?igsh=cWI2c3QxYjJjZWpp&utm_source=qr_code_scanner",
-      color: "hover:text-pink-400",
+      href: "https://instagram.com/samiministry",
+      color: "hover:text-pink-600",
     },
-    // { icon: Whatsapp, href: "https" },
   ];
 
   return (
-    <footer className="relative bg-gray-50 text-gray-900 overflow-hidden">
-      {/* Animated background pattern */}
+    <footer className="relative bg-gray-50 text-gray-700 overflow-hidden">
+      {/* Decorative background pattern (subtle) */}
       <div className="absolute inset-0 opacity-5">
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 2px 2px, #8b5cf6 1px, transparent 0)",
+              "radial-gradient(circle at 2px 2px, #10b981 1px, transparent 0)",
             backgroundSize: "40px 40px",
           }}
         />
       </div>
 
-      {/* Gradient orbs */}
+      {/* Gradient orbs (soft) */}
       <motion.div
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.1, 0.2, 0.1],
+          scale: [1, 1.1, 1],
+          opacity: [0.05, 0.1, 0.05],
         }}
         transition={{ duration: 8, repeat: Infinity }}
-        className="absolute top-20 left-20 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"
+        className="absolute top-20 left-20 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl"
       />
       <motion.div
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.1, 0.2, 0.1],
+          scale: [1, 1.1, 1],
+          opacity: [0.05, 0.1, 0.05],
         }}
         transition={{ duration: 10, repeat: Infinity }}
-        className="absolute bottom-20 right-20 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"
+        className="absolute bottom-20 right-20 w-64 h-64 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl"
       />
 
-      {/* Floating sparkles */}
-      <motion.div
-        animate={{
-          y: [0, -20, 0],
-          rotate: [0, 10, 0],
-        }}
-        transition={{ duration: 6, repeat: Infinity }}
-        className="absolute top-40 right-40 text-purple-500/10 hidden lg:block"
-      >
-        <Sparkles size={60} />
-      </motion.div>
-
-      <div className="relative container mx-auto px-4 py-16">
+      <div className="relative container mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          {/* Company Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand & Mission */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -127,48 +103,47 @@ const Footer = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                {/* Logo Image */}
                 <img
                   src={logo}
-                  alt="F.T.I. Logo"
-                  className="w-12 h-12 object-contain"
+                  alt="RemSam Homestead Logo"
+                  className="w-12 h-12 object-contain rounded-full bg-white"
                 />
                 <motion.div
                   animate={{
                     boxShadow: [
-                      "0 0 0 0 rgba(139, 92, 246, 0.4)",
-                      "0 0 0 10px rgba(139, 92, 246, 0)",
+                      "0 0 0 0 rgba(16, 185, 129, 0.4)",
+                      "0 0 0 8px rgba(16, 185, 129, 0)",
                     ],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                   className="absolute inset-0 rounded-full"
                 />
               </motion.div>
-
               <div className="flex flex-col">
-                <span className="text-lg font-semibold text-gray-900">
-                  Fancy Tech
+                <span className="text-lg font-semibold text-gray-800">
+                  RemSam Homestead
                 </span>
-                <span className="text-s text-gray-400">Integration</span>
+                <span className="text-xs text-gray-500">
+                  Faith • Family • Farming
+                </span>
               </div>
             </Link>
-
-            <p className="text-gray-400 leading-relaxed">
-              Leading provider of technology solutions, Software products,
-              Starlink Kits, Networking Equipment, Laptops, and Phones in South
-              Sudan.
+            <p className="text-gray-600 leading-relaxed">
+              Inspiring families to grow spiritually, live healthily, learn
+              joyfully, and steward God’s creation – from Kenya to the nations.
             </p>
-
             {/* Social Links */}
-            <div className="flex items-center gap-3 pt-4">
+            <div className="flex items-center gap-3 pt-2">
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ y: -3, scale: 1.1 }}
-                  className={`w-10 h-10 rounded-full bg-gray-50 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-gray-400 ${social.color} hover:bg-white/10 transition-all duration-300`}
+                  className={`w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 ${social.color} hover:shadow transition-all`}
                 >
-                  <social.icon size={18} />
+                  <social.icon size={16} />
                 </motion.a>
               ))}
             </div>
@@ -180,130 +155,117 @@ const Footer = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h4 className="text-lg font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-              Quick Links
+            <h4 className="text-md font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+              Explore
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {quickLinks.map((link, index) => (
                 <motion.li
                   key={index}
-                  whileHover={{ x: 5 }}
+                  whileHover={{ x: 4 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <Link
                     to={link.path}
-                    className="group flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors"
+                    className="group flex items-center gap-2 text-gray-500 hover:text-emerald-600 transition-colors text-sm"
                   >
                     <ArrowRight
-                      size={14}
-                      className="opacity-0 group-hover:opacity-100 text-purple-400 transition-opacity"
+                      size={12}
+                      className="opacity-0 group-hover:opacity-100 text-emerald-500"
                     />
-                    <span className="group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 group-hover:text-transparent group-hover:bg-clip-text transition-all">
-                      {link.name}
-                    </span>
+                    <span>{link.name}</span>
                   </Link>
                 </motion.li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Products */}
+          {/* Shop Categories */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h4 className="text-lg font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-              Our Products
+            <h4 className="text-md font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+              Shop
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {productLinks.map((link, index) => (
                 <motion.li
                   key={index}
-                  whileHover={{ x: 5 }}
+                  whileHover={{ x: 4 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <Link
                     to={link.path}
-                    className="group flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors"
+                    className="group flex items-center gap-2 text-gray-500 hover:text-emerald-600 transition-colors text-sm"
                   >
-                    <span className="text-sm">{link.icon}</span>
-                    <span className="group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-blue-400 group-hover:text-transparent group-hover:bg-clip-text transition-all">
-                      {link.name}
-                    </span>
+                    <span className="text-base">{link.icon}</span>
+                    <span>{link.name}</span>
                   </Link>
                 </motion.li>
               ))}
             </ul>
+            <div className="mt-4 pt-2">
+              <Link
+                to="/donate"
+                className="inline-flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+              >
+                Support Our Work <ArrowRight size={14} />
+              </Link>
+            </div>
           </motion.div>
 
-          {/* Contact Info */}
+          {/* Contact & Newsletter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <h4 className="text-lg font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-              Get in Touch
+            <h4 className="text-md font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+              Connect
             </h4>
-            <ul className="space-y-4">
-              <motion.li
-                whileHover={{ x: 5 }}
-                className="flex items-start gap-3 text-gray-400 hover:text-gray-900 transition-colors group"
-              >
-                <Mail
-                  size={18}
-                  className="text-purple-400 mt-1 flex-shrink-0"
-                />
+            <ul className="space-y-3 mb-5">
+              <li className="flex items-start gap-3 text-gray-500 text-sm">
+                <Mail size={16} className="text-emerald-500 mt-0.5" />
                 <a
-                  href="mailto:sales@fancytechintegration.com"
-                  className="hover:text-gray-900 transition-colors break-all"
+                  href="mailto:hello@samiministry.org"
+                  className="hover:text-emerald-600"
                 >
-                  sales@fancytechintegration.com
+                  hello@samiministry.org
                 </a>
-              </motion.li>
-
-              <motion.li
-                whileHover={{ x: 5 }}
-                className="flex items-center gap-3 text-gray-400 hover:text-gray-900 transition-colors group"
-              >
-                <Phone size={18} className="text-purple-400 flex-shrink-0" />
-                <a
-                  href="tel:+254759466446"
-                  className="hover:text-gray-900 transition-colors"
-                >
-                  +211 929 097 920
+              </li>
+              <li className="flex items-center gap-3 text-gray-500 text-sm">
+                <Phone size={16} className="text-emerald-500" />
+                <a href="tel:+254721627977" className="hover:text-emerald-600">
+                  +254 721 627 977
                 </a>
-              </motion.li>
-
-              <motion.li
-                whileHover={{ x: 5 }}
-                className="flex items-center gap-3 text-gray-400 group"
-              >
-                <MapPin size={18} className="text-purple-400 flex-shrink-0" />
-                <span>Juba, South Sudan</span>
-              </motion.li>
+              </li>
+              <li className="flex items-center gap-3 text-gray-500 text-sm">
+                <MapPin size={16} className="text-emerald-500" />
+                <span>Nairobi, Kenya</span>
+              </li>
             </ul>
-
-            {/* Newsletter Signup (Optional) */}
-            <div className="mt-6">
-              <p className="text-sm text-gray-400 mb-2">
-                Subscribe to our newsletter
-              </p>
+            {/* Newsletter */}
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 mb-2">Stay encouraged</p>
               <div className="flex">
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="flex-1 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-l-lg px-4 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                  className="flex-1 bg-white border border-gray-200 rounded-l-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-emerald-400"
                 />
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-4 py-2 rounded-r-lg text-sm font-medium"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-r-lg text-sm font-medium hover:bg-emerald-700 transition"
                 >
                   Subscribe
                 </motion.button>
               </div>
+              <p className="text-xs text-gray-400 mt-2">
+                No spam, only encouragement.
+              </p>
             </div>
           </motion.div>
         </div>
@@ -313,44 +275,54 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="border-t border-gray-200 mt-12 pt-8"
+          className="border-t border-gray-200 mt-10 pt-6"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm flex items-center gap-2">
-              © {currentYear} Fancy Tech Integration.
-              <span className="hidden md:inline">All rights reserved.</span>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm">
+            <p className="text-gray-500 flex items-center gap-2">
+              © {currentYear} RemSam Homestead. All rights reserved.
+              <span className="hidden md:inline">•</span>
               <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
+                animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
-                className="inline-flex items-center gap-1 ml-2"
+                className="inline-flex items-center gap-1"
               >
-                Made with{" "}
-                <Heart size={14} className="text-red-400 fill-red-400" /> in
-                South Sudan
+                powered by{" "}
+                <a
+                  href="https://fancytechintegration.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-600 hover:text-emerald-700 transition"
+                >
+                  fancy tech integration
+                </a>
               </motion.span>
             </p>
-
-            {/* Legal Links */}
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-5">
               <Link
                 to="/privacy"
-                className="text-gray-400 hover:text-purple-400 transition-colors"
+                className="text-gray-500 hover:text-emerald-600 transition"
               >
-                Privacy Policy
+                Privacy
               </Link>
               <Link
                 to="/terms"
-                className="text-gray-400 hover:text-purple-400 transition-colors"
+                className="text-gray-500 hover:text-emerald-600 transition"
               >
-                Terms of Service
+                Terms
+              </Link>
+              <Link
+                to="/contact"
+                className="text-gray-500 hover:text-emerald-600 transition"
+              >
+                Contact
               </Link>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Decorative bottom gradient line */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500" />
+      {/* Decorative bottom line */}
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400" />
     </footer>
   );
 };

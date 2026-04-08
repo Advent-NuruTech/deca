@@ -26,7 +26,7 @@ const storage = hasCloudinaryConfig
   ? new CloudinaryStorage({
       cloudinary: cloudinary,
       params: {
-        folder: "fancytech-South Sudan", // Folder name in Cloudinary
+        folder: "remsam-Kenya", // Folder name in Cloudinary
         // Don't include allowed_formats or transformation here - they cause signature issues
         // File validation is handled by multer fileFilter instead
       },
@@ -63,7 +63,7 @@ export const deleteImage = async (publicId) => {
       // If it's a URL, extract the public_id
       const parts = publicId.split("/");
       const filename = parts[parts.length - 1];
-      public_id = `fancytech-South Sudan/${filename.split(".")[0]}`;
+      public_id = `remsam-Kenya/${filename.split(".")[0]}`;
     }
 
     const result = await cloudinary.uploader.destroy(public_id);

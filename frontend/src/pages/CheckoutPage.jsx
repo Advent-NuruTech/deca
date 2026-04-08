@@ -1,4 +1,4 @@
-// pages/CheckoutPage.jsx
+// src/pages/CheckoutPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -65,7 +65,6 @@ const CheckoutPage = () => {
         [name]: value,
       });
     }
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -73,7 +72,6 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
@@ -91,25 +89,21 @@ const CheckoutPage = () => {
       newErrors["address.city"] = "City is required";
     if (!formData.address.county.trim())
       newErrors["address.county"] = "County is required";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fill in all required fields correctly");
       return;
     }
-
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       navigate("/cart");
       return;
     }
-
     try {
       const orderData = {
         customer: {
@@ -118,7 +112,7 @@ const CheckoutPage = () => {
           phone: formData.phone,
           address: {
             ...formData.address,
-            country: "South Sudan",
+            country: "Kenya",
           },
         },
         items: cartItems.map((item) => ({
@@ -135,13 +129,8 @@ const CheckoutPage = () => {
         shippingMethod: formData.shippingMethod,
         notes: formData.notes,
       };
-
       const result = await dispatch(createOrder(orderData)).unwrap();
-
-      // Clear cart
       dispatch(clearCart());
-
-      // Navigate to order confirmation
       navigate(`/order-confirmation/${result.orderNumber}`);
       toast.success("Order placed successfully!");
     } catch (error) {
@@ -162,31 +151,27 @@ const CheckoutPage = () => {
   return (
     <>
       <SEO
-        title="Checkout"
-        description="Complete your order at Fancy Tech Integration South Sudan. Secure checkout for all your technology needs."
-        keywords={["Checkout", "Order", "Payment"]}
+        title="Checkout | RemSam Homestead"
+        description="Complete your order at RemSam Homestead. Secure checkout for organic seeds, fresh produce, and other farm products."
+        keywords={["Checkout", "Order", "Payment", "Organic Seeds", "Kenya"]}
       />
-
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
             <h1 className="text-4xl md:text-5xl font-bold">
-              <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                 Checkout
               </span>
             </h1>
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-500 mt-2">
               Complete your order by providing your details below
             </p>
           </motion.div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Checkout Form */}
             <div className="lg:col-span-2">
               <CheckoutForm
                 formData={formData}
@@ -196,8 +181,6 @@ const CheckoutPage = () => {
                 loading={loading}
               />
             </div>
-
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <OrderSummary
                 cartItems={cartItems}

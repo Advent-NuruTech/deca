@@ -1,4 +1,4 @@
-# FancyTech South Sudan - Setup Guide
+# remsam Kenya - Setup Guide
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ This will install dependencies for:
 
    ```env
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/fancytech-South Sudan
+   MONGODB_URI=mongodb://localhost:27017/remsam-Kenya
    JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
    NODE_ENV=development
 
@@ -86,7 +86,7 @@ npm run create-admin "Admin Name" "admin@example.com" "securepassword"
 
 Default credentials:
 
-- Email: `admin@fancytechSouth Sudan.com`
+- Email: `admin@remsamKenya.com`
 - Password: `admin123`
 
 **⚠️ IMPORTANT:** Change the default password immediately after first login!
@@ -156,12 +156,12 @@ app.get("*", (req, res) => {
 
 ### Backend (.env)
 
-| Variable    | Description                          | Default                                         |
-| ----------- | ------------------------------------ | ----------------------------------------------- |
-| PORT        | Server port                          | 5000                                            |
-| MONGODB_URI | MongoDB connection string            | mongodb://localhost:27017/fancytech-South Sudan |
-| JWT_SECRET  | Secret key for JWT tokens            | (required)                                      |
-| NODE_ENV    | Environment (development/production) | development                                     |
+| Variable    | Description                          | Default                                |
+| ----------- | ------------------------------------ | -------------------------------------- |
+| PORT        | Server port                          | 5000                                   |
+| MONGODB_URI | MongoDB connection string            | mongodb://localhost:27017/remsam-Kenya |
+| JWT_SECRET  | Secret key for JWT tokens            | (required)                             |
+| NODE_ENV    | Environment (development/production) | development                            |
 
 ## Troubleshooting
 

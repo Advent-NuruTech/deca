@@ -1,4 +1,4 @@
-// components/admin/QuickActions.jsx
+// src/components/admin/QuickActions.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -18,90 +18,133 @@ const QuickActions = () => {
       icon: Package,
       label: "Manage Products",
       path: "/admin/products",
-      color: "from-purple-500 to-blue-500",
+      color: "emerald",
       description: "Add, edit or remove products",
     },
     {
       icon: FileText,
       label: "Manage Articles",
       path: "/admin/articles",
-      color: "from-blue-500 to-cyan-500",
+      color: "blue",
       description: "Create and publish articles",
     },
     {
       icon: ShoppingCart,
       label: "Manage Orders",
       path: "/admin/orders",
-      color: "from-green-500 to-emerald-500",
+      color: "green",
       description: "View and process orders",
     },
     {
       icon: Users,
       label: "Manage Users",
       path: "/admin/users",
-      color: "from-orange-500 to-red-500",
+      color: "orange",
       description: "Customer management",
     },
     {
       icon: BarChart,
       label: "Analytics",
       path: "/admin/analytics",
-      color: "from-pink-500 to-rose-500",
+      color: "pink",
       description: "View site statistics",
     },
     {
       icon: Settings,
       label: "Settings",
       path: "/admin/settings",
-      color: "from-gray-500 to-gray-600",
+      color: "gray",
       description: "Configure your store",
     },
   ];
+
+  // Color mapping for pastel backgrounds and icon colors
+  const colorStyles = {
+    emerald: {
+      bg: "bg-emerald-100",
+      icon: "text-emerald-600",
+      hover: "hover:border-emerald-300",
+      link: "text-emerald-500",
+    },
+    blue: {
+      bg: "bg-blue-100",
+      icon: "text-blue-600",
+      hover: "hover:border-blue-300",
+      link: "text-blue-500",
+    },
+    green: {
+      bg: "bg-green-100",
+      icon: "text-green-600",
+      hover: "hover:border-green-300",
+      link: "text-green-500",
+    },
+    orange: {
+      bg: "bg-orange-100",
+      icon: "text-orange-600",
+      hover: "hover:border-orange-300",
+      link: "text-orange-500",
+    },
+    pink: {
+      bg: "bg-pink-100",
+      icon: "text-pink-600",
+      hover: "hover:border-pink-300",
+      link: "text-pink-500",
+    },
+    gray: {
+      bg: "bg-gray-100",
+      icon: "text-gray-600",
+      hover: "hover:border-gray-300",
+      link: "text-gray-500",
+    },
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
     >
-      <h2 className="text-xl font-bold mb-6">
-        <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-          Quick Actions
-        </span>
+      <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+        Quick Actions
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {actions.map((action, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 * index }}
-            whileHover={{ scale: 1.02 }}
-          >
-            <Link
-              to={action.path}
-              className="block p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-purple-500/50 transition-all group"
+        {actions.map((action, index) => {
+          const style = colorStyles[action.color] || colorStyles.emerald;
+          return (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 * index }}
+              whileHover={{ scale: 1.02 }}
             >
-              <div className="flex items-center gap-3 mb-2">
-                <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} p-2`}
-                >
-                  <action.icon className="w-full h-full text-gray-900" />
+              <Link
+                to={action.path}
+                className={`block p-4 bg-gray-50 rounded-xl border border-gray-200 ${style.hover} transition-all group`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div
+                    className={`w-10 h-10 rounded-lg ${style.bg} flex items-center justify-center`}
+                  >
+                    <action.icon className={`w-5 h-5 ${style.icon}`} />
+                  </div>
+                  <span className="font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors">
+                    {action.label}
+                  </span>
                 </div>
-                <span className="font-semibold text-gray-900 group-hover:text-purple-400 transition-colors">
-                  {action.label}
-                </span>
-              </div>
-              <p className="text-sm text-gray-400 mb-2">{action.description}</p>
-              <div className="flex items-center gap-1 text-xs text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                Go to {action.label}
-                <ArrowRight size={12} />
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+                <p className="text-sm text-gray-500 mb-2">
+                  {action.description}
+                </p>
+                <div className="flex items-center gap-1 text-xs text-emerald-500 opacity-50 group-hover:opacity-100 transition-opacity">
+                  Go to {action.label}
+                  <ArrowRight size={12} />
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

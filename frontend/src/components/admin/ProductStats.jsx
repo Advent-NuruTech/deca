@@ -1,4 +1,4 @@
-// components/admin/ProductStats.jsx
+// src/components/admin/ProductStats.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import {
@@ -11,62 +11,63 @@ import {
 } from "lucide-react";
 
 const ProductStats = ({ products }) => {
+  const totalValue = products
+    .filter((p) => p.status === "active")
+    .reduce((sum, p) => sum + p.price * (p.stockQuantity || 0), 0);
+
   const stats = [
     {
       title: "Total Products",
       value: products.length,
       icon: Package,
-      color: "from-purple-500 to-blue-500",
-      bgColor: "bg-purple-500/10",
-      textColor: "text-purple-400",
+      bgColor: "bg-emerald-100",
+      iconColor: "text-emerald-600",
+      textColor: "text-gray-800",
       delay: 0.1,
     },
     {
       title: "Active Products",
       value: products.filter((p) => p.status === "active").length,
       icon: TrendingUp,
-      color: "from-green-500 to-emerald-500",
-      bgColor: "bg-green-500/10",
-      textColor: "text-green-400",
+      bgColor: "bg-green-100",
+      iconColor: "text-green-600",
+      textColor: "text-gray-800",
       delay: 0.2,
     },
     {
       title: "Featured Products",
       value: products.filter((p) => p.featured).length,
       icon: Star,
-      color: "from-yellow-500 to-orange-500",
-      bgColor: "bg-yellow-500/10",
-      textColor: "text-yellow-400",
+      bgColor: "bg-amber-100",
+      iconColor: "text-amber-600",
+      textColor: "text-gray-800",
       delay: 0.3,
     },
     {
       title: "Out of Stock",
       value: products.filter((p) => !p.inStock).length,
       icon: AlertCircle,
-      color: "from-red-500 to-pink-500",
-      bgColor: "bg-red-500/10",
-      textColor: "text-red-400",
+      bgColor: "bg-red-100",
+      iconColor: "text-red-600",
+      textColor: "text-gray-800",
       delay: 0.4,
     },
     {
       title: "Total Value",
-      value: `$ ${products
-        .filter((p) => p.status === "active")
-        .reduce((sum, p) => sum + p.price * (p.stockQuantity || 0), 0)
-        .toLocaleString()}`,
+      value: `KSH ${totalValue.toLocaleString()}`,
       icon: DollarSign,
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-500/10",
-      textColor: "text-blue-400",
+      bgColor: "bg-blue-100",
+      iconColor: "text-blue-600",
+      textColor: "text-gray-800",
       delay: 0.5,
     },
     {
       title: "Categories",
       value: [...new Set(products.map((p) => p.category))].length,
       icon: Package,
-      color: "from-indigo-500 to-purple-500",
-      bgColor: "bg-indigo-500/10",
-      textColor: "text-indigo-400",
+      bgColor: "bg-indigo-100",
+      iconColor: "text-indigo-600",
+      textColor: "text-gray-800",
       delay: 0.6,
     },
   ];
@@ -82,24 +83,23 @@ const ProductStats = ({ products }) => {
           whileHover={{ y: -5 }}
           className="relative group"
         >
-          <div
-            className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
-          />
+          {/* Subtle hover border effect (optional) */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-200 to-teal-200 rounded-xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
 
-          <div className="relative bg-gray-500 backdrop-blur-sm rounded-xl p-4 border border-gray-200 group-hover:border-transparent transition-all duration-500">
+          <div className="relative bg-white rounded-xl shadow-sm p-4 border border-gray-100 group-hover:border-transparent transition-all duration-500">
             <div className="flex items-center justify-between mb-2">
               <div
                 className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}
               >
-                <stat.icon className={`w-5 h-5 ${stat.textColor}`} />
+                <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
               </div>
               <span className={`text-2xl font-bold ${stat.textColor}`}>
                 {typeof stat.value === "number"
-                  ? stat.value
-                  : stat.value.split(" ")[1]}
+                  ? stat.value.toLocaleString()
+                  : stat.value}
               </span>
             </div>
-            <p className="text-sm text-gray-400">{stat.title}</p>
+            <p className="text-sm text-gray-500">{stat.title}</p>
           </div>
         </motion.div>
       ))}

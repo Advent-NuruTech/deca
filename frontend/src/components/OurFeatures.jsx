@@ -16,7 +16,7 @@ const OurFeatures = () => {
     {
       icon: Rocket,
       title: "Fast Delivery",
-      description: "Quick and reliable delivery across South Sudan",
+      description: "Quick and reliable delivery across Kenya",
       color: "from-purple-400 to-blue-400",
       delay: 0.1,
     },

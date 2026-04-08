@@ -1,89 +1,28 @@
-// components/articles/CategoryStats.jsx
-import React from "react";
-import { motion } from "framer-motion";
-import {
-  Newspaper,
-  BookOpen,
-  Star,
-  TrendingUp,
-  Zap,
-  Sparkles,
-} from "lucide-react";
-
+// src/components/articles/CategoryStats.jsx
 const CategoryStats = ({ articles }) => {
-  const categories = [
-    {
-      name: "News",
-      icon: Newspaper,
-      color: "from-blue-400 to-blue-500",
-      count: articles.filter((a) => a.category === "news").length,
-    },
-    {
-      name: "Tutorials",
-      icon: BookOpen,
-      color: "from-green-400 to-green-500",
-      count: articles.filter((a) => a.category === "tutorial").length,
-    },
-    {
-      name: "Reviews",
-      icon: Star,
-      color: "from-purple-400 to-purple-500",
-      count: articles.filter((a) => a.category === "product-review").length,
-    },
-    {
-      name: "Updates",
-      icon: TrendingUp,
-      color: "from-orange-400 to-orange-500",
-      count: articles.filter((a) => a.category === "company-update").length,
-    },
-    {
-      name: "Tips",
-      icon: Zap,
-      color: "from-pink-400 to-pink-500",
-      count: articles.filter((a) => a.category === "tech-tips").length,
-    },
-  ].filter((cat) => cat.count > 0);
+  const counts = articles.reduce((acc, article) => {
+    acc[article.category] = (acc[article.category] || 0) + 1;
+    return acc;
+  }, {});
 
-  if (categories.length === 0) return null;
+  const categoryLabels = {
+    faith: "Faith Blogs",
+    recipe: "Recipes",
+    agriculture: "Agriculture",
+    homeschooling: "Homeschooling",
+    study: "Study Materials",
+  };
 
   return (
-    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-8">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-5 h-5 text-purple-400" />
-        <h3 className="text-lg font-semibold text-gray-900">
-          Category Breakdown
-        </h3>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {categories.map((cat, index) => (
-          <motion.div
-            key={cat.name}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -3 }}
-            className="relative group"
-          >
-            <div
-              className={`absolute inset-0 bg-gradient-to-r ${cat.color} rounded-lg opacity-0 group-hover:opacity-20 transition-opacity`}
-            />
-            <div className="relative bg-gray-50 backdrop-blur-sm rounded-lg p-3 border border-gray-200">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-8 h-8 rounded-lg bg-gradient-to-r ${cat.color} p-1.5`}
-                >
-                  <cat.icon className="w-full h-full text-gray-900" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">{cat.name}</p>
-                  <p className="text-lg font-bold text-gray-900">{cat.count}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-3 mb-8">
+      {Object.entries(counts).map(([cat, count]) => (
+        <span
+          key={cat}
+          className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 text-sm rounded-full"
+        >
+          {categoryLabels[cat] || cat}: {count}
+        </span>
+      ))}
     </div>
   );
 };

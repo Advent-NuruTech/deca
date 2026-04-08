@@ -1,3 +1,4 @@
+// src/components/SEO.jsx
 import { Helmet } from "react-helmet-async";
 
 const SEO = ({
@@ -8,19 +9,22 @@ const SEO = ({
   url,
   type = "website",
 }) => {
-  const siteName = "Fancy Tech Integration South Sudan";
+  const siteName = "RemSam Homestead";
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
   const fullDescription =
     description ||
-    "Fancy Tech Integration South Sudan - Leading provider of Starlink Kits, Networking Equipment, Laptops, Phones, and Software Solutions in South Sudan";
+    "RemSam Homestead – Faith, Family, Farming. Inspiring content on faith, organic recipes, agriculture, homeschooling, free study materials, and farm‑fresh products in Kenya.";
   const fullKeywords = [
-    "Fancy Tech Integration South Sudan",
-    "F.T.I. South Sudan",
-    "Starlink South Sudan",
-    "Networking Equipment",
-    "Laptops South Sudan",
-    "Phones South Sudan",
-    "Software Solutions",
+    "RemSam Homestead",
+    "Faith",
+    "Family",
+    "Farming",
+    "Organic Seeds",
+    "Homeschooling",
+    "Study Materials",
+    "Kenya",
+    "Kakamega",
+    "Butere",
     ...keywords,
   ].join(", ");
 

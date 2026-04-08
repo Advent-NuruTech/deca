@@ -1,4 +1,4 @@
-// components/checkout/CheckoutForm.jsx
+// src/components/checkout/CheckoutForm.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import {
@@ -14,12 +14,12 @@ import {
 
 const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
   const inputClasses = (fieldError) => `
-    w-full bg-gray-50 border rounded-lg px-4 py-4 text-gray-900 placeholder-gray-500 
+    w-full bg-white border rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 
     focus:outline-none focus:ring-2 transition-all
     ${
       fieldError
         ? "border-red-500 focus:ring-red-500/50"
-        : "border-gray-200 focus:border-purple-500 focus:ring-purple-500/50"
+        : "border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/50"
     }
   `;
 
@@ -30,22 +30,19 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
       >
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Customer Information
-          </span>
+        <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Customer Information
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Name */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Full Name *
             </label>
             <div className="relative group">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="text"
                 name="name"
@@ -57,17 +54,16 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               />
             </div>
             {errors.name && (
-              <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
             )}
           </div>
 
-          {/* Email */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email *
             </label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="email"
                 name="email"
@@ -79,17 +75,16 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               />
             </div>
             {errors.email && (
-              <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
             )}
           </div>
 
-          {/* Phone */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number *
             </label>
             <div className="relative group">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="tel"
                 name="phone"
@@ -101,7 +96,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               />
             </div>
             {errors.phone && (
-              <p className="text-red-400 text-xs mt-1">{errors.phone}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
             )}
           </div>
         </div>
@@ -112,22 +107,19 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
       >
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Shipping Address
-          </span>
+        <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Shipping Address
         </h2>
 
         <div className="space-y-4">
-          {/* Street */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Street Address *
             </label>
             <div className="relative group">
-              <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+              <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="text"
                 name="address.street"
@@ -139,68 +131,65 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               />
             </div>
             {errors["address.street"] && (
-              <p className="text-red-400 text-xs mt-1">
+              <p className="text-red-500 text-xs mt-1">
                 {errors["address.street"]}
               </p>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* City */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 City *
               </label>
               <div className="relative group">
-                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="text"
                   name="address.city"
                   value={formData.address.city}
                   onChange={onChange}
                   className={inputClasses(errors["address.city"])}
-                  placeholder="Juba"
+                  placeholder="Nairobi"
                   required
                 />
               </div>
               {errors["address.city"] && (
-                <p className="text-red-400 text-xs mt-1">
+                <p className="text-red-500 text-xs mt-1">
                   {errors["address.city"]}
                 </p>
               )}
             </div>
 
-            {/* County */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 County *
               </label>
               <div className="relative group">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="text"
                   name="address.county"
                   value={formData.address.county}
                   onChange={onChange}
                   className={inputClasses(errors["address.county"])}
-                  placeholder="Juba County"
+                  placeholder="Nairobi County"
                   required
                 />
               </div>
               {errors["address.county"] && (
-                <p className="text-red-400 text-xs mt-1">
+                <p className="text-red-500 text-xs mt-1">
                   {errors["address.county"]}
                 </p>
               )}
             </div>
 
-            {/* Postal Code */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Postal Code
               </label>
               <div className="relative group">
-                <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+                <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="text"
                   name="address.postalCode"
@@ -220,12 +209,10 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
       >
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Shipping Method
-          </span>
+        <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Shipping Method
         </h2>
 
         <div className="space-y-3">
@@ -254,10 +241,10 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
           ].map((option) => (
             <label
               key={option.method}
-              className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all group ${
+              className={`relative flex items-center p-4 border rounded-xl cursor-pointer transition-all group ${
                 formData.shippingMethod === option.method
-                  ? "border-purple-500 bg-purple-500/10"
-                  : "border-gray-200 hover:border-purple-500/50"
+                  ? "border-emerald-500 bg-emerald-50"
+                  : "border-gray-200 hover:border-emerald-300"
               }`}
             >
               <input
@@ -269,14 +256,14 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
                 className="sr-only"
               />
               <div className="flex items-center gap-4 flex-grow">
-                <span className="text-3xl">{option.icon}</span>
+                <span className="text-2xl">{option.icon}</span>
                 <div className="flex-grow">
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-gray-800">
                     {option.label}
                   </div>
-                  <div className="text-sm text-gray-400">{option.time}</div>
+                  <div className="text-sm text-gray-500">{option.time}</div>
                 </div>
-                <div className="font-bold text-purple-400">
+                <div className="font-bold text-emerald-600">
                   {option.rate === 0
                     ? "Free"
                     : `$ ${option.rate.toLocaleString()}`}
@@ -285,7 +272,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
               {formData.shippingMethod === option.method && (
                 <motion.div
                   layoutId="shippingIndicator"
-                  className="absolute inset-0 border-2 border-purple-500 rounded-xl"
+                  className="absolute inset-0 border-2 border-emerald-500 rounded-xl"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -299,12 +286,10 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
       >
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Payment Method
-          </span>
+        <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Payment Method
         </h2>
 
         <div className="space-y-3">
@@ -330,10 +315,10 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
           ].map((method) => (
             <label
               key={method.value}
-              className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+              className={`relative flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
                 formData.paymentMethod === method.value
-                  ? "border-purple-500 bg-purple-500/10"
-                  : "border-gray-200 hover:border-purple-500/50"
+                  ? "border-emerald-500 bg-emerald-50"
+                  : "border-gray-200 hover:border-emerald-300"
               }`}
             >
               <input
@@ -345,18 +330,18 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
                 className="sr-only"
               />
               <div className="flex items-center gap-4">
-                <span className="text-3xl">{method.icon}</span>
+                <span className="text-2xl">{method.icon}</span>
                 <div>
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-gray-800">
                     {method.label}
                   </div>
-                  <div className="text-sm text-gray-400">{method.desc}</div>
+                  <div className="text-sm text-gray-500">{method.desc}</div>
                 </div>
               </div>
               {formData.paymentMethod === method.value && (
                 <motion.div
                   layoutId="paymentIndicator"
-                  className="absolute inset-0 border-2 border-purple-500 rounded-xl"
+                  className="absolute inset-0 border-2 border-emerald-500 rounded-xl"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -370,21 +355,19 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200"
+        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
       >
-        <h2 className="text-2xl font-bold mb-6">
-          <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            Additional Notes
-          </span>
+        <h2 className="text-xl font-bold mb-5 text-gray-800 border-l-3 border-emerald-500 pl-3">
+          Additional Notes
         </h2>
         <div className="relative group">
-          <FileText className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
+          <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
           <textarea
             name="notes"
             value={formData.notes}
             onChange={onChange}
             rows="4"
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+            className="w-full bg-white border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50 transition-all"
             placeholder="Any special instructions or notes for your order..."
           />
         </div>
@@ -399,7 +382,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
         whileTap={{ scale: 0.98 }}
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 py-5 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+        className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group shadow-sm hover:bg-emerald-700 transition"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-3">
@@ -411,14 +394,7 @@ const CheckoutForm = ({ formData, errors, onChange, onSubmit, loading }) => {
             Processing Order...
           </span>
         ) : (
-          <>
-            <span className="relative z-10">Place Order</span>
-            <motion.div
-              animate={{ x: ["0%", "200%"] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-            />
-          </>
+          <span>Place Order</span>
         )}
       </motion.button>
     </form>

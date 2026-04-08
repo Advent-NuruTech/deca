@@ -1,7 +1,5 @@
-// components/products/ProductsFilter.jsx
-import React from "react";
-import { motion } from "framer-motion";
-import { Search, Filter, X } from "lucide-react";
+// src/components/products/ProductsFilter.jsx
+import { Search } from "lucide-react";
 
 const ProductsFilter = ({
   search,
@@ -12,155 +10,38 @@ const ProductsFilter = ({
   onSearch,
   totalProducts,
 }) => {
-  const [showFilters, setShowFilters] = React.useState(false);
-
   return (
-    <div className="bg-gray-500 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <Filter className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg font-semibold text-gray-900">
-            Filter Products
-          </h2>
+    <div className="bg-white rounded-xl shadow-sm p-4 mb-8">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setCategory(cat.value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                category === cat.value
+                  ? "bg-emerald-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
-        {totalProducts > 0 && (
-          <span className="text-sm text-gray-400">
-            <span className="text-purple-400 font-semibold">
-              {totalProducts}
-            </span>{" "}
-            products found
-          </span>
-        )}
+        <form onSubmit={onSearch} className="relative w-full md:w-64">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          />
+          <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+        </form>
       </div>
-
-      <form onSubmit={onSearch}>
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search Input */}
-          <div className="flex-1 relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-400 transition-colors" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-12 pr-4 py-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-
-          {/* Category Select - Desktop */}
-          <div className="hidden md:block md:w-64">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
-            >
-              {categories.map((cat) => (
-                <option key={cat.value} value={cat.value} className="bg-white">
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Mobile Filter Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className="md:hidden flex items-center justify-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 hover:bg-white/10 transition-colors"
-          >
-            <Filter size={18} />
-            {showFilters ? "Hide Categories" : "Show Categories"}
-          </button>
-
-          {/* Search Button */}
-          <motion.button
-            type="submit"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <Search size={18} />
-              Search
-            </span>
-            <motion.div
-              animate={{ x: ["0%", "200%"] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-            />
-          </motion.button>
-        </div>
-
-        {/* Mobile Category Select */}
-        {showFilters && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="md:hidden mt-4"
-          >
-            <select
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                setShowFilters(false);
-              }}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-gray-900 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer"
-            >
-              {categories.map((cat) => (
-                <option key={cat.value} value={cat.value} className="bg-white">
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </motion.div>
-        )}
-      </form>
-
-      {/* Active Filters */}
-      {(category || search) && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-200"
-        >
-          <span className="text-sm text-gray-400">Active filters:</span>
-          {category && (
-            <span className="inline-flex items-center gap-1 bg-purple-500/20 text-purple-400 text-sm px-3 py-1 rounded-full border border-purple-500/30">
-              {categories.find((c) => c.value === category)?.label}
-              <button onClick={() => setCategory("")}>
-                <X size={14} />
-              </button>
-            </span>
-          )}
-          {search && (
-            <span className="inline-flex items-center gap-1 bg-blue-500/20 text-blue-400 text-sm px-3 py-1 rounded-full border border-blue-500/30">
-              "{search}"
-              <button onClick={() => setSearch("")}>
-                <X size={14} />
-              </button>
-            </span>
-          )}
-          <button
-            onClick={() => {
-              setCategory("");
-              setSearch("");
-            }}
-            className="text-sm text-gray-400 hover:text-gray-900 transition-colors ml-2"
-          >
-            Clear all
-          </button>
-        </motion.div>
-      )}
+      <div className="mt-3 text-right text-sm text-gray-500">
+        {totalProducts} product{totalProducts !== 1 ? "s" : ""} found
+      </div>
     </div>
   );
 };

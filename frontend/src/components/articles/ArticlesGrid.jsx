@@ -1,54 +1,71 @@
-// components/articles/ArticlesGrid.jsx
-import React from "react";
-import { motion } from "framer-motion";
-import { Newspaper, Frown } from "lucide-react";
-import ArticleCard from "./ArticleCard";
+// src/components/articles/ArticlesGrid.jsx
+import { Link } from "react-router-dom";
+import { Calendar, User } from "lucide-react";
 
 const ArticlesGrid = ({ articles, loading }) => {
   if (loading) {
     return (
-      <div className="text-center py-20">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="inline-block w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
-        />
-        <p className="mt-4 text-gray-400">Loading amazing articles...</p>
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600" />
       </div>
     );
   }
 
   if (articles.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center py-20"
-      >
-        <motion.div
-          animate={{
-            y: [0, -10, 0],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="inline-block mb-4"
-        >
-          <Newspaper size={60} className="text-gray-600" />
-        </motion.div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          No articles found
-        </h3>
-        <p className="text-gray-400">
-          Try adjusting your search or filter criteria
-        </p>
-      </motion.div>
+      <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+        <p className="text-gray-500">No articles found.</p>
+      </div>
     );
   }
 
+  const categoryLabels = {
+    faith: "Faith",
+    recipe: "Recipe",
+    agriculture: "Agriculture",
+    homeschooling: "Homeschooling",
+    study: "Study",
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {articles.map((article, index) => (
-        <ArticleCard key={article._id} article={article} index={index} />
+      {articles.map((article) => (
+        <Link
+          key={article._id}
+          to={`/articles/${article.slug}`}
+          className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 block"
+        >
+          {article.featuredImage && (
+            <div className="relative h-48 overflow-hidden">
+              <img
+                src={article.featuredImage}
+                alt={article.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+              />
+              <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
+                {categoryLabels[article.category] || article.category}
+              </span>
+            </div>
+          )}
+          <div className="p-5">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+              {article.title}
+            </h3>
+            <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+              {article.excerpt}
+            </p>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <Calendar size={12} />
+                {new Date(article.createdAt).toLocaleDateString()}
+              </span>
+              <span className="flex items-center gap-1">
+                <User size={12} />
+                {article.author?.name || "Admin"}
+              </span>
+            </div>
+          </div>
+        </Link>
       ))}
     </div>
   );

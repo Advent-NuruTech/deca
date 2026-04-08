@@ -1,4 +1,4 @@
-// components/order/ActionButtons.jsx
+// src/components/order/ActionButtons.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -16,18 +16,13 @@ const ActionButtons = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 group relative overflow-hidden"
+          className="w-full bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 group relative overflow-hidden shadow-sm hover:bg-emerald-700 transition"
         >
           <span className="relative z-10 flex items-center gap-2">
             <ShoppingBag size={18} />
             Continue Shopping
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </span>
-          <motion.div
-            animate={{ x: ["0%", "200%"] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-          />
         </motion.button>
       </Link>
 
@@ -35,7 +30,7 @@ const ActionButtons = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+          className="w-full bg-white border border-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm"
         >
           <Headphones size={18} />
           Contact Support

@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema(
         postalCode: String,
         country: {
           type: String,
-          default: "South Sudan",
+          default: "Kenya",
         },
       },
     },

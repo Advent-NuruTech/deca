@@ -1,4 +1,4 @@
-// components/cart/EmptyCart.jsx
+// src/components/cart/EmptyCart.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -10,7 +10,7 @@ const EmptyCart = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-500 backdrop-blur-sm rounded-2xl p-16 text-center border border-gray-200"
+      className="bg-white rounded-xl shadow-sm p-16 text-center border border-gray-100"
     >
       <motion.div
         animate={{
@@ -20,27 +20,25 @@ const EmptyCart = () => {
         transition={{ duration: 4, repeat: Infinity }}
         className="inline-block mb-6"
       >
-        <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-          <ShoppingBag size={64} className="text-purple-400" />
+        <div className="w-32 h-32 rounded-full bg-emerald-50 flex items-center justify-center">
+          <ShoppingBag size={64} className="text-emerald-500" />
         </div>
       </motion.div>
 
-      <h2 className="text-3xl font-bold mb-4">
-        <span className="bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-          Your cart is empty
-        </span>
+      <h2 className="text-3xl font-bold mb-4 text-gray-800">
+        Your cart is empty
       </h2>
 
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">
+      <p className="text-gray-500 mb-8 max-w-md mx-auto">
         Looks like you haven't added anything to your cart yet. Start exploring
-        our amazing products!
+        our organic seeds and fresh produce!
       </p>
 
       <Link to="/products">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="group inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-purple-500/30 hover:shadow-2xl transition-all"
+          className="group inline-flex items-center gap-3 bg-emerald-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-md hover:bg-emerald-700 transition-all"
         >
           Browse Products
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

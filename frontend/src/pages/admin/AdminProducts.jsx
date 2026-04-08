@@ -1,4 +1,4 @@
-// pages/admin/AdminProducts.jsx
+// src/pages/admin/AdminProducts.jsx
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
@@ -67,8 +67,8 @@ const AdminProducts = () => {
   return (
     <>
       <SEO
-        title="Product Management"
-        description="Manage products for Sami Ministry – organic seeds, fresh produce, and other farm products."
+        title="Product Management | RemSam Homestead"
+        description="Manage products for RemSam Homestead – organic seeds, fresh produce, and other farm products."
       />
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
@@ -79,11 +79,11 @@ const AdminProducts = () => {
           >
             <div>
               <h1 className="text-4xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
+                <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                   Product Management
                 </span>
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 Manage your organic seeds, fresh produce, and other agricultural
                 products.
               </p>
@@ -94,7 +94,7 @@ const AdminProducts = () => {
                 transition={{ duration: 20, repeat: Infinity }}
                 className="hidden md:block"
               >
-                <Sparkles size={32} className="text-purple-400/30" />
+                <Sparkles size={32} className="text-emerald-400/50" />
               </motion.div>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -103,7 +103,7 @@ const AdminProducts = () => {
                   setEditingProduct(null);
                   setShowModal(true);
                 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 text-gray-900 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-emerald-700 transition-all"
               >
                 <Plus size={20} />
                 Add New Product

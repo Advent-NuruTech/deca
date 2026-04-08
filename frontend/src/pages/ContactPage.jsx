@@ -13,6 +13,7 @@ import {
 import SEO from "../components/SEO";
 import HeroSection from "../components/HeroSection";
 import AnimatedSection from "../components/AnimatedSection";
+import contact from "../assets/contact.jpg";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -34,8 +35,8 @@ const ContactPage = () => {
     setSubmitting(true);
     setError("");
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/contact", {
+      // Backend API endpoint – adjust if needed for production
+      const response = await fetch("http://localhost:8000/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -56,8 +57,8 @@ const ContactPage = () => {
   return (
     <>
       <SEO
-        title="Contact Us | Sami Ministry"
-        description="Get in touch with Sami Ministry. We'd love to hear from you – whether for prayer requests, questions about our resources, or partnership opportunities."
+        title="Contact Us | RemSam Homestead"
+        description="Get in touch with RemSam Homestead. We'd love to hear from you – whether for prayer requests, questions about our resources, or partnership opportunities."
       />
       <HeroSection
         badge="Get in Touch"
@@ -67,7 +68,7 @@ const ContactPage = () => {
         primaryLink="#contact-form"
         secondaryText="Join Our Community"
         secondaryLink="/donate"
-        imageSrc="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        imageSrc={contact}
         imageAlt="Hands holding a letter"
       />
 
@@ -91,10 +92,10 @@ const ContactPage = () => {
                     <div>
                       <p className="font-medium text-gray-800">Email</p>
                       <a
-                        href="mailto:hello@saministry.org"
+                        href="mailto:hello@remSamhomestead.org"
                         className="text-gray-600 hover:text-emerald-600"
                       >
-                        hello@saministry.org
+                        hello@remSamhomestead.org
                       </a>
                     </div>
                   </div>
@@ -103,10 +104,10 @@ const ContactPage = () => {
                     <div>
                       <p className="font-medium text-gray-800">Phone</p>
                       <a
-                        href="tel:+211123456789"
+                        href="tel:+254721627977"
                         className="text-gray-600 hover:text-emerald-600"
                       >
-                        +211 123 456 789
+                        +254 721 627 977
                       </a>
                     </div>
                   </div>
@@ -114,7 +115,7 @@ const ContactPage = () => {
                     <MapPin className="w-5 h-5 text-emerald-600 mt-0.5" />
                     <div>
                       <p className="font-medium text-gray-800">Address</p>
-                      <p className="text-gray-600">Juba, South Sudan</p>
+                      <p className="text-gray-600">Butere, Kakamega, Kenya</p>
                     </div>
                   </div>
                 </div>
@@ -122,19 +123,25 @@ const ContactPage = () => {
                   <p className="font-medium text-gray-800 mb-3">Follow Us</p>
                   <div className="flex gap-4">
                     <a
-                      href="#"
+                      href="https://facebook.com/remSamhomestead"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-gray-500 hover:text-emerald-600 transition"
                     >
                       <Facebook size={20} />
                     </a>
                     <a
-                      href="#"
+                      href="https://twitter.com/remSamhomestead"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-gray-500 hover:text-emerald-600 transition"
                     >
                       <Twitter size={20} />
                     </a>
                     <a
-                      href="#"
+                      href="https://instagram.com/remSamhomestead"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-gray-500 hover:text-emerald-600 transition"
                     >
                       <Instagram size={20} />
@@ -250,13 +257,13 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Optional Map Section (if you have a physical location) */}
+      {/* Map Section – Butere, Kakamega, Kenya */}
       <section className="py-10 bg-white">
         <div className="container mx-auto px-4">
           <div className="rounded-2xl overflow-hidden shadow-md h-64 md:h-80">
             <iframe
-              title="Sami Ministry Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.449429669445!2d31.5883007!3d4.8512422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x17699f9c4e0e8c5b%3A0x7c1b2b2b2b2b2b2b!2sJuba%2C%20South%20Sudan!5e0!3m2!1sen!2s!4v1699999999999!5m2!1sen!2s"
+              title="RemSam Homestead Location - Butere, Kakamega, Kenya"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15952.725584681865!2d34.491067!3d0.208476!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x178001c6f8d3c8f5%3A0x8a2d1f2c0c1c0e5!2sButere%2C%20Kenya!5e0!3m2!1sen!2s!4v1699999999999!5m2!1sen!2s"
               width="100%"
               height="100%"
               style={{ border: 0 }}

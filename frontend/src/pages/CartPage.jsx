@@ -1,4 +1,4 @@
-// pages/CartPage.jsx
+// src/pages/CartPage.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,9 +42,9 @@ const CartPage = () => {
   return (
     <>
       <SEO
-        title="Shopping Cart"
-        description="View your shopping cart at Fancy Tech Integration South Sudan. Review your selected products before checkout."
-        keywords={["Cart", "Shopping Cart", "Checkout"]}
+        title="Shopping Cart | RemSam Homestead"
+        description="View your shopping cart at RemSam Homestead. Review organic seeds, fresh produce, and other farm products before checkout."
+        keywords={["Cart", "Shopping Cart", "Checkout", "Organic Seeds"]}
       />
 
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
@@ -56,12 +56,12 @@ const CartPage = () => {
             className="mb-8"
           >
             <h1 className="text-4xl md:text-5xl font-bold">
-              <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
                 Shopping Cart
               </span>
             </h1>
             {cartItems.length > 0 && (
-              <p className="text-gray-400 mt-2">
+              <p className="text-gray-500 mt-2">
                 You have {cartItems.length}{" "}
                 {cartItems.length === 1 ? "item" : "items"} in your cart
               </p>

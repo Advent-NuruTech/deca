@@ -1,8 +1,8 @@
-# FancyTech South Sudan - Project Summary
+# remsam Kenya - Project Summary
 
 ## Overview
 
-This is a complete, production-ready MERN stack e-commerce and content management system built for FancyTech South Sudan. The system includes a public-facing marketplace website and a comprehensive admin panel for managing products and SEO-optimized articles.
+This is a complete, production-ready MERN stack e-commerce and content management system built for remsam Kenya. The system includes a public-facing marketplace website and a comprehensive admin panel for managing products and SEO-optimized articles.
 
 ## Key Features Implemented
 
@@ -83,7 +83,7 @@ This is a complete, production-ready MERN stack e-commerce and content managemen
 ## Project Structure
 
 ```
-fancyTechSouth Sudan/
+remsamKenya/
 ├── backend/
 │   ├── models/              # Database models (Product, Article, User)
 │   ├── routes/              # API route handlers
@@ -276,4 +276,4 @@ MIT License - Feel free to use and modify for your business needs.
 
 ---
 
-**Built with ❤️ for FancyTech South Sudan**
+**Built with ❤️ for remsam Kenya**

@@ -1,12 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "../../../.."
-		},
-		{
-			"name": "fancytechintegration",
-			"path": "../../.."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "../../../..",
+    },
+    {
+      "name": "remsamintegration",
+      "path": "../../..",
+    },
+  ],
+  "settings": {},
 }

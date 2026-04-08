@@ -1,6 +1,6 @@
-# FancyTech South Sudan - E-Commerce & Content Management System
+# remsam Kenya - E-Commerce & Content Management System
 
-A professional MERN stack application for FancyTech South Sudan, featuring a marketplace for Starlink Kits, Networking Equipment, Laptops, Phones, and Software Solutions, with integrated SEO-optimized content management.
+A professional MERN stack application for remsam Kenya, featuring a marketplace for Starlink Kits, Networking Equipment, Laptops, Phones, and Software Solutions, with integrated SEO-optimized content management.
 
 ## Features
 
@@ -42,7 +42,7 @@ A professional MERN stack application for FancyTech South Sudan, featuring a mar
 
    **Frontend (for production):**
    - Create `frontend/.env` file
-   - Add: `VITE_API_URL=https://fancytechintegration.onrender.com/api`
+   - Add: `VITE_API_URL=https://remsamintegration.onrender.com/api`
    - For development, the app will use the proxy configured in `vite.config.js`
 
 3. **Start development servers:**
@@ -59,22 +59,22 @@ A professional MERN stack application for FancyTech South Sudan, featuring a mar
 
 ### Backend (Render.com)
 
-- **URL**: `https://fancytechintegration.onrender.com`
-- **CORS**: Configured to allow requests from `https://fancytechintegration.vercel.app`
+- **URL**: `https://remsamintegration.onrender.com`
+- **CORS**: Configured to allow requests from `https://remsamintegration.vercel.app`
 - **Environment Variables**: Set CLOUDINARY credentials in Render dashboard
 
 ### Frontend (Vercel)
 
-- **URL**: `https://fancytechintegration.vercel.app`
+- **URL**: `https://remsamintegration.vercel.app`
 - **API**: Automatically uses production backend URL in production builds
-- **Environment Variable**: Set `VITE_API_URL=https://fancytechintegration.onrender.com/api` in Vercel
+- **Environment Variable**: Set `VITE_API_URL=https://remsamintegration.onrender.com/api` in Vercel
 - **SPA Routing**: Configured via `frontend/vercel.json` to handle React Router routes
 
 ### Image URLs
 
 All image URLs are automatically configured to use the production backend URL in production builds. The app uses a utility function (`getImageUrl`) that:
 
-- Uses production backend URL (`https://fancytechintegration.onrender.com`) in production
+- Uses production backend URL (`https://remsamintegration.onrender.com`) in production
 - Uses localhost for development
 - Handles both absolute and relative image paths
 - Supports Cloudinary URLs (full URLs are used as-is)
@@ -82,7 +82,7 @@ All image URLs are automatically configured to use the production backend URL in
 ## Project Structure
 
 ```
-fancyTechSouth Sudan/
+remsamKenya/
 ├── backend/
 │   ├── models/          # MongoDB models
 │   ├── routes/          # API routes
@@ -151,7 +151,7 @@ npm run create-admin "Admin Name" "admin@example.com" "securepassword"
 
 Default credentials:
 
-- Email: `admin@fancytechSouth Sudan.com`
+- Email: `admin@remsamKenya.com`
 - Password: `admin123`
 
 **⚠️ IMPORTANT:** Change the default password immediately after first login!

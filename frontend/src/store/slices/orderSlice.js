@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../services/api";
 
 const initialState = {
   order: null,
@@ -9,36 +9,36 @@ const initialState = {
 
 // Create order
 export const createOrder = createAsyncThunk(
-  'order/createOrder',
+  "order/createOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const { data } = await api.post('/orders', orderData);
+      const { data } = await api.post("/orders", orderData);
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to create order'
+        error.response?.data?.message || "Failed to create order",
       );
     }
-  }
+  },
 );
 
 // Get order by order number
 export const fetchOrder = createAsyncThunk(
-  'order/fetchOrder',
+  "order/fetchOrder",
   async (orderNumber, { rejectWithValue }) => {
     try {
       const { data } = await api.get(`/orders/${orderNumber}`);
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to fetch order'
+        error.response?.data?.message || "Failed to fetch order",
       );
     }
-  }
+  },
 );
 
 const orderSlice = createSlice({
-  name: 'order',
+  name: "order",
   initialState,
   reducers: {
     clearOrder: (state) => {

@@ -1,7 +1,7 @@
 {
-  "name": "fancytech-South Sudan",
+  "name": "remsam-Kenya",
   "version": "1.0.0",
-  "description": "FancyTech South Sudan - Software, Starlink Kits, Networking Equipment, Laptops & Phones Marketplace",
+  "description": "remsam Kenya - Software, Starlink Kits, Networking Equipment, Laptops & Phones Marketplace",
   "main": "server.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -17,7 +17,7 @@
     "networking",
     "laptops"
   ],
-  "author": "FancyTech South Sudan",
+  "author": "remsam Kenya",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2",

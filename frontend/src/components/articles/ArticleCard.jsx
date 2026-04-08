@@ -1,25 +1,27 @@
-// components/articles/ArticleCard.jsx (Enhanced version)
+// src/components/articles/ArticleCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, User, Tag, Clock, Eye } from "lucide-react";
+import { Calendar, User, Clock, Eye } from "lucide-react";
 import { getImageUrl } from "../../utils/constants";
 
 const ArticleCard = ({ article, index }) => {
+  // Updated category labels for RemSam Homestead
   const categoryLabels = {
-    news: "News",
-    tutorial: "Tutorial",
-    "product-review": "Product Review",
-    "company-update": "Company Update",
-    "tech-tips": "Tech Tips",
+    faith: "Faith Blog",
+    recipe: "Recipe",
+    agriculture: "Agriculture",
+    homeschooling: "Homeschooling",
+    study: "Study Material",
   };
 
+  // Light, ministry‑appropriate gradient colors
   const categoryColors = {
-    news: "from-blue-400 to-blue-500",
-    tutorial: "from-green-400 to-green-500",
-    "product-review": "from-purple-400 to-purple-500",
-    "company-update": "from-orange-400 to-orange-500",
-    "tech-tips": "from-pink-400 to-pink-500",
+    faith: "from-emerald-500 to-teal-500",
+    recipe: "from-amber-500 to-orange-500",
+    agriculture: "from-green-500 to-emerald-500",
+    homeschooling: "from-blue-500 to-indigo-500",
+    study: "from-purple-500 to-pink-500",
   };
 
   const formatDate = (date) => {
@@ -34,11 +36,12 @@ const ArticleCard = ({ article, index }) => {
     const wordsPerMinute = 200;
     const wordCount = content?.split(/\s+/).length || 0;
     const readTime = Math.ceil(wordCount / wordsPerMinute);
-    return readTime || 3; // Default to 3 minutes if no content
+    return readTime || 3;
   };
 
   const color =
-    categoryColors[article.category] || "from-purple-400 to-blue-400";
+    categoryColors[article.category] || "from-emerald-500 to-teal-500";
+  const label = categoryLabels[article.category] || article.category;
 
   return (
     <motion.div
@@ -48,14 +51,14 @@ const ArticleCard = ({ article, index }) => {
       whileHover={{ y: -8 }}
       className="group relative h-full"
     >
-      {/* Animated border */}
+      {/* Animated gradient border on hover */}
       <div
         className={`absolute -inset-0.5 bg-gradient-to-r ${color} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500`}
       />
 
       <Link
         to={`/articles/${article.slug}`}
-        className="relative block h-full bg-gray-500 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200 group-hover:border-transparent transition-all duration-500"
+        className="relative block h-full bg-white rounded-xl overflow-hidden border border-gray-200 group-hover:border-transparent transition-all duration-500 shadow-sm hover:shadow-xl"
       >
         {/* Image Container */}
         {article.featuredImage && (
@@ -68,20 +71,20 @@ const ArticleCard = ({ article, index }) => {
               transition={{ duration: 0.6 }}
             />
 
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+            {/* Light gradient overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent" />
 
             {/* Category Badge */}
             <motion.div
               initial={{ x: -100 }}
               animate={{ x: 0 }}
-              className={`absolute top-4 left-4 bg-gradient-to-r ${color} text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
+              className={`absolute top-4 left-4 bg-gradient-to-r ${color} text-white text-xs font-bold px-3 py-1 rounded-full shadow-md`}
             >
-              {categoryLabels[article.category] || article.category}
+              {label}
             </motion.div>
 
-            {/* Read Time */}
-            <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-gray-900 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+            {/* Read Time Badge */}
+            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm text-gray-700 text-xs px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
               <Clock size={12} />
               <span>{getReadTime(article.content)} min read</span>
             </div>
@@ -92,18 +95,18 @@ const ArticleCard = ({ article, index }) => {
         <div className="p-6">
           {/* Title */}
           <h3
-            className={`text-xl font-bold mb-3 text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${color} transition-all duration-300 line-clamp-2`}
+            className={`text-xl font-bold mb-3 text-gray-800 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${color} transition-all duration-300 line-clamp-2`}
           >
             {article.title}
           </h3>
 
           {/* Excerpt */}
-          <p className="text-gray-400 text-sm mb-4 line-clamp-3">
+          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
             {article.excerpt}
           </p>
 
           {/* Meta Info */}
-          <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
             <div className="flex items-center gap-1">
               <User size={12} />
               <span>{article.author?.name || "Admin"}</span>
@@ -122,7 +125,7 @@ const ArticleCard = ({ article, index }) => {
               {article.tags.slice(0, 3).map((tag, tagIndex) => (
                 <span
                   key={tagIndex}
-                  className="text-xs bg-gray-50 text-gray-400 px-2 py-1 rounded-full border border-gray-200"
+                  className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full border border-gray-200"
                 >
                   #{tag}
                 </span>

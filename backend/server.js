@@ -14,13 +14,13 @@ import articleRoutes from "./routes/articleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-
+import contactRoutes from "./routes/contactRoutes.js"; // added contact route
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// CORS Configuration - updated for Sami Ministry
+// CORS Configuration - updated for RemSam Homestead
 const corsOptions = {
   origin: [
     "http://localhost:3000",
@@ -41,7 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Database connection - updated database name
 mongoose
   .connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/sami-ministry", // changed from fancytech-South Sudan
+    process.env.MONGODB_URI || "mongodb://localhost:27017/sami-ministry", // changed from remsam-Kenya
   )
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
@@ -53,10 +53,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/download", downloadRoutes); // added download route
+app.use("/api/contact", contactRoutes); // added contact route
 
 // Health check - updated message
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", message: "Sami Ministry API is running" });
+  res.json({ status: "OK", message: "RemSam Homestead API is running" });
 });
 
 const PORT = process.env.PORT || 8000; // changed from 5000 to match your .env (8000)

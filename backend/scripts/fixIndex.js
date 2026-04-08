@@ -11,8 +11,7 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 const fixIndex = async () => {
   try {
     const mongoUri =
-      process.env.MONGODB_URI ||
-      "mongodb://localhost:27017/fancytech-South Sudan";
+      process.env.MONGODB_URI || "mongodb://localhost:27017/remsam-Kenya";
     await mongoose.connect(mongoUri);
     console.log("MongoDB Connected");
 
