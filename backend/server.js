@@ -24,7 +24,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:3000",
-    "https://remsam.netlify.app/",
+    "https://remsam.netlify.app",
     "https://sami-ministry.onrender.com",
   ],
   credentials: true,

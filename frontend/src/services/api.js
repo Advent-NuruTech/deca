@@ -1,15 +1,15 @@
 import axios from "axios";
 
-// Use production backend URL or fallback to proxy for development
-const API_BASE_URL =
+// Use environment variable for the backend root (without /api)
+const BACKEND_ROOT =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "https://sami-ministry.onrender.com/api" : "/api");
+  (import.meta.env.PROD
+    ? "https://sami-ministry.onrender.com"
+    : "http://localhost:8000");
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: `${BACKEND_ROOT}/api`, // 👈 ensures /api is always added
+  headers: { "Content-Type": "application/json" },
 });
 
 // const API_BASE_URL =
