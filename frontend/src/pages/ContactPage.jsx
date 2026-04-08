@@ -29,7 +29,7 @@ const ContactPage = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  // handle submit function to send form data to backend API.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
