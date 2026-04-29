@@ -64,11 +64,11 @@ const YouTubeVideos = () => {
     <AnimatedSection delay={0.1} direction="up">
       <div className="text-center mb-10">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-          Watch Our Latest Videos
+          Watch Our Latest Videos From Prophetic Mirror
         </h2>
         <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 mx-auto mt-3 rounded-full" />
         <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-          Encouragement, teachings, and stories from our homestead.
+          Encouragement, teachings, and stories from our channel.
         </p>
       </div>
 

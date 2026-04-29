@@ -20,6 +20,7 @@ import api from "../services/api";
 import SEO from "../components/SEO";
 import YouTubeVideos from "../components/YouTubeVideos";
 import ActivityCarousel from "../components/ActivityCarousel";
+import YouTubeVideos2 from "../components/YouTubeVideos2";
 
 const HomePage = () => {
   const [featuredFaith, setFeaturedFaith] = useState(null);
@@ -495,6 +496,11 @@ const HomePage = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <YouTubeVideos />
+          </div>
+        </section>
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <YouTubeVideos2 />
           </div>
         </section>
       </div>
