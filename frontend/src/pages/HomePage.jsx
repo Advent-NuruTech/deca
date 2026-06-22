@@ -21,6 +21,7 @@ import SEO from "../components/SEO";
 import YouTubeVideos from "../components/YouTubeVideos";
 import ActivityCarousel from "../components/ActivityCarousel";
 import YouTubeVideos2 from "../components/YouTubeVideos2";
+import remsamVideo from "../assets/remsam.mp4";
 
 const HomePage = () => {
   const [featuredFaith, setFeaturedFaith] = useState(null);
@@ -119,42 +120,42 @@ const HomePage = () => {
         ]}
       />
       <div className="bg-white overflow-hidden">
-        {/* ========== 1. VIDEO HERO ========== */}
-        <section
-          ref={heroRef}
-          className="relative h-screen flex items-center justify-center overflow-hidden"
-        >
-          <div className="absolute inset-0 z-0">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-              poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-            >
-              <source
-                src="https://cdn.pixabay.com/video/2022/03/21/112890-693130067_large.mp4"
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
-            <div className="absolute inset-0 bg-black/40" />
-          </div>
-          <motion.div
-            style={{ opacity, scale }}
-            className="relative z-10 container mx-auto px-4 text-center text-white"
-          >
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-              className="max-w-4xl mx-auto"
-            >
-              <motion.span
-                variants={fadeUp}
-                className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/30"
-              >
+  {/* ========== 1. VIDEO HERO ========== */}
+<section
+  ref={heroRef}
+  className="relative h-screen flex items-center justify-center overflow-hidden"
+>
+  {/* Video Background */}
+  <div className="absolute inset-0 z-0">
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover"
+      poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+    >
+      <source src={remsamVideo} type="video/mp4" />
+    </video>
+
+    <div className="absolute inset-0 bg-black/40" />
+  </div>
+
+  {/* Hero Content */}
+  <motion.div
+    style={{ opacity, scale }}
+    className="relative z-10 container mx-auto px-4 text-center text-white"
+  >
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
+      className="max-w-4xl mx-auto"
+    >
+      <motion.span
+        variants={fadeUp}
+        className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/30"
+      >
                 Welcome to RemSam Homestead
               </motion.span>
               <motion.h1
@@ -164,7 +165,7 @@ const HomePage = () => {
                 <span className="text-emerald-400">Remsam Homestade</span>
                 <br />
                 <span className="text-amber-400">Faith,Family, Farming</span>,<br />
-                Cultivating the <span className="text-blue-400">Land</span>
+
               </motion.h1>
               <motion.p
                 variants={fadeUp}
