@@ -14,6 +14,26 @@ const StudyMaterialsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 9;
+  const studyCategories = [
+  "Church History",
+  "Daniel",
+  "Revelation",
+  "Devotionals",
+  "Dress",
+  "Education",
+  "EGW-Pioneers",
+  "Anatomy and Physiology",
+  "Diseases and Programs",
+  "Medical Missionary Work",
+  "Music",
+  "Organic Farming",
+  "Prophecy",
+  "Righteousness by Faith",
+  "The Church",
+  "The Sanctuary",
+  "The Heavenly Trio",
+  "Youths, Courtship and Marriage",
+];
 
   useEffect(() => {
     const fetchStudyMaterials = async () => {
@@ -48,6 +68,7 @@ const StudyMaterialsPage = () => {
   };
 
   return (
+    
     <>
       <SEO
         title="Study Materials | RemSam Homestead"
@@ -71,6 +92,28 @@ const StudyMaterialsPage = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/40" />
         </div>
+        {/* ========== CATEGORY BUTTONS (ADD HERE) ========== */}
+<div className="bg-white py-10 border-b">
+  <div className="container mx-auto px-4">
+    <h2 className="text-xl font-bold text-gray-800 mb-4">
+      Browse Categories
+    </h2>
+
+    <div className="flex flex-wrap gap-3">
+      {studyCategories.map((cat, index) => (
+        <Link
+          key={index}
+          to={`/study-materials?category=${cat
+            .toLowerCase()
+            .replace(/ /g, "-")}`}
+          className="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-emerald-600 hover:text-white transition"
+        >
+          {cat}
+        </Link>
+      ))}
+    </div>
+  </div>
+</div>
 
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
           <motion.div

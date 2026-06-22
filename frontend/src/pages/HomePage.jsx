@@ -159,11 +159,11 @@ const HomePage = () => {
               </motion.span>
               <motion.h1
                 variants={fadeUp}
-                className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight"
+                className="text-5xl md:text-7xl lg:text-4xl font-bold leading-tight"
               >
-                Growing in <span className="text-emerald-400">Faith</span>,
+                <span className="text-emerald-400">Remsam Homestade</span>
                 <br />
-                Nurturing <span className="text-amber-400">Family</span>,<br />
+                <span className="text-amber-400">Faith,Family, Farming</span>,<br />
                 Cultivating the <span className="text-blue-400">Land</span>
               </motion.h1>
               <motion.p

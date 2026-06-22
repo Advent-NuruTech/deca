@@ -229,21 +229,21 @@ const Footer = () => {
               <li className="flex items-start gap-3 text-gray-500 text-sm">
                 <Mail size={16} className="text-emerald-500 mt-0.5" />
                 <a
-                  href="mailto:hello@samiministry.org"
+                  href="mailto:linksstan@gmail.com / remmyviolita27@gmail.com"
                   className="hover:text-emerald-600"
                 >
-                  hello@samiministry.org
+                  linksstan@gmail.com / remmyviolita27@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-3 text-gray-500 text-sm">
                 <Phone size={16} className="text-emerald-500" />
-                <a href="tel:+254721627977" className="hover:text-emerald-600">
-                  +254 721 627 977
+                <a href="tel:++254721627977 / +254746840322" className="hover:text-emerald-600">
+                 +254721627977 / +254746840322
                 </a>
               </li>
               <li className="flex items-center gap-3 text-gray-500 text-sm">
                 <MapPin size={16} className="text-emerald-500" />
-                <span>Nairobi, Kenya</span>
+                <span>Butere, Kenya</span>
               </li>
             </ul>
             {/* Newsletter */}

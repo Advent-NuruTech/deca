@@ -43,13 +43,32 @@ const Header = () => {
   };
 
   const resourcesItems = [
-    { name: "Faith Blogs", path: "/articles?category=faith" },
-    { name: "Recipes", path: "/articles?category=recipe" },
-    { name: "Agriculture", path: "/articles?category=agriculture" },
-    { name: "Homeschooling", path: "/articles?category=homeschooling" },
-    { name: "Study Materials", path: "/study-materials" },
-  ];
+  { name: "Faith Blogs", path: "/articles?category=faith" },
+  { name: "Recipes", path: "/articles?category=recipe" },
+  { name: "Agriculture", path: "/articles?category=agriculture" },
+  { name: "Homeschooling", path: "/articles?category=homeschooling" },
+  { name: "Study Materials", path: "/study-materials" },
 
+  // NEW CATEGORIES
+  { name: "Church History", path: "/articles?category=church-history" },
+  { name: "Daniel", path: "/articles?category=daniel" },
+  { name: "Revelation", path: "/articles?category=revelation" },
+  { name: "Devotionals", path: "/articles?category=devotionals" },
+  { name: "Dress", path: "/articles?category=dress" },
+  { name: "Education", path: "/articles?category=education" },
+  { name: "EGW-Pioneers", path: "/articles?category=egw-pioneers" },
+  { name: "Anatomy and Physiology", path: "/articles?category=anatomy-physiology" },
+  { name: "Diseases and Programs", path: "/articles?category=diseases-programs" },
+  { name: "Medical Missionary Work", path: "/articles?category=medical-missionary-work" },
+  { name: "Music", path: "/articles?category=music" },
+  { name: "Organic Farming", path: "/articles?category=organic-farming" },
+  { name: "Prophecy", path: "/articles?category=prophecy" },
+  { name: "Righteousness by Faith", path: "/articles?category=righteousness-by-faith" },
+  { name: "The Church", path: "/articles?category=the-church" },
+  { name: "The Sanctuary", path: "/articles?category=the-sanctuary" },
+  { name: "The Heavenly Trio", path: "/articles?category=the-heavenly-trio" },
+  { name: "Youths, Courtship and Marriage", path: "/articles?category=youths-courtship-marriage" },
+];
   const shopItems = [
     { name: "Seeds Shop", path: "/products?category=seeds" },
     { name: "Fresh Produce", path: "/products?category=produce" },
