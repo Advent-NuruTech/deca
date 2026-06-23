@@ -3,8 +3,21 @@ import axios from "axios";
 
 const router = express.Router();
 
-// @route   GET /api/download
-// @desc    Proxy file download with proper filename
+// Helper: map MIME types to file extensions
+const getExtensionFromMime = (mimeType) => {
+  const mimeMap = {
+    "application/pdf": ".pdf",
+    "application/msword": ".doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
+    "application/vnd.ms-powerpoint": ".ppt",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      ".pptx",
+    "application/octet-stream": ".bin", // fallback
+  };
+  return mimeMap[mimeType] || ".bin";
+};
+
 router.get("/", async (req, res) => {
   try {
     const { url, filename } = req.query;
@@ -12,29 +25,27 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ message: "URL parameter required" });
     }
 
-    // Use provided filename or generate one
+    // 1. Start with the provided filename, or extract from URL
     let finalFilename = filename;
     if (!finalFilename) {
-      // Try to extract from URL
       const decodedUrl = decodeURIComponent(url);
       const lastSegment = decodedUrl.split("/").pop();
       const match = lastSegment.match(/[^?]+/);
       if (match) {
         let name = match[0];
-        // If it has no extension, try to infer from Cloudinary's resource type
         if (!name.includes(".")) {
-          // Check if it's likely a PDF (by URL path containing '/raw/')
+          // Infer from Cloudinary URL path
           if (url.includes("/raw/")) {
             name += ".pdf";
           }
         }
         finalFilename = name;
       } else {
-        finalFilename = "document.pdf";
+        finalFilename = "document";
       }
     }
 
-    // Fetch the file from Cloudinary
+    // 2. Fetch the file from Cloudinary to get Content-Type
     const response = await axios({
       method: "get",
       url: url,
@@ -42,12 +53,24 @@ router.get("/", async (req, res) => {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
 
-    // Force download with correct filename
+    // 3. Ensure the final filename has an extension
+    const contentType =
+      response.headers["content-type"] || "application/octet-stream";
+    // If the filename has no dot, append the extension from Content-Type
+    if (!finalFilename.includes(".")) {
+      const ext = getExtensionFromMime(contentType);
+      finalFilename += ext;
+    }
+
+    // 4. Set headers to force download with the correct filename
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${finalFilename}"`,
     );
     res.setHeader("Content-Type", "application/octet-stream"); // Let browser guess from extension
+    res.setHeader("Content-Length", response.headers["content-length"]);
+
+    // 5. Pipe the file stream to the response
     response.data.pipe(res);
   } catch (error) {
     console.error("Download proxy error:", error.message);

@@ -1,10 +1,8 @@
-// src/components/admin/ArticleModal.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Upload,
-  Image as ImageIcon,
   FileText,
   Tag,
   Globe,
@@ -12,31 +10,69 @@ import {
   Eye,
   Download,
   Link as LinkIcon,
-  File,
 } from "lucide-react";
 import { getImageUrl } from "../../utils/constants";
 import api from "../../services/api";
 import toast from "react-hot-toast";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
   const [formData, setFormData] = useState({
-    title: article?.title || "",
-    content: article?.content || "",
-    excerpt: article?.excerpt || "",
-    category: article?.category || "faith",
-    tags: article?.tags?.join(", ") || "",
-    published: article?.published || false,
-    seoTitle: article?.seoTitle || "",
-    seoDescription: article?.seoDescription || "",
-    seoKeywords: article?.seoKeywords?.join(", ") || "",
-    featuredImage: article?.featuredImage || "",
-    isDownloadable: article?.isDownloadable || false,
-    fileUrl: article?.fileUrl || "",
+    title: "",
+    content: "",
+    excerpt: "",
+    category: "faith",
+    tags: "",
+    published: false,
+    seoTitle: "",
+    seoDescription: "",
+    seoKeywords: "",
+    featuredImage: "",
+    isDownloadable: false,
+    fileUrl: "",
   });
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
   const [previewMode, setPreviewMode] = useState(false);
 
+  // Populate formData when article changes (editing)
+  useEffect(() => {
+    if (article) {
+      setFormData({
+        title: article.title || "",
+        content: article.content || "",
+        excerpt: article.excerpt || "",
+        category: article.category || "faith",
+        tags: article.tags?.join(", ") || "",
+        published: article.published || false,
+        seoTitle: article.seoTitle || "",
+        seoDescription: article.seoDescription || "",
+        seoKeywords: article.seoKeywords?.join(", ") || "",
+        featuredImage: article.featuredImage || "",
+        isDownloadable: article.isDownloadable || false,
+        fileUrl: article.fileUrl || "",
+      });
+    } else {
+      // Reset for new article
+      setFormData({
+        title: "",
+        content: "",
+        excerpt: "",
+        category: "faith",
+        tags: "",
+        published: false,
+        seoTitle: "",
+        seoDescription: "",
+        seoKeywords: "",
+        featuredImage: "",
+        isDownloadable: false,
+        fileUrl: "",
+      });
+    }
+  }, [article]);
+
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -45,9 +81,11 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     });
   };
 
+  // Image upload (for featured image)
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setUploading(true);
     try {
       const uploadFormData = new FormData();
@@ -66,16 +104,21 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     }
   };
 
+  // Document upload (for downloadable files)
   const handleDocumentUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setUploading(true);
     try {
       const uploadFormData = new FormData();
       uploadFormData.append("image", file);
       const response = await api.post("/upload", uploadFormData);
       const fileUrl = response.data.secure_url || response.data.url;
-      setFormData((prev) => ({ ...prev, fileUrl }));
+      setFormData((prev) => ({
+        ...prev,
+        fileUrl: fileUrl,
+      }));
       toast.success("Document uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload document");
@@ -85,6 +128,7 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     }
   };
 
+  // Form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const articleData = {
@@ -97,16 +141,35 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
     onSubmit(articleData);
   };
 
-  const tabs = [
-    { id: "content", label: "Content", icon: FileText },
-    { id: "seo", label: "SEO", icon: Globe },
-    { id: "settings", label: "Settings", icon: Settings },
+  // ================== TOOLBAR CONFIGURATION ==================
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "link",
+    "image",
   ];
 
+  // ================== RENDER ==================
   return (
     <AnimatePresence>
       {isOpen && (
         <>
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -154,7 +217,11 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                 {/* Tabs */}
                 {!previewMode && (
                   <div className="flex border-b border-gray-200">
-                    {tabs.map((tab) => (
+                    {[
+                      { id: "content", label: "Content", icon: FileText },
+                      { id: "seo", label: "SEO", icon: Globe },
+                      { id: "settings", label: "Settings", icon: Settings },
+                    ].map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
@@ -248,6 +315,28 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                             </select>
                           </div>
 
+                          {/* Rich Text Editor */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Content *
+                            </label>
+                            <ReactQuill
+                              theme="snow"
+                              value={formData.content}
+                              onChange={(value) =>
+                                setFormData({ ...formData, content: value })
+                              }
+                              modules={modules}
+                              formats={formats}
+                              className="bg-white rounded-lg"
+                              placeholder="Write your article content here..."
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Use the toolbar to format text, add headings,
+                              lists, and links.
+                            </p>
+                          </div>
+
                           {/* Downloadable Section */}
                           <div className="border-t border-gray-200 pt-4">
                             <label className="flex items-center gap-2 cursor-pointer mb-3">
@@ -329,26 +418,6 @@ const ArticleModal = ({ isOpen, onClose, article, onSubmit }) => {
                               className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                               placeholder="Short description of the article"
                             />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Content * (HTML supported)
-                            </label>
-                            <textarea
-                              name="content"
-                              value={formData.content}
-                              onChange={handleChange}
-                              required
-                              rows="10"
-                              className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-800 font-mono text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                              placeholder="<p>Your article content here...</p>"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                              HTML tags supported: &lt;p&gt;, &lt;h2&gt;,
-                              &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;,
-                              &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;img&gt;
-                            </p>
                           </div>
 
                           <div>
