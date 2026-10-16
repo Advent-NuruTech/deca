@@ -14,6 +14,8 @@
     "phase8:check": "node --env-file=.env.local scripts/phase8-readiness.mjs",
     "phase8:smoke": "node scripts/phase8-smoke.mjs",
     "migrate:d1": "node --env-file=.env.local scripts/d1-migrate.mjs",
+    "migrate:legacy": "node --env-file=.env.local scripts/migrate-legacy-data.mjs",
+    "migrate:legacy:apply": "node --env-file=.env.local scripts/migrate-legacy-data.mjs --apply",
     "smoke:cloudinary": "node --env-file=.env.local scripts/cloudinary-smoke.mjs",
     "smoke:firebase": "node --env-file=.env.local scripts/firebase-smoke.mjs",
     "smoke:r2": "node --env-file=.env.local scripts/r2-smoke.mjs"
@@ -21,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1152.0",
     "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "bson": "^6.10.4",
     "cloudinary": "^2.11.0",
     "firebase": "^13.0.0",
     "firebase-admin": "^14.5.0",
@@ -42,5 +45,10 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
   }
 }

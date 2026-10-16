@@ -81,28 +81,12 @@ export async function d1Batch(statements: { sql: string; params?: unknown[] }[])
     );
   }
 
-  const res = await fetch(endpoint(), {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(
-      statements.map((s) => ({ sql: s.sql, params: s.params ?? [] })),
-    ),
-    cache: "no-store",
-  });
-
-  const json = (await res.json()) as D1Response;
-
-  if (!res.ok || !json.success) {
-    const message =
-      json.errors?.map((e) => e.message).join("; ") ||
-      `D1 batch failed with status ${res.status}`;
-    throw new Error(message);
+  const results: D1QueryResult[] = [];
+  for (const statement of statements) {
+    const result = await d1Query(statement.sql, statement.params ?? []);
+    results.push(result);
   }
-
-  return json.result;
+  return results;
 }
 
 export function parseJson<T>(value: unknown, fallback: T): T {
