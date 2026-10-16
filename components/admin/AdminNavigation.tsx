@@ -28,7 +28,7 @@ export default function AdminNavigation() {
         <Link href="/admin/dashboard" className="mr-auto flex items-center gap-3">
           <img src="/logo.png" alt="RemSam Homestead" className="h-10 w-10 rounded-full object-contain" />
           <div>
-            <p className="font-bold text-gray-900">RemSam Admin</p>
+            <p className="font-bold text-gray-900">RemSam Admin Panel</p>
             <p className="text-xs text-gray-500">{user?.name || user?.email}</p>
           </div>
         </Link>
