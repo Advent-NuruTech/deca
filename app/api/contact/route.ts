@@ -1,0 +1,47 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { NextRequest, NextResponse } from "next/server";
+import { errorResponse, HttpError } from "@/lib/auth";
+import { firestore } from "@/lib/firestore";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body: unknown = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      throw new HttpError(400, "Missing required fields");
+    }
+    const { name, email, subject, message } = body as Record<string, unknown>;
+    if (typeof name !== "string" || !name.trim() || name.trim().length > 120) {
+      throw new HttpError(400, "A valid name is required");
+    }
+    if (
+      typeof email !== "string" ||
+      !/^\S+@\S+\.\S+$/.test(email.trim()) ||
+      email.trim().length > 254
+    ) {
+      throw new HttpError(400, "A valid email is required");
+    }
+    if (typeof message !== "string" || !message.trim() || message.trim().length > 10_000) {
+      throw new HttpError(400, "A message of up to 10,000 characters is required");
+    }
+    if (subject !== undefined && (typeof subject !== "string" || subject.trim().length > 200)) {
+      throw new HttpError(400, "Subject must be at most 200 characters");
+    }
+
+    const result = await firestore().collection("contacts").add({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      subject: typeof subject === "string" ? subject.trim() : "",
+      message: message.trim(),
+      status: "new",
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    return NextResponse.json(
+      { id: result.id, message: "Email sent successfully" },
+      { status: 201 },
+    );
+  } catch (error) {
+    return errorResponse(error);
+  }
+}

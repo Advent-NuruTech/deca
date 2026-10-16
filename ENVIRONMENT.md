@@ -1,0 +1,65 @@
+# Required environment variables
+
+Add these secrets in `.env.local` for local development and in Vercel's
+project settings for deployment. Never prefix a secret with `NEXT_PUBLIC_`.
+
+| Service | Variables | Used for |
+| --- | --- | --- |
+| Firebase client | `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID` | Browser Firebase Auth |
+| Firebase Admin | `FIREBASE_SERVICE_ACCOUNT_KEY`, or `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Token verification and Firestore on the server |
+| Admin signup | `SIGN_UP_CODE` | Server-only access code required by `/admin/signup` |
+| Cloudinary | `CLOUDINARY_CLOUD_NAME` (or existing `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Product/article images |
+| Cloudflare R2 | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, optional `R2_PUBLIC_URL` | PDFs, DOC/DOCX and PPT/PPTX downloads |
+| Cloudflare D1 | `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `D1_DATABASE_ID` | Article body text only |
+| YouTube (optional public embeds) | `NEXT_PUBLIC_YOUTUBE_API_KEY`, `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID`, `NEXT_PUBLIC_YOUTUBE_API_KEY_2`, `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID_2` | The two existing home-page channel feeds |
+
+Study-material uploads are accepted at `POST /api/study-materials` as a
+multipart `file` (or `document`) field. Store the returned `fileKey`,
+`fileName`, and `fileType` on the article payload. Downloads use the returned
+same-origin `fileUrl`; the R2 bucket does not need to be public.
+
+`CF_API_TOKEN` needs D1 permissions. R2 credentials must be scoped to the
+documents bucket. Use the matching Vercel Development, Preview and Production
+environment settings.
+
+For split Firebase Admin credentials, keep the private key quoted and retain
+its escaped newlines:
+
+```dotenv
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+The application converts the escaped `\n` sequences before initializing the
+Admin SDK. None of these three variables may use the `NEXT_PUBLIC_` prefix.
+
+## Creating an administrator account
+
+Open `/admin/signup`, enter the administrator's name, email, password, and the
+value configured in `SIGN_UP_CODE`. The code is submitted to the server for a
+timing-safe comparison and is never exposed through a `NEXT_PUBLIC_` variable.
+After successful validation, the server creates `users/{uid}` with
+`role: "admin"` and the browser opens `/admin/dashboard`.
+
+Use a long, random value for `SIGN_UP_CODE`, configure the same value in the
+deployment environment, and rotate it after onboarding administrators. Normal
+application registration still always creates `role: "user"` accounts.
+
+If the signup screen cannot be used, an owner can still bootstrap an
+administrator manually:
+
+1. Create the account through the application (or Firebase Authentication's
+   **Users** screen) and copy its Firebase **UID**.
+2. In the Firebase console for the same project, open **Firestore Database** →
+   `users` → the document whose ID is that exact UID. If it does not exist,
+   create it with the exact UID as its document ID.
+3. Preserve or enter `name` and `email`, set `role` to the string `admin`, and
+   ensure `createdAt` and `updatedAt` are Firestore Timestamp values (use the
+   console's current-time option for each timestamp when creating a document).
+4. Save, then sign out and sign back in (or refresh the page) so the client
+   reloads `/api/auth/me` and sees the new role.
+
+Do this only from the Firebase console while signed into the project owner
+account. Never expose `SIGN_UP_CODE`, add a client-side role selector, or commit
+a service-account script for role promotion.

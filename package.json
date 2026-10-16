@@ -1,26 +1,46 @@
 {
-  "name": "remsam-Kenya",
-  "version": "1.0.0",
-  "description": "remsam Kenya - Software, Starlink Kits, Networking Equipment, Laptops & Phones Marketplace",
-  "main": "server.js",
-  "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd backend && npm run dev",
-    "client": "cd frontend && npm run dev",
-    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "build": "cd frontend && npm run build"
+  "name": "remsam-kenya",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.9.0"
   },
-  "keywords": [
-    "ecommerce",
-    "marketplace",
-    "starlink",
-    "networking",
-    "laptops"
-  ],
-  "author": "remsam Kenya",
-  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run build",
+    "phase8:check": "node --env-file=.env.local scripts/phase8-readiness.mjs",
+    "phase8:smoke": "node scripts/phase8-smoke.mjs",
+    "migrate:d1": "node --env-file=.env.local scripts/d1-migrate.mjs",
+    "smoke:cloudinary": "node --env-file=.env.local scripts/cloudinary-smoke.mjs",
+    "smoke:firebase": "node --env-file=.env.local scripts/firebase-smoke.mjs",
+    "smoke:r2": "node --env-file=.env.local scripts/r2-smoke.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "cloudinary": "^2.11.0",
+    "firebase": "^13.0.0",
+    "firebase-admin": "^14.5.0",
+    "framer-motion": "^12.34.3",
+    "lucide-react": "^0.575.0",
+    "next": "16.4.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^10.0.3",
+    "slugify": "^1.6.9",
+    "swiper": "^12.1.3"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "nodemon": "^3.1.13"
+    "@tailwindcss/turbopack": "^4",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
