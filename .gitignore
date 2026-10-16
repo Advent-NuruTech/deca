@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# local database migration exports (may contain customer data)
+/app/migrated-data/
+*.bson
+
 # next.js
 /.next/
 /out/
