@@ -11,52 +11,42 @@ import SEO from "../SEO";
 import AnimatedSection from "../AnimatedSection";
 const study = "/assets/study.jpg";
 
+type StudyCategoryOption = {
+  name: string;
+  slug: string;
+  count: number;
+};
+
 const StudyMaterialsPage = () => {
   const [materials, setMaterials] = useState<(PublicArticle & { thumbnail?: string; description?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
 
   const limit = 9;
-
-  const studyCategories = [
-    "Church History",
-    "Daniel",
-    "Revelation",
-    "Devotionals",
-    "Dress",
-    "Education",
-    "EGW-Pioneers",
-    "Anatomy and Physiology",
-    "Diseases and Programs",
-    "Medical Missionary Work",
-    "Music",
-    "Organic Farming",
-    "Prophecy",
-    "Righteousness by Faith",
-    "The Church",
-    "The Sanctuary",
-    "The Heavenly Trio",
-    "Youths, Courtship and Marriage",
-  ];
 
   useEffect(() => {
     const fetchStudyMaterials = async () => {
       setLoading(true);
       try {
-        const response = await api.get<{ articles: (PublicArticle & { thumbnail?: string; description?: string })[]; totalPages: number }>("/articles", {
+        const response = await api.get<{
+          articles: (PublicArticle & { thumbnail?: string; description?: string })[];
+          totalPages: number;
+          studyCategories: StudyCategoryOption[];
+        }>("/articles", {
           params: {
             isDownloadable: true,
             page: currentPage,
             limit,
-            category:
-              selectedCategory === "All" ? "" : selectedCategory,
+            category: selectedCategory,
           },
         });
 
         setMaterials(response.data.articles || []);
         setTotalPages(response.data.totalPages || 1);
+        setStudyCategories(response.data.studyCategories || []);
       } catch (error) {
         console.error("Error fetching study materials:", error);
       } finally {
@@ -74,6 +64,14 @@ const StudyMaterialsPage = () => {
 
   const getDownloadFilename = (material: PublicArticle) => {
     return material.fileName || material.title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+  };
+
+  const getStudyCategoryName = (material: PublicArticle) => {
+    return (
+      studyCategories.find((category) => category.slug === material.studyCategory)?.name ||
+      material.studyCategory ||
+      material.category
+    );
   };
 
   return (
@@ -123,9 +121,12 @@ const StudyMaterialsPage = () => {
           <div className="flex flex-wrap gap-3 justify-center">
             
             <button
-              onClick={() => setSelectedCategory("All")}
+              onClick={() => {
+                setSelectedCategory("");
+                setCurrentPage(1);
+              }}
               className={`px-4 py-2 rounded-full border text-sm ${
-                selectedCategory === "All"
+                selectedCategory === ""
                   ? "bg-emerald-600 text-white"
                   : "text-gray-700"
               }`}
@@ -133,17 +134,20 @@ const StudyMaterialsPage = () => {
               All
             </button>
 
-            {studyCategories.map((cat, index) => (
+            {studyCategories.map((category) => (
               <button
-                key={index}
-                onClick={() => setSelectedCategory(cat)}
+                key={category.slug}
+                onClick={() => {
+                  setSelectedCategory(category.slug);
+                  setCurrentPage(1);
+                }}
                 className={`px-4 py-2 rounded-full border text-sm transition ${
-                  selectedCategory === cat
+                  selectedCategory === category.slug
                     ? "bg-emerald-600 text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                {cat}
+                {category.name} ({category.count})
               </button>
             ))}
           </div>
@@ -190,7 +194,7 @@ const StudyMaterialsPage = () => {
                       </p>
 
                       <div className="text-xs text-gray-500 mt-2 flex gap-3">
-                        <span>{material.studyCategory || material.category}</span>
+                        <span>{getStudyCategoryName(material)}</span>
                         <span>
                           {typeof material.createdAt === "string" || typeof material.createdAt === "number"
                             ? new Date(material.createdAt).toLocaleDateString()

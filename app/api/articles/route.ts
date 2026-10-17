@@ -11,6 +11,20 @@ import {
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
 
+type StudyCategoryOption = {
+  name: string;
+  slug: string;
+  count: number;
+};
+
+function categoryNameFromSlug(slug: string) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .join(" ");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
@@ -21,15 +35,59 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
-    const snapshot = await firestore().collection("articles").get();
-    const matching = snapshot.docs
-      .filter((document) => adminView || document.data().published === true)
+    const db = firestore();
+    const [snapshot, categorySnapshot] = await Promise.all([
+      db.collection("articles").get(),
+      downloadable === "true" ? db.collection("categories").get() : Promise.resolve(null),
+    ]);
+    const visibleDocuments = snapshot.docs.filter(
+      (document) => adminView || document.data().published === true,
+    );
+
+    const studyCategoryCounts = new Map<string, number>();
+    for (const document of visibleDocuments) {
+      const data = document.data();
+      if (data.isDownloadable !== true || typeof data.studyCategory !== "string") continue;
+      const slug = data.studyCategory.trim().toLowerCase();
+      if (slug) studyCategoryCounts.set(slug, (studyCategoryCounts.get(slug) ?? 0) + 1);
+    }
+
+    const studyCategories: StudyCategoryOption[] = (categorySnapshot?.docs ?? [])
+      .map((document) => document.data())
+      .filter(
+        (data) =>
+          typeof data.name === "string" &&
+          typeof data.slug === "string" &&
+          studyCategoryCounts.has(data.slug.trim().toLowerCase()),
+      )
+      .sort((left, right) => Number(left.order ?? 0) - Number(right.order ?? 0))
+      .map((data) => {
+        const slug = String(data.slug).trim().toLowerCase();
+        return { name: String(data.name).trim(), slug, count: studyCategoryCounts.get(slug) ?? 0 };
+      });
+
+    const knownStudyCategorySlugs = new Set(studyCategories.map((item) => item.slug));
+    for (const [slug, count] of studyCategoryCounts) {
+      if (!knownStudyCategorySlugs.has(slug)) {
+        studyCategories.push({ name: categoryNameFromSlug(slug), slug, count });
+      }
+    }
+
+    const resolvedCategory =
+      studyCategories.find(
+        (item) => item.slug === category || item.name.toLowerCase() === category,
+      )?.slug ?? category;
+
+    const matching = visibleDocuments
       .filter((document) => {
-        if (!category) return true;
+        if (!resolvedCategory) return true;
         const data = document.data();
         const articleCategory = String(data.category ?? "").toLowerCase();
         const studyCategory = String(data.studyCategory ?? "").toLowerCase();
-        return articleCategory === category || (data.isDownloadable === true && studyCategory === category);
+        return (
+          articleCategory === resolvedCategory ||
+          (data.isDownloadable === true && studyCategory === resolvedCategory)
+        );
       })
       .filter((document) => {
         if (downloadable === null) return true;
@@ -55,7 +113,7 @@ export async function GET(request: NextRequest) {
       .slice((currentPage - 1) * limit, currentPage * limit)
       .map((document) => serializeArticle(document));
 
-    return NextResponse.json({ articles, total, totalPages, currentPage });
+    return NextResponse.json({ articles, total, totalPages, currentPage, studyCategories });
   } catch (error) {
     return errorResponse(error);
   }
