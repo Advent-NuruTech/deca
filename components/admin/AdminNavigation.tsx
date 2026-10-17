@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FileText, LayoutDashboard, LogOut, Package, ShoppingCart } from "lucide-react";
+import { FileText, LayoutDashboard, LogOut, Package, ShoppingCart, Youtube } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/articles", label: "Articles", icon: FileText },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/youtube", label: "YouTube", icon: Youtube },
 ];
 
 export default function AdminNavigation() {

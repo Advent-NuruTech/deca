@@ -11,7 +11,7 @@ project settings for deployment. Never prefix a secret with `NEXT_PUBLIC_`.
 | Cloudinary | `CLOUDINARY_CLOUD_NAME` (or existing `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Product/article images |
 | Cloudflare R2 | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, optional `R2_PUBLIC_URL` | PDFs, DOC/DOCX and PPT/PPTX downloads |
 | Cloudflare D1 | `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `D1_DATABASE_ID` | Article body text only |
-| YouTube (optional public embeds) | `NEXT_PUBLIC_YOUTUBE_API_KEY`, `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID`, `NEXT_PUBLIC_YOUTUBE_API_KEY_2`, `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID_2` | The two existing home-page channel feeds |
+| YouTube | `YOUTUBE_API_KEY` | Server-side YouTube Data API key for the channel feeds |
 
 Study-material uploads are accepted at `POST /api/study-materials` as a
 multipart `file` (or `document`) field. Store the returned `fileKey`,
@@ -63,3 +63,20 @@ administrator manually:
 Do this only from the Firebase console while signed into the project owner
 account. Never expose `SIGN_UP_CODE`, add a client-side role selector, or commit
 a service-account script for role promotion.
+
+## YouTube channels
+
+Enable YouTube Data API v3 for the project and set `YOUTUBE_API_KEY` in the
+server environment. In `/admin/youtube`, paste up to two channel URLs and save.
+The homepage shows the latest uploads and `/videos` lets visitors page through
+them. Channel settings occupy one Firestore document and are cached for one
+hour; video pages are fetched from YouTube and cached for one hour, so the
+number of Firestore reads does not grow with the number of videos. Shared HTTP
+caches can keep an older response for up to five minutes after a settings change.
+
+Existing `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID` and `NEXT_PUBLIC_YOUTUBE_CHANNEL_ID_2`
+remain fallback settings until an administrator saves channel settings. Legacy
+`NEXT_PUBLIC_YOUTUBE_API_KEY` and `NEXT_PUBLIC_YOUTUBE_API_KEY_2` are accepted
+as fallbacks, but migrate to the server-only key and remove the public variables
+from the deployment. API key restrictions must permit server-side YouTube Data
+API requests. YouTube quota and cache behavior depend on traffic and hosting.

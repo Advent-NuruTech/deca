@@ -67,6 +67,7 @@ const Header = () => {
   { name: "Agriculture", path: "/articles?category=agriculture" },
   { name: "Homeschooling", path: "/articles?category=homeschooling" },
   { name: "Study Materials", path: "/study-materials" },
+  { name: "Videos", path: "/videos" },
 
  
 ];
@@ -83,6 +84,7 @@ const Header = () => {
 
   // ========== SMART TEXT COLOR BASED ON PAGE ==========
   const lightHeroPages = [
+    "/videos",
     "/articles",
     "/about",
     "/contact",
