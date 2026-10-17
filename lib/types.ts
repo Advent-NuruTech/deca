@@ -53,6 +53,12 @@ export interface ArticleAuthor {
   email: string;
 }
 
+export interface StudyCategoryOption {
+  name: string;
+  slug: string;
+  count: number;
+}
+
 export interface Article {
   id?: string;
   title: string;

@@ -10,12 +10,7 @@ import {
   validateArticleBody,
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
-
-type StudyCategoryOption = {
-  name: string;
-  slug: string;
-  count: number;
-};
+import type { StudyCategoryOption } from "@/lib/types";
 
 function categoryNameFromSlug(slug: string) {
   return slug
@@ -38,7 +33,9 @@ export async function GET(request: NextRequest) {
     const db = firestore();
     const [snapshot, categorySnapshot] = await Promise.all([
       db.collection("articles").get(),
-      downloadable === "true" ? db.collection("categories").get() : Promise.resolve(null),
+      downloadable === "true" || adminView
+        ? db.collection("categories").get()
+        : Promise.resolve(null),
     ]);
     const visibleDocuments = snapshot.docs.filter(
       (document) => adminView || document.data().published === true,
@@ -58,7 +55,7 @@ export async function GET(request: NextRequest) {
         (data) =>
           typeof data.name === "string" &&
           typeof data.slug === "string" &&
-          studyCategoryCounts.has(data.slug.trim().toLowerCase()),
+          (adminView || studyCategoryCounts.has(data.slug.trim().toLowerCase())),
       )
       .sort((left, right) => Number(left.order ?? 0) - Number(right.order ?? 0))
       .map((data) => {

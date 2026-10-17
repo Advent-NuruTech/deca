@@ -6,16 +6,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Download, Calendar, User, ChevronRight } from "lucide-react";
 import api from "@/lib/public-api";
-import type { PublicArticle } from "@/lib/types";
+import type { PublicArticle, StudyCategoryOption } from "@/lib/types";
 import SEO from "../SEO";
 import AnimatedSection from "../AnimatedSection";
 const study = "/assets/study.jpg";
-
-type StudyCategoryOption = {
-  name: string;
-  slug: string;
-  count: number;
-};
 
 const StudyMaterialsPage = () => {
   const [materials, setMaterials] = useState<(PublicArticle & { thumbnail?: string; description?: string })[]>([]);

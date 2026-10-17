@@ -5,11 +5,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, FileText, Package, Plus, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import { api } from "@/lib/api";
-import type { PublicArticle, PublicOrder, PublicProduct } from "@/lib/types";
+import type { PublicArticle, PublicOrder, PublicProduct, StudyCategoryOption } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 
 type ProductsResponse = { products: PublicProduct[] };
-type ArticlesResponse = { articles: PublicArticle[] };
+type ArticlesResponse = { articles: PublicArticle[]; studyCategories: StudyCategoryOption[] };
 type OrdersResponse = { orders: PublicOrder[] };
 
 const colorStyles = {
@@ -35,6 +35,7 @@ function StatCard({ title, value, icon: Icon, color, href }: { title: string; va
 export default function AdminDashboard() {
   const [products, setProducts] = useState<PublicProduct[]>([]);
   const [articles, setArticles] = useState<PublicArticle[]>([]);
+  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
   const [orders, setOrders] = useState<PublicOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,6 +51,7 @@ export default function AdminDashboard() {
       ]);
       setProducts(productData.products ?? []);
       setArticles(articleData.articles ?? []);
+      setStudyCategories(articleData.studyCategories ?? []);
       setOrders(orderData.orders ?? []);
     } catch (nextError) {
       setError(errorMessage(nextError, "Dashboard data could not be loaded"));
@@ -69,6 +71,34 @@ export default function AdminDashboard() {
     customers: new Set(orders.map((order) => order.userId).filter(Boolean)).size,
     paymentRate: orders.length ? Math.round((orders.filter((order) => order.paymentStatus === "paid").length / orders.length) * 100) : 0,
   }), [articles, orders, products]);
+
+  const articleCategoryStats = useMemo(() => {
+    const standardCategories = [
+      { name: "Faith", slug: "faith" },
+      { name: "Recipes", slug: "recipe" },
+      { name: "Agriculture", slug: "agriculture" },
+      { name: "Homeschooling", slug: "homeschooling" },
+    ].map((category) => ({
+      ...category,
+      count: articles.filter((article) => article.category === category.slug).length,
+      filter: category.slug,
+    }));
+    const originalStudyCategories = studyCategories.map((category) => ({
+      ...category,
+      filter: `study:${category.slug}`,
+    }));
+    const uncategorizedStudyCount = articles.filter(
+      (article) => article.category === "study" && !article.studyCategory,
+    ).length;
+
+    return [
+      ...standardCategories,
+      ...originalStudyCategories,
+      ...(uncategorizedStudyCount
+        ? [{ name: "Uncategorized Study Materials", slug: "uncategorized-study", count: uncategorizedStudyCount, filter: "study:uncategorized" }]
+        : []),
+    ];
+  }, [articles, studyCategories]);
 
   return (
     <main className="pb-16 pt-10">
@@ -92,6 +122,21 @@ export default function AdminDashboard() {
           <StatCard title="Pending Orders" value={stats.pendingOrders} icon={Clock} color="red" href="/admin/orders?status=pending" />
           <StatCard title="Customers" value={stats.customers} icon={Users} color="blue" />
         </div>
+
+        <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div><h2 className="text-xl font-bold text-gray-900">Article Categories</h2><p className="mt-1 text-sm text-gray-500">Counts include published articles and drafts.</p></div>
+            <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage articles</Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {articleCategoryStats.map((category) => (
+              <Link key={category.slug} href={`/admin/articles?category=${encodeURIComponent(category.filter)}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50">
+                <span className="text-sm font-medium text-gray-700">{category.name}</span>
+                <span className="rounded-full bg-blue-100 px-2.5 py-1 text-sm font-bold text-blue-700">{category.count}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-xl font-bold text-gray-900">Quick Actions</h2>
