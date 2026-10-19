@@ -3,87 +3,46 @@
 // components/FloatingActions.jsx
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageCircle,
-  ChevronUp,
-  X,
-  Laptop,
-  GraduationCap,
-  Building2,
-  ShoppingCart,
-  Globe,
-  Satellite,
-  HelpCircle,
-  Camera,
-} from "lucide-react";
+import { MessageCircle, ChevronUp, X } from "lucide-react";
+import type { ChatSettings } from "@/lib/types";
+
+const fallbackSettings: ChatSettings = {
+  directPhone: "254721627977",
+  categories: [
+    { id: "study-materials", label: "Study Materials", phone: "254721627977" },
+    { id: "it-field", label: "IT Field", phone: "254721627977" },
+    { id: "photocopiers", label: "Photocopiers", phone: "254721627977" },
+    { id: "computers", label: "Computers", phone: "254721627977" },
+    { id: "homeschooling", label: "Homeschooling", phone: "254746840322" },
+    { id: "agriculture", label: "Agriculture", phone: "254746840322" },
+    { id: "seeds", label: "Seeds", phone: "254746840322" },
+    { id: "health-products", label: "Health Products", phone: "254746840322" },
+  ],
+};
 
 const FloatingActions = () => {
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-
-  // WhatsApp number - replace with your actual number
-  const whatsappNumber = "+211929097920"; // Format: country code + number
-
-  // Quick replies for WhatsApp
-  const quickReplies = [
-    {
-      icon: <Laptop className="w-4 h-4" />,
-      text: "Laptop prices",
-      message:
-        "Hi! I'd like to know more about your available laptops and prices.",
-    },
-    {
-      icon: <Satellite className="w-4 h-4" />,
-      text: "Starlink Kits",
-      message:
-        "Hi! I'd like to know more about your available Starlink kits and pricing.",
-    },
-    {
-      icon: <Globe className="w-4 h-4" />,
-      text: "Website development",
-      message:
-        "Hi! I'd like to know more about your available website development services and pricing.",
-    },
-    {
-      icon: <Camera className="w-4 h-4" />,
-      text: " CCTV Systems",
-      message:
-        "Hi! I'd like to know more about your available CCTV systems and pricing.",
-    },
-    {
-      icon: <ShoppingCart className="w-4 h-4" />,
-      text: "FancifyBusiness POS",
-      message:
-        "Hello! I'm interested in FancifyBusiness POS for my business. Can you tell me more about pricing and features?",
-    },
-    {
-      icon: <GraduationCap className="w-4 h-4" />,
-      text: "FancifySchool",
-      message:
-        "Hi! I'd like to learn more about FancifySchool management system for our institution.",
-    },
-    {
-      icon: <Building2 className="w-4 h-4" />,
-      text: "FancifyProperty",
-      message:
-        "Hello! Tell me more about FancifyProperty software for property management.",
-    },
-    {
-      icon: <HelpCircle className="w-4 h-4" />,
-      text: "Custom solution",
-      message:
-        "Hi! I'd like to discuss a custom software solution for my business.",
-    },
-  ];
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [chatSettings, setChatSettings] = useState<ChatSettings>(fallbackSettings);
 
   // Show back to top button after scrolling down
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 500);
+      setScrollProgress(Math.min(window.scrollY / 1000, 1));
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/chat")
+      .then((response) => response.ok ? response.json() as Promise<ChatSettings> : Promise.reject())
+      .then(setChatSettings)
+      .catch(() => undefined);
   }, []);
 
   const scrollToTop = () => {
@@ -93,9 +52,9 @@ const FloatingActions = () => {
     });
   };
 
-  const openWhatsApp = (message: string) => {
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+  const openWhatsApp = (phone: string, message: string) => {
+    const url = `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
     setIsWhatsAppOpen(false);
   };
 
@@ -135,20 +94,20 @@ const FloatingActions = () => {
 
               {/* Quick replies list */}
               <div className="p-2 max-h-96 overflow-y-auto">
-                {quickReplies.map((reply, index) => (
+                {chatSettings.categories.map((category, index) => (
                   <motion.button
-                    key={index}
+                    key={category.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    onClick={() => openWhatsApp(reply.message)}
+                    onClick={() => openWhatsApp(category.phone, `Hello! I'd like to know more about ${category.label}.`)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-white rounded-xl transition-colors text-left group"
                   >
                     <div className="p-2 bg-green-500/10 rounded-lg text-green-400 group-hover:bg-green-500 group-hover:text-gray-900 transition-colors">
-                      {reply.icon}
+                      <MessageCircle className="w-4 h-4" />
                     </div>
                     <span className="text-gray-600 group-hover:text-gray-900 flex-1 text-sm">
-                      {reply.text}
+                      {category.label}
                     </span>
                     <MessageCircle className="w-4 h-4 text-gray-600 group-hover:text-green-400" />
                   </motion.button>
@@ -158,7 +117,7 @@ const FloatingActions = () => {
               {/* Footer with direct chat option */}
               <div className="p-3 border-t border-gray-200">
                 <button
-                  onClick={() => openWhatsApp("Hello! I have a question.")}
+                  onClick={() => openWhatsApp(chatSettings.directPhone, "Hello! I have a question.")}
                   className="w-full text-center text-sm text-gray-400 hover:text-green-400 transition-colors"
                 >
                   Or send direct message →
@@ -239,7 +198,7 @@ const FloatingActions = () => {
                   strokeWidth="2"
                   strokeDasharray="113"
                   strokeDashoffset={
-                    113 - 113 * Math.min(window.scrollY / 1000, 1)
+                    113 - 113 * scrollProgress
                   }
                   className="transition-all duration-300"
                 />

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Clock, FileText, Package, Plus, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
+import { Clock, FileText, MessageCircle, Package, Plus, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import type { PublicArticle, PublicOrder, PublicProduct, StudyCategoryOption } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
@@ -140,10 +140,11 @@ export default function AdminDashboard() {
 
         <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-xl font-bold text-gray-900">Quick Actions</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/admin/products?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700"><Plus size={18} /> Add Product</Link>
             <Link href="/admin/articles?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700"><Plus size={18} /> Write Article</Link>
             <Link href="/admin/orders?status=pending" className="flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 font-semibold text-white hover:bg-orange-600"><ShoppingCart size={18} /> Process Orders</Link>
+            <Link href="/admin/chat" className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> Edit Chat</Link>
           </div>
         </section>
 

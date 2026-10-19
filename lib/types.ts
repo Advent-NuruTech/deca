@@ -59,6 +59,17 @@ export interface StudyCategoryOption {
   count: number;
 }
 
+export interface ChatCategory {
+  id: string;
+  label: string;
+  phone: string;
+}
+
+export interface ChatSettings {
+  directPhone: string;
+  categories: ChatCategory[];
+}
+
 export interface Article {
   id?: string;
   title: string;
