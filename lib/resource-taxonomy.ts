@@ -76,11 +76,13 @@ export function resolveArticleAssignment(data: DocumentData, taxonomy: ResourceT
   return legacyAssignment(data, [...taxonomy.majors, ...taxonomy.subcategories]);
 }
 
-async function initialRecords() {
+async function initialRecords(articleDocuments?: QueryDocumentSnapshot<DocumentData>[]) {
   const db = firestore();
   const [legacyCategories, articles] = await Promise.all([
     db.collection("categories").get(),
-    db.collection("articles").get(),
+    articleDocuments
+      ? Promise.resolve(articleDocuments)
+      : db.collection("articles").get().then((snapshot) => snapshot.docs),
   ]);
   const records: TaxonomyRecord[] = [...DEFAULT_MAJORS];
   DEFAULT_ARTICLE_SUBCATEGORIES.forEach(([slug, name], order) => records.push({
@@ -100,7 +102,7 @@ async function initialRecords() {
       studyNames.set(slug, typeof data.name === "string" && data.name.trim() ? data.name.trim() : titleFromSlug(slug));
     }
   }
-  for (const article of articles.docs) {
+  for (const article of articles) {
     const data = article.data();
     if ((data.isDownloadable === true || data.category === "study") && typeof data.studyCategory === "string" && data.studyCategory.trim()) {
       const slug = cleanSlug(data.studyCategory);
@@ -126,21 +128,29 @@ async function commitInChunks(operations: Array<(batch: FirebaseFirestore.WriteB
   }
 }
 
-export async function getResourceTaxonomy(options: { initialize?: boolean; includeDrafts?: boolean } = {}): Promise<ResourceTaxonomy> {
+export async function getResourceTaxonomy(options: {
+  initialize?: boolean;
+  includeDrafts?: boolean;
+  includeCounts?: boolean;
+  articleDocuments?: QueryDocumentSnapshot<DocumentData>[];
+} = {}): Promise<ResourceTaxonomy> {
   const db = firestore();
   const collection = db.collection("resourceCategories");
-  const [snapshot, config] = await Promise.all([collection.get(), collection.doc(CONFIG_ID).get()]);
+  const snapshot = await collection.get();
+  const configExists = snapshot.docs.some((document) => document.id === CONFIG_ID);
   let records = snapshot.docs.map(recordFromDocument).filter((item): item is TaxonomyRecord => item !== null);
+  let articleDocuments = options.articleDocuments;
 
-  if (!config.exists) {
-    const initial = await initialRecords();
+  if (!configExists) {
+    const initial = await initialRecords(articleDocuments);
     records = initial.records;
+    articleDocuments = initial.articles;
     if (options.initialize) {
       const operations: Array<(batch: FirebaseFirestore.WriteBatch) => void> = records.map((record) => (batch) => {
         const { id, ...data } = record;
         batch.set(collection.doc(id), { ...data, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       });
-      for (const article of initial.articles.docs) {
+      for (const article of initial.articles) {
         const data = article.data();
         if (typeof data.majorCategoryId === "string") continue;
         const assignment = legacyAssignment(data, records);
@@ -150,8 +160,8 @@ export async function getResourceTaxonomy(options: { initialize?: boolean; inclu
       await collection.doc(CONFIG_ID).set({ version: 2, initializedAt: FieldValue.serverTimestamp() });
     }
   } else if (options.initialize) {
-    const articles = await db.collection("articles").get();
-    const operations = articles.docs
+    articleDocuments ??= (await db.collection("articles").get()).docs;
+    const operations = articleDocuments
       .filter((article) => typeof article.data().majorCategoryId !== "string")
       .map((article) => (batch: FirebaseFirestore.WriteBatch) => batch.update(article.ref, {
         ...legacyAssignment(article.data(), records),
@@ -160,18 +170,20 @@ export async function getResourceTaxonomy(options: { initialize?: boolean; inclu
     await commitInChunks(operations);
   }
 
-  const articles = await db.collection("articles").get();
-  const visible = articles.docs.filter((item) => options.includeDrafts || item.data().published === true);
   const majorCounts = new Map<string, number>();
   const subcategoryCounts = new Map<string, number>();
   const baseTaxonomy: ResourceTaxonomy = {
     majors: records.filter((item) => item.kind === "major").map((item) => ({ ...item, kind: "major", count: 0 } as ResourceMajorCategory)),
     subcategories: records.filter((item) => item.kind === "subcategory").map((item) => ({ ...item, kind: "subcategory", parentId: item.parentId!, count: 0 } as ResourceSubcategory)),
   };
-  for (const article of visible) {
-    const assignment = resolveArticleAssignment(article.data(), baseTaxonomy);
-    majorCounts.set(assignment.majorCategoryId, (majorCounts.get(assignment.majorCategoryId) ?? 0) + 1);
-    if (assignment.subcategoryId) subcategoryCounts.set(assignment.subcategoryId, (subcategoryCounts.get(assignment.subcategoryId) ?? 0) + 1);
+  if (options.includeCounts !== false) {
+    articleDocuments ??= (await db.collection("articles").get()).docs;
+    const visible = articleDocuments.filter((item) => options.includeDrafts || item.data().published === true);
+    for (const article of visible) {
+      const assignment = resolveArticleAssignment(article.data(), baseTaxonomy);
+      majorCounts.set(assignment.majorCategoryId, (majorCounts.get(assignment.majorCategoryId) ?? 0) + 1);
+      if (assignment.subcategoryId) subcategoryCounts.set(assignment.subcategoryId, (subcategoryCounts.get(assignment.subcategoryId) ?? 0) + 1);
+    }
   }
   baseTaxonomy.majors.forEach((item) => { item.count = majorCounts.get(item.id) ?? 0; });
   baseTaxonomy.subcategories.forEach((item) => { item.count = subcategoryCounts.get(item.id) ?? 0; });

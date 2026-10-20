@@ -10,6 +10,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart } from "@/components/providers/CartProvider";
 import type { ResourceTaxonomy } from "@/lib/types";
+import { getPublicTaxonomy } from "@/lib/public-settings-client";
 import {
   Menu,
   X,
@@ -58,8 +59,7 @@ const Header = () => {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/resource-categories")
-      .then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject())
+    getPublicTaxonomy()
       .then((data) => { if (!cancelled) setResourceTaxonomy(data); })
       .catch(() => undefined);
     return () => { cancelled = true; };

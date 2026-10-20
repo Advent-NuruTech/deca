@@ -1,6 +1,8 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { PUBLIC_ARTICLES_TAG, RESOURCE_TAXONOMY_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
 import {
   assertUniqueCategorySlug,
@@ -50,6 +52,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (!Object.keys(updates).length) throw new HttpError(400, "No supported category changes were provided");
     updates.updatedAt = FieldValue.serverTimestamp();
     await reference.update(updates);
+    revalidateTag(RESOURCE_TAXONOMY_TAG, { expire: 0 });
+    revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });
     return NextResponse.json({ id, ...current, ...updates });
   } catch (error) {
     return errorResponse(error);
@@ -90,6 +94,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       }
     }
     await reference.delete();
+    revalidateTag(RESOURCE_TAXONOMY_TAG, { expire: 0 });
+    revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });
     return NextResponse.json({ message: "Category deleted", replacementId: replacementId || null });
   } catch (error) {
     return errorResponse(error);

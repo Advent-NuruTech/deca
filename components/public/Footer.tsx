@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ResourceTaxonomy } from "@/lib/types";
+import { getPublicTaxonomy } from "@/lib/public-settings-client";
 import {
   Mail,
   Phone,
@@ -24,7 +25,7 @@ const Footer = () => {
   const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
 
   useEffect(() => {
-    fetch("/api/resource-categories").then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject()).then(setTaxonomy).catch(() => undefined);
+    getPublicTaxonomy().then(setTaxonomy).catch(() => undefined);
   }, []);
 
   const quickLinks = [

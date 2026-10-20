@@ -103,45 +103,22 @@ const HomePage = () => {
     const fetchHomeData = async () => {
       setLoading(true);
       try {
-        const faithRes = await api.get<{ articles: Article[] }>("/articles", {
-          params: { category: "faith", limit: 1, sort: "-createdAt" },
-        });
-        if (faithRes.data.articles?.length)
-          setFeaturedFaith(faithRes.data.articles[0]);
-
-        const recipeRes = await api.get<{ articles: Article[] }>("/articles", {
-          params: { category: "recipe", limit: 1, sort: "-createdAt" },
-        });
-        if (recipeRes.data.articles?.length)
-          setFeaturedRecipe(recipeRes.data.articles[0]);
-
-        const agriRes = await api.get<{ articles: Article[] }>("/articles", {
-          params: { category: "agriculture", limit: 1, sort: "-createdAt" },
-        });
-        if (agriRes.data.articles?.length)
-          setFeaturedAgriculture(agriRes.data.articles[0]);
-
-        const schoolRes = await api.get<{ articles: Article[] }>("/articles", {
-          params: { category: "homeschooling", limit: 1, sort: "-createdAt" },
-        });
-        if (schoolRes.data.articles?.length)
-          setFeaturedHomeschool(schoolRes.data.articles[0]);
-
-        const studyRes = await api.get<{ articles: StudyMaterial[]; resourceCategories: ResourceTaxonomy }>("/articles", {
-          params: {
-            majorCategoryId: "study-library",
-            limit: 3,
-            sort: "-createdAt",
-          },
-        });
-        setLatestStudies(studyRes.data.articles || []);
-        setResourceTaxonomy(studyRes.data.resourceCategories || { majors: [], subcategories: [] });
-
-        const seedsRes = await api.get<{ products: (Product & { _id?: string })[] }>("/products", {
-          params: { category: "seeds", featured: true, limit: 3 },
-        });
-        if (seedsRes.data.products?.length)
-          setFeaturedSeeds(seedsRes.data.products);
+        const response = await api.get<{
+          featuredFaith: Article | null;
+          featuredRecipe: Article | null;
+          featuredAgriculture: Article | null;
+          featuredHomeschool: Article | null;
+          latestStudies: StudyMaterial[];
+          resourceTaxonomy: ResourceTaxonomy;
+          featuredSeeds: (Product & { _id?: string })[];
+        }>("/home");
+        setFeaturedFaith(response.data.featuredFaith);
+        setFeaturedRecipe(response.data.featuredRecipe);
+        setFeaturedAgriculture(response.data.featuredAgriculture);
+        setFeaturedHomeschool(response.data.featuredHomeschool);
+        setLatestStudies(response.data.latestStudies || []);
+        setResourceTaxonomy(response.data.resourceTaxonomy || { majors: [], subcategories: [] });
+        setFeaturedSeeds(response.data.featuredSeeds || []);
       } catch (error) {
         console.error("Error fetching home data:", error);
       } finally {

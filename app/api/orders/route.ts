@@ -1,6 +1,8 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin, requireAuth } from "@/lib/auth";
+import { PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
 import {
   createOrderNumber,
@@ -65,6 +67,7 @@ export async function POST(request: NextRequest) {
       });
     });
 
+    revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeOrder(await orderReference.get()), { status: 201 });
   } catch (error) {
     return errorResponse(error);

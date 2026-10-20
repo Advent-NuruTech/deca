@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
+import { getPublicTaxonomy } from "@/lib/public-settings-client";
 
 export default function ArticleSidebar({ article }: { article: PublicArticle }) {
   const [currentUrl, setCurrentUrl] = useState("");
   const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   useEffect(() => setCurrentUrl(window.location.href), []);
   useEffect(() => {
-    fetch("/api/resource-categories").then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject()).then(setTaxonomy).catch(() => undefined);
+    getPublicTaxonomy().then(setTaxonomy).catch(() => undefined);
   }, []);
   const shareText = `Check out this article: ${article.title}`;
 

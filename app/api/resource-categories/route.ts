@@ -1,7 +1,10 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { PUBLIC_CACHE_CONTROL, RESOURCE_TAXONOMY_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
+import { getCachedNavigationTaxonomy } from "@/lib/public-content";
 import {
   assertUniqueCategorySlug,
   categorySlug,
@@ -12,8 +15,13 @@ export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
-    const taxonomy = await getResourceTaxonomy({ initialize: adminView, includeDrafts: adminView });
-    return NextResponse.json(taxonomy);
+    const taxonomy = adminView
+      ? await getResourceTaxonomy({ initialize: true, includeDrafts: true })
+      : await getCachedNavigationTaxonomy();
+    return NextResponse.json(
+      taxonomy,
+      adminView ? undefined : { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } },
+    );
   } catch (error) {
     return errorResponse(error);
   }
@@ -54,6 +62,7 @@ export async function POST(request: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
+    revalidateTag(RESOURCE_TAXONOMY_TAG, { expire: 0 });
     return NextResponse.json({ id: reference.id, kind, name, slug, parentId, order: siblings.size, count: 0 }, { status: 201 });
   } catch (error) {
     return errorResponse(error);

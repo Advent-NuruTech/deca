@@ -1,6 +1,8 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { CHAT_SETTINGS_TAG } from "@/lib/cache-tags";
 import { normalizePhone, readChatSettings } from "@/lib/chat-settings";
 import { firestore } from "@/lib/firestore";
 import type { ChatCategory } from "@/lib/types";
@@ -47,6 +49,7 @@ export async function PUT(request: NextRequest) {
       ...settings,
       updatedAt: FieldValue.serverTimestamp(),
     });
+    revalidateTag(CHAT_SETTINGS_TAG, { expire: 0 });
     return NextResponse.json(settings);
   } catch (error) {
     return errorResponse(error);

@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { deleteArticleContent, getArticleContent, saveArticleContent } from "@/lib/article-content";
 import {
@@ -9,7 +10,9 @@ import {
   validateArticleBody,
 } from "@/lib/articles";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { PUBLIC_ARTICLES_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
+import { getCachedPublishedArticleBySlug } from "@/lib/public-content";
 import { deleteImage, publicIdFromManagedUrl } from "@/lib/cloudinary";
 import { deleteFromR2 } from "@/lib/r2";
 import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
@@ -22,28 +25,36 @@ export async function GET(
   try {
     const { identifier } = await params;
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
-    if (adminView) await requireAdmin(request);
+    if (!adminView) {
+      const article = await getCachedPublishedArticleBySlug(identifier);
+      if (!article) throw new HttpError(404, "Article not found");
+      const content = await getArticleContent(article.id);
+      if (content === null) throw new HttpError(404, "Article content not found");
+      await firestore().collection("articles").doc(article.id).update({ views: FieldValue.increment(1) });
+      return NextResponse.json(
+        { ...article, content },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    }
+
+    await requireAdmin(request);
     const collection = firestore().collection("articles");
-    const directDocument = adminView ? await collection.doc(identifier).get() : null;
+    const directDocument = await collection.doc(identifier).get();
     const snapshot = directDocument?.exists
       ? null
       : await collection.where("slug", "==", identifier).limit(1).get();
     const document = directDocument?.exists ? directDocument : snapshot?.docs[0];
-    if (!document || (!adminView && document.data()?.published !== true)) {
+    if (!document) {
       throw new HttpError(404, "Article not found");
     }
 
     const content = await getArticleContent(document.id);
     if (content === null) throw new HttpError(404, "Article content not found");
-    const taxonomy = await getResourceTaxonomy({ initialize: adminView, includeDrafts: adminView });
+    const taxonomy = await getResourceTaxonomy({ initialize: true, includeDrafts: true });
     const serializeWithAssignment = (value: typeof document, body: string) => ({
       ...serializeArticle(value, body),
       ...resolveArticleAssignment(value.data() ?? {}, taxonomy),
     });
-    if (!adminView) {
-      await document.ref.update({ views: FieldValue.increment(1) });
-      return NextResponse.json(serializeWithAssignment(await document.ref.get(), content));
-    }
     return NextResponse.json(serializeWithAssignment(document, content));
   } catch (error) {
     return errorResponse(error);
@@ -110,6 +121,7 @@ export async function PUT(
 
     const updated = await reference.get();
     const nextContent = content ?? (await getArticleContent(identifier));
+    revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });
     return NextResponse.json(serializeArticle(updated, nextContent));
   } catch (error) {
     return errorResponse(error);
@@ -152,6 +164,7 @@ export async function DELETE(
       throw error;
     }
 
+    revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });
     return NextResponse.json({ message: "Article deleted successfully" });
   } catch (error) {
     return errorResponse(error);

@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, ChevronUp, X } from "lucide-react";
 import type { ChatSettings } from "@/lib/types";
+import { getPublicChatSettings } from "@/lib/public-settings-client";
 
 const fallbackSettings: ChatSettings = {
   directPhone: "254721627977",
@@ -39,8 +40,7 @@ const FloatingActions = () => {
   }, []);
 
   useEffect(() => {
-    fetch("/api/chat")
-      .then((response) => response.ok ? response.json() as Promise<ChatSettings> : Promise.reject())
+    getPublicChatSettings()
       .then(setChatSettings)
       .catch(() => undefined);
   }, []);

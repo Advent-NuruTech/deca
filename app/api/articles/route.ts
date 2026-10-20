@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { saveArticleContent } from "@/lib/article-content";
 import {
@@ -10,7 +11,10 @@ import {
   validateArticleBody,
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
+import { PUBLIC_ARTICLES_TAG, PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
+import { getCachedPublishedArticles } from "@/lib/public-content";
 import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
+import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,58 +28,67 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
-    const db = firestore();
-    const [snapshot, resourceCategories] = await Promise.all([
-      db.collection("articles").get(),
-      getResourceTaxonomy({ initialize: adminView, includeDrafts: adminView }),
-    ]);
-    const visibleDocuments = snapshot.docs.filter(
-      (document) => adminView || document.data().published === true,
-    );
+    let availableArticles: PublicArticle[];
+    let resourceCategories: ResourceTaxonomy;
+    if (adminView) {
+      const snapshot = await firestore().collection("articles").get();
+      resourceCategories = await getResourceTaxonomy({
+        initialize: true,
+        includeDrafts: true,
+        articleDocuments: snapshot.docs,
+      });
+      availableArticles = snapshot.docs.map((document) => ({
+        ...serializeArticle(document),
+        ...resolveArticleAssignment(document.data(), resourceCategories),
+      }));
+    } else {
+      const dataset = await getCachedPublishedArticles();
+      availableArticles = dataset.articles;
+      resourceCategories = dataset.resourceCategories;
+    }
 
     const legacySubcategory = resourceCategories.subcategories.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
     const legacyMajor = resourceCategories.majors.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
 
-    const matching = visibleDocuments
-      .filter((document) => {
-        const data = document.data();
-        const assignment = resolveArticleAssignment(data, resourceCategories);
-        if (requestedMajor && assignment.majorCategoryId !== requestedMajor) return false;
-        if (requestedSubcategory && assignment.subcategoryId !== requestedSubcategory) return false;
+    const matching = availableArticles
+      .filter((article) => {
+        if (requestedMajor && article.majorCategoryId !== requestedMajor) return false;
+        if (requestedSubcategory && article.subcategoryId !== requestedSubcategory) return false;
         if (!category) return true;
-        if (legacySubcategory) return assignment.subcategoryId === legacySubcategory.id;
-        if (legacyMajor) return assignment.majorCategoryId === legacyMajor.id;
-        return String(data.category ?? "").toLowerCase() === category || String(data.studyCategory ?? "").toLowerCase() === category;
+        if (legacySubcategory) return article.subcategoryId === legacySubcategory.id;
+        if (legacyMajor) return article.majorCategoryId === legacyMajor.id;
+        return String(article.category ?? "").toLowerCase() === category || String(article.studyCategory ?? "").toLowerCase() === category;
       })
-      .filter((document) => {
+      .filter((article) => {
         if (downloadable === null) return true;
-        return Boolean(document.data().isDownloadable) === (downloadable === "true");
+        return Boolean(article.isDownloadable) === (downloadable === "true");
       })
-      .filter((document) => {
+      .filter((article) => {
         if (!search) return true;
-        const data = document.data();
-        return `${data.title ?? ""} ${data.description ?? ""} ${data.excerpt ?? ""} ${(data.tags ?? []).toString()}`
+        return `${article.title ?? ""} ${article.excerpt ?? ""} ${(article.tags ?? []).toString()}`
           .toLowerCase()
           .includes(search);
       })
       .sort(
         (left, right) =>
-          timestamp(right.data().publishedAt ?? right.data().createdAt) -
-          timestamp(left.data().publishedAt ?? left.data().createdAt),
+          timestamp(right.publishedAt ?? right.createdAt) -
+          timestamp(left.publishedAt ?? left.createdAt),
       );
 
     const total = matching.length;
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const currentPage = Math.min(page, totalPages);
     const articles = matching
-      .slice((currentPage - 1) * limit, currentPage * limit)
-      .map((document) => ({ ...serializeArticle(document), ...resolveArticleAssignment(document.data(), resourceCategories) }));
+      .slice((currentPage - 1) * limit, currentPage * limit);
 
     const studyCategories = resourceCategories.subcategories
       .filter((item) => item.parentId === "study-library")
       .map((item) => ({ id: item.id, name: item.name, slug: item.slug, count: item.count }));
 
-    return NextResponse.json({ articles, total, totalPages, currentPage, studyCategories, resourceCategories });
+    return NextResponse.json(
+      { articles, total, totalPages, currentPage, studyCategories, resourceCategories },
+      adminView ? undefined : { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } },
+    );
   } catch (error) {
     return errorResponse(error);
   }
@@ -115,6 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     const created = await reference.get();
+    revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });
     return NextResponse.json(serializeArticle(created, content), { status: 201 });
   } catch (error) {
     return errorResponse(error);

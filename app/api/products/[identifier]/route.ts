@@ -1,7 +1,10 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
+import { getCachedActiveProductBySlug } from "@/lib/public-content";
 import {
   assertUniqueProductSlug,
   productSlug,
@@ -16,16 +19,11 @@ export async function GET(
 ) {
   try {
     const { identifier } = await params;
-    const snapshot = await firestore()
-      .collection("products")
-      .where("slug", "==", identifier)
-      .limit(1)
-      .get();
-    const document = snapshot.docs[0];
-    if (!document || document.data().status !== "active") {
+    const product = await getCachedActiveProductBySlug(identifier);
+    if (!product) {
       throw new HttpError(404, "Product not found");
     }
-    return NextResponse.json(serializeProduct(document));
+    return NextResponse.json(product, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
   } catch (error) {
     return errorResponse(error);
   }
@@ -61,6 +59,7 @@ export async function PUT(
     }
     await reference.update(withUpdateTimestamp(data));
     const updated = await reference.get();
+    revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeProduct(updated));
   } catch (error) {
     return errorResponse(error);
@@ -78,6 +77,7 @@ export async function DELETE(
     const existing = await reference.get();
     if (!existing.exists) throw new HttpError(404, "Product not found");
     await reference.delete();
+    revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {
     return errorResponse(error);

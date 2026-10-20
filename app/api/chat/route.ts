@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/auth";
-import { readChatSettings } from "@/lib/chat-settings";
+import { PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
+import { getCachedChatSettings } from "@/lib/chat-settings";
 
 export async function GET() {
   try {
-    return NextResponse.json(await readChatSettings(), {
-      headers: { "Cache-Control": "no-store" },
+    return NextResponse.json(await getCachedChatSettings(), {
+      headers: { "Cache-Control": PUBLIC_CACHE_CONTROL },
     });
   } catch (error) {
     return errorResponse(error);

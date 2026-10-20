@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
+import { getCachedActiveProducts } from "@/lib/public-content";
 import {
   assertUniqueProductSlug,
   productSlug,
@@ -31,10 +34,10 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
-    const snapshot = await firestore().collection("products").get();
-    const matching = snapshot.docs
-      .map((document) => serializeProduct(document) as unknown as StoredRecord)
-      .filter((product) => adminView || product.status === "active")
+    const availableProducts = adminView
+      ? (await firestore().collection("products").get()).docs.map((document) => serializeProduct(document) as unknown as StoredRecord)
+      : await getCachedActiveProducts() as unknown as StoredRecord[];
+    const matching = availableProducts
       .filter((product) => !status || product.status === status)
       .filter((product) => !category || product.category === category)
       .filter((product) => featured === null || Boolean(product.featured) === (featured === "true"))
@@ -49,7 +52,10 @@ export async function GET(request: NextRequest) {
     const currentPage = Math.min(page, totalPages);
     const products = matching.slice((currentPage - 1) * limit, currentPage * limit).map(serializeValue);
 
-    return NextResponse.json({ products, total, totalPages, currentPage });
+    return NextResponse.json(
+      { products, total, totalPages, currentPage },
+      adminView ? undefined : { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } },
+    );
   } catch (error) {
     return errorResponse(error);
   }
@@ -71,6 +77,7 @@ export async function POST(request: NextRequest) {
       .collection("products")
       .add(withCreateTimestamps({ ...data, slug }));
     const created = await reference.get();
+    revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeProduct(created), { status: 201 });
   } catch (error) {
     return errorResponse(error);

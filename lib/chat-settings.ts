@@ -1,5 +1,7 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+import { CHAT_SETTINGS_TAG } from "@/lib/cache-tags";
 import { firestore, firestoreConfigured } from "@/lib/firestore";
 import type { ChatCategory, ChatSettings } from "@/lib/types";
 
@@ -56,3 +58,9 @@ export async function readChatSettings(): Promise<ChatSettings> {
   const document = await firestore().collection("settings").doc("chat").get();
   return document.exists ? sanitizeChatSettings(document.data()) : DEFAULT_CHAT_SETTINGS;
 }
+
+export const getCachedChatSettings = unstable_cache(
+  readChatSettings,
+  ["public-chat-settings-v1"],
+  { revalidate: 3600, tags: [CHAT_SETTINGS_TAG] },
+);
