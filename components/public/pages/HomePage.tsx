@@ -214,7 +214,7 @@ const HomePage = () => {
         variants={fadeUp}
         className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-4 md:mb-6 border border-white/30"
       >
-                Welcome to RemSam Homestead
+                Welcome
               </motion.span>
               <motion.h1
                 variants={fadeUp}
@@ -275,7 +275,7 @@ const HomePage = () => {
                   link: "/faith",
                 },
                 {
-                  image: "/assets/study2.jpeg",
+                  image: "/assets/study2.png",
                   width: 810,
                   height: 1080,
                   title: "Family",
