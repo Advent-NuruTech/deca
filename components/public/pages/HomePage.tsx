@@ -25,6 +25,61 @@ import YouTubeVideos from "../YouTubeVideos";
 import ActivityCarousel from "../ActivityCarousel";
 import YouTubeVideos2 from "../YouTubeVideos2";
 const remsamVideo = "/assets/remsam.mp4";
+const heroPhrase = "Faith, Family, Farming";
+
+function HeroTypewriter() {
+  const [text, setText] = useState(heroPhrase);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    let position = 0;
+    let phase: "typing" | "mistake" | "correcting" | "pause" | "deleting" = "typing";
+
+    const tick = () => {
+      let delay = 100;
+      if (phase === "typing") {
+        position += 1;
+        setText(heroPhrase.slice(0, position));
+        if (position === heroPhrase.length) phase = "mistake";
+      } else if (phase === "mistake") {
+        setText(`${heroPhrase}g`);
+        phase = "correcting";
+        delay = 350;
+      } else if (phase === "correcting") {
+        setText(heroPhrase);
+        phase = "pause";
+        delay = 1800;
+      } else if (phase === "pause") {
+        phase = "deleting";
+        delay = 80;
+      } else {
+        position -= 1;
+        setText(heroPhrase.slice(0, position));
+        delay = 45;
+        if (position === 0) {
+          phase = "typing";
+          delay = 500;
+        }
+      }
+      timer = setTimeout(tick, delay);
+    };
+
+    timer = setTimeout(() => {
+      setText("");
+      tick();
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <span className="grid text-amber-400" aria-label={heroPhrase}>
+      <span className="invisible col-start-1 row-start-1" aria-hidden="true">{heroPhrase}</span>
+      <span className="col-start-1 row-start-1" aria-hidden="true">{text}<span className="animate-pulse motion-reduce:animate-none">|</span></span>
+    </span>
+  );
+}
 
 const HomePage = () => {
   const [featuredFaith, setFeaturedFaith] = useState<Article | null>(null);
@@ -126,7 +181,7 @@ const HomePage = () => {
   {/* ========== 1. VIDEO HERO ========== */}
 <section
   ref={heroRef}
-  className="relative h-screen flex items-center justify-center overflow-hidden"
+  className="relative min-h-screen min-h-[100svh] flex items-center justify-center overflow-hidden pt-28 pb-32 md:pt-24 md:pb-28"
 >
   {/* Video Background */}
   <div className="absolute inset-0 z-0">
@@ -157,22 +212,21 @@ const HomePage = () => {
     >
       <motion.span
         variants={fadeUp}
-        className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/30"
+        className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-semibold mb-4 md:mb-6 border border-white/30"
       >
                 Welcome to RemSam Homestead
               </motion.span>
               <motion.h1
                 variants={fadeUp}
-                className="text-5xl md:text-7xl lg:text-4xl font-bold leading-tight"
+                className="text-3xl sm:text-5xl md:text-7xl lg:text-4xl font-bold leading-tight"
               >
-                <span className="text-emerald-400">Remsam Homestade</span>
-                <br />
-                <span className="text-amber-400">Faith,Family, Farming</span>,<br />
+                <span className="block text-emerald-400">Remsam Homestade</span>
+                <HeroTypewriter />
 
               </motion.h1>
               <motion.p
                 variants={fadeUp}
-                className="text-xl md:text-2xl mt-6 mb-8 max-w-2xl mx-auto text-gray-200"
+                className="text-base sm:text-lg md:text-2xl mt-4 mb-6 md:mt-6 md:mb-8 max-w-2xl mx-auto text-gray-200"
               >
                 A place where faith meets everyday life – inspiring blogs,
                 organic recipes, sustainable agriculture, homeschooling wisdom,
@@ -180,25 +234,25 @@ const HomePage = () => {
               </motion.p>
               <motion.div
                 variants={fadeUp}
-                className="flex flex-wrap gap-4 justify-center"
+                className="flex flex-wrap gap-3 md:gap-4 justify-center"
               >
                 <Link
                   href="/faith"
-                  className="group inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-full font-semibold shadow-lg hover:bg-emerald-700 transition-all hover:shadow-xl"
+                  className="group inline-flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-emerald-600 text-white rounded-full font-semibold shadow-lg hover:bg-emerald-700 transition-all hover:shadow-xl"
                 >
                   Explore Faith
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/donate"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-semibold hover:bg-white/30 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-black/50 backdrop-blur-md border border-white/60 text-white rounded-full font-semibold hover:bg-black/60 transition-all"
                 >
                   <Gift size={20} /> Support Our Work
                 </Link>
               </motion.div>
             </motion.div>
           </motion.div>
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+          <div className="hidden md:block absolute bottom-24 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
             <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
               <div className="w-1 h-2 bg-white/50 rounded-full mt-2 animate-pulse" />
             </div>
@@ -212,6 +266,8 @@ const HomePage = () => {
               {[
                 {
                   image: "/assets/about.jpeg",
+                  width: 1080,
+                  height: 810,
                   title: "Faith",
                   description:
                     "Daily devotionals and spiritual growth resources",
@@ -220,6 +276,8 @@ const HomePage = () => {
                 },
                 {
                   image: "/assets/study2.jpeg",
+                  width: 810,
+                  height: 1080,
                   title: "Family",
                   description: "Homeschooling support and parenting wisdom",
                   color: "from-blue-500 to-indigo-500",
@@ -227,6 +285,8 @@ const HomePage = () => {
                 },
                 {
                   image: "/assets/farm1.jpeg",
+                  width: 1080,
+                  height: 810,
                   title: "Farming",
                   description:
                     "Organic gardening and sustainable agriculture tips",
@@ -235,6 +295,8 @@ const HomePage = () => {
                 },
                 {
                   image: "/assets/study.jpg",
+                  width: 1920,
+                  height: 1442,
                   title: "Learning",
                   description: "Free study materials and educational content",
                   color: "from-purple-500 to-violet-500",
@@ -255,23 +317,24 @@ const HomePage = () => {
                   />
                   <Link
                     href={card.link}
-                    className="relative block bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
+                    className="relative block h-full overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-100"
                   >
-                    <div className="relative h-44 w-full rounded-xl bg-gray-50 mb-4">
-                      <Image
-                        src={card.image}
-                        alt=""
-                        fill
-                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-                        className="object-contain rounded-xl"
-                      />
-                    </div>
+                    <Image
+                      src={card.image}
+                      alt=""
+                      width={card.width}
+                      height={card.height}
+                      sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                      className="w-full h-auto"
+                    />
+                    <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
                       {card.title}
                     </h3>
                     <p className="text-gray-600">{card.description}</p>
                     <div className="mt-4 text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all">
                       Learn more →
+                    </div>
                     </div>
                   </Link>
                 </motion.div>
