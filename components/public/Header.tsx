@@ -147,7 +147,8 @@ const Header = () => {
     "/donate",
     "/faith",
   ];
-  const isLightHeroPage = lightHeroPages.some((path) =>
+  const articleListing = ["/articles", "/faith", "/recipes", "/agriculture", "/homeschooling"].includes(pathname);
+  const isLightHeroPage = !articleListing && lightHeroPages.some((path) =>
     pathname.startsWith(path),
   );
   const defaultTextColor = isLightHeroPage ? "text-gray-800" : "text-white";
@@ -172,7 +173,7 @@ const Header = () => {
     },
   };
 
-  const hideForStudyScroll = pathname === "/study-materials" && isScrolled;
+  const hideForStudyScroll = (pathname === "/study-materials" || articleListing) && isScrolled;
 
   return (
     <motion.header

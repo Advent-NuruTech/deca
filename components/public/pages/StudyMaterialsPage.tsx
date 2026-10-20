@@ -99,7 +99,7 @@ export default function StudyMaterialsPage() {
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Learn and grow</p><h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Study Materials</h1><p className="mt-4 text-base text-emerald-50/90 sm:text-lg">Explore downloadable guides and resources for your faith and learning journey.</p>
         </div>
       </section>}
-      {query && <div className="h-20" aria-hidden="true" />}
+      {query && <div className="h-20 bg-emerald-950" aria-hidden="true" />}
       <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
           <label className="flex min-w-0 flex-1 items-center gap-2 px-2 text-gray-500 sm:px-3"><Search size={20} aria-hidden="true" /><span className="sr-only">Search study materials</span><input type="search" value={query} onChange={(event) => { if (!query && event.target.value) window.scrollTo({ top: 0, behavior: "smooth" }); setQuery(event.target.value); }} placeholder="Search study materials..." className="min-w-0 w-full py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 sm:text-base" /></label>
