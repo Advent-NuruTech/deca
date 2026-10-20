@@ -3,9 +3,9 @@
 // src/pages/HomePage.jsx
 import { useEffect, useState, useRef, type ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import {
-  Heart,
   BookOpen,
   Apple,
   Sprout,
@@ -211,7 +211,7 @@ const HomePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  icon: <Heart className="w-8 h-8" />,
+                  image: "/assets/about.jpeg",
                   title: "Faith",
                   description:
                     "Daily devotionals and spiritual growth resources",
@@ -219,14 +219,14 @@ const HomePage = () => {
                   link: "/faith",
                 },
                 {
-                  icon: <School className="w-8 h-8" />,
+                  image: "/assets/study2.jpeg",
                   title: "Family",
                   description: "Homeschooling support and parenting wisdom",
                   color: "from-blue-500 to-indigo-500",
                   link: "/homeschooling",
                 },
                 {
-                  icon: <Sprout className="w-8 h-8" />,
+                  image: "/assets/farm1.jpeg",
                   title: "Farming",
                   description:
                     "Organic gardening and sustainable agriculture tips",
@@ -234,7 +234,7 @@ const HomePage = () => {
                   link: "/agriculture",
                 },
                 {
-                  icon: <BookOpen className="w-8 h-8" />,
+                  image: "/assets/study.jpg",
                   title: "Learning",
                   description: "Free study materials and educational content",
                   color: "from-purple-500 to-violet-500",
@@ -257,10 +257,14 @@ const HomePage = () => {
                     href={card.link}
                     className="relative block bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
                   >
-                    <div
-                      className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${card.color} text-white shadow-md mb-4`}
-                    >
-                      {card.icon}
+                    <div className="relative h-44 w-full rounded-xl bg-gray-50 mb-4">
+                      <Image
+                        src={card.image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                        className="object-contain rounded-xl"
+                      />
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
                       {card.title}

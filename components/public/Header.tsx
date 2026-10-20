@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 // components/Header.jsx (smart navbar for light/dark heroes)
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -38,6 +39,8 @@ function NavLink({ href, className, ...props }: NavLinkProps) {
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const { itemCount: cartItemsCount } = useCart();
   const router = useRouter();
@@ -54,6 +57,45 @@ const Header = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    drawerRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      } else if (event.key === "Tab" && drawerRef.current) {
+        const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), summary',
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    const media = window.matchMedia("(min-width: 768px)");
+    const handleResize = () => {
+      if (media.matches) setIsMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    media.addEventListener("change", handleResize);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      media.removeEventListener("change", handleResize);
+      menuButtonRef.current?.focus();
+    };
+  }, [isMobileMenuOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -167,7 +209,7 @@ const Header = () => {
                 <span
                   className={`text-xs ${isScrolled ? "text-gray-500" : isLightHeroPage ? "text-gray-500" : "text-gray-200"}`}
                 >
-                  Faith • Family • Farming
+                  Faith â€¢ Family â€¢ Farming
                 </span>
               </div>
             </Link>
@@ -293,9 +335,9 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Admin Section – ONLY when admin is logged in */}
+            {/* Admin Section â€“ ONLY when admin is logged in */}
             {user?.role === "admin" && (
-              <div className="flex items-center gap-2">
+              <div className="hidden items-center gap-2 md:flex">
                 <Link
                   href="/admin/dashboard"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -323,6 +365,11 @@ const Header = () => {
 
             {/* Mobile menu button */}
             <button
+              ref={menuButtonRef}
+              type="button"
+              aria-label="Open navigation menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
               className={`md:hidden p-2 transition-colors ${isScrolled ? "text-gray-700" : isLightHeroPage ? "text-gray-700" : "text-white"}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -335,92 +382,98 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu – always white background for readability */}
+        {typeof document !== "undefined" && createPortal(
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden mt-4 rounded-2xl bg-white border border-gray-200 shadow-xl overflow-hidden"
-            >
-              <div className="py-4 px-4 space-y-2">
-                <NavLink
-                  href="/"
-                  className={({ isActive }) =>
-                    `block px-4 py-3 rounded-lg text-gray-800 ${isActive ? "bg-emerald-50 text-emerald-600" : "hover:bg-gray-50"}`
-                  }
+            <div className="fixed inset-0 z-[9999] md:hidden">
+              <motion.div
+                aria-hidden="true"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute inset-0 bg-gray-950/60 backdrop-blur-sm"
+              />
+              <motion.div
+                ref={drawerRef}
+                id="mobile-navigation"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Navigation menu"
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "tween", duration: 0.25 }}
+                className="absolute inset-y-0 left-0 flex h-[100dvh] w-[min(85vw,22rem)] flex-col bg-white shadow-2xl"
+              >
+                <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4">
+                  <span className="text-base font-semibold text-gray-900">RemSam Homestead</span>
+                  <button
+                    type="button"
+                    aria-label="Close navigation menu"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+                <div
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [padding-bottom:max(1rem,env(safe-area-inset-bottom))]"
+                  onClick={(event) => {
+                    if ((event.target as HTMLElement).closest("a")) setIsMobileMenuOpen(false);
+                  }}
                 >
-                  Home
-                </NavLink>
-                <div className="pt-2">
-                  <div className="text-gray-500 text-sm px-4 py-1">
-                    Resources
+                  <div className="space-y-1">
+                    {navItems.map((item) => (
+                      <NavLink
+                        key={item.name}
+                        href={item.path}
+                        className={({ isActive }) =>
+                          `block rounded-lg px-4 py-3 font-medium ${isActive ? "bg-emerald-50 text-emerald-700" : "text-gray-800 hover:bg-gray-50"}`
+                        }
+                      >
+                        {item.name}
+                      </NavLink>
+                    ))}
+                    {[
+                      { name: "Resources", items: resourcesItems },
+                      { name: "Shop", items: shopItems },
+                    ].map((section) => (
+                      <details key={section.name} className="group">
+                        <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg px-4 py-3 font-medium text-gray-800 transition-colors hover:bg-gray-50 [&::-webkit-details-marker]:hidden">
+                          {section.name}
+                          <ChevronDown className="h-5 w-5 text-gray-500 transition-transform group-open:rotate-180" />
+                        </summary>
+                        <div className="ml-4 border-l border-gray-200 pl-2">
+                          {section.items.map((item) => (
+                            <NavLink key={item.name} href={item.path} className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-50">
+                              {item.name}
+                            </NavLink>
+                          ))}
+                        </div>
+                      </details>
+                    ))}
+                    <div className="pt-4">
+                      <NavLink href="/donate" className="block rounded-lg bg-emerald-600 px-4 py-3 text-center font-semibold text-white hover:bg-emerald-700">
+                        Donate
+                      </NavLink>
+                    </div>
                   </div>
-                  {resourcesItems.map((item) => (
-                    <NavLink
-                      key={item.name}
-                      href={item.path}
-                      className={({ isActive }) =>
-                        `block px-8 py-2 rounded-lg text-gray-700 ${isActive ? "text-emerald-600" : "hover:bg-gray-50"}`
-                      }
-                    >
-                      {item.name}
-                    </NavLink>
-                  ))}
                 </div>
-                <div className="pt-2">
-                  <div className="text-gray-500 text-sm px-4 py-1">Shop</div>
-                  {shopItems.map((item) => (
-                    <NavLink
-                      key={item.name}
-                      href={item.path}
-                      className={({ isActive }) =>
-                        `block px-8 py-2 rounded-lg text-gray-700 ${isActive ? "text-emerald-600" : "hover:bg-gray-50"}`
-                      }
-                    >
-                      {item.name}
-                    </NavLink>
-                  ))}
-                </div>
-                <NavLink
-                  href="/about"
-                  className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                >
-                  About
-                </NavLink>
-                <NavLink
-                  href="/contact"
-                  className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                >
-                  Contact
-                </NavLink>
-                <NavLink
-                  href="/donate"
-                  className="block px-4 py-3 bg-emerald-600 text-white rounded-lg text-center"
-                >
-                  Donate
-                </NavLink>
                 {user?.role === "admin" && (
-                  <>
-                    <Link
-                      href="/admin/dashboard"
-                      className="block px-4 py-3 text-emerald-600 hover:bg-gray-50 rounded-lg"
-                    >
-                      Dashboard
+                  <div className="shrink-0 border-t border-gray-100 bg-white px-4 pt-3 [padding-bottom:max(0.75rem,env(safe-area-inset-bottom))]">
+                    <Link href="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-emerald-700 hover:bg-emerald-50">
+                      <LayoutDashboard className="h-5 w-5" /> Dashboard
                     </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                    >
-                      Logout
+                    <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-gray-700 hover:bg-gray-50">
+                      <LogOut className="h-5 w-5" /> Logout
                     </button>
-                  </>
+                  </div>
                 )}
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </AnimatePresence>, document.body)}
       </nav>
     </motion.header>
   );
