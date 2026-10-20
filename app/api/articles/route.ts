@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       .filter((document) => {
         if (!search) return true;
         const data = document.data();
-        return `${data.title ?? ""} ${data.excerpt ?? ""} ${(data.tags ?? []).toString()}`
+        return `${data.title ?? ""} ${data.description ?? ""} ${data.excerpt ?? ""} ${(data.tags ?? []).toString()}`
           .toLowerCase()
           .includes(search);
       })

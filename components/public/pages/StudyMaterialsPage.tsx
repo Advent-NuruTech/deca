@@ -1,268 +1,141 @@
 "use client";
 
-// src/pages/StudyMaterialsPage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Download, Calendar, User, ChevronRight } from "lucide-react";
+import { Check, ChevronDown, Download, FileText, Search, Share2, X } from "lucide-react";
+import toast from "react-hot-toast";
 import api from "@/lib/public-api";
 import type { PublicArticle, StudyCategoryOption } from "@/lib/types";
-import SEO from "../SEO";
-import AnimatedSection from "../AnimatedSection";
-const study = "/assets/study.jpg";
 
-const StudyMaterialsPage = () => {
-  const [materials, setMaterials] = useState<(PublicArticle & { thumbnail?: string; description?: string })[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+type Material = PublicArticle & { thumbnail?: string; description?: string };
+type Response = { articles: Material[]; totalPages: number; total: number; studyCategories: StudyCategoryOption[] };
+
+export default function StudyMaterialsPage() {
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [categories, setCategories] = useState<StudyCategoryOption[]>([]);
+  const [category, setCategory] = useState("");
+  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
-
-  const limit = 9;
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [desktopCategoriesOpen, setDesktopCategoriesOpen] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const sentinel = useRef<HTMLDivElement>(null);
+  const drawer = useRef<HTMLDivElement>(null);
+  const categoryButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const fetchStudyMaterials = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get<{
-          articles: (PublicArticle & { thumbnail?: string; description?: string })[];
-          totalPages: number;
-          studyCategories: StudyCategoryOption[];
-        }>("/articles", {
-          params: {
-            isDownloadable: true,
-            page: currentPage,
-            limit,
-            category: selectedCategory,
-          },
-        });
+    const timer = window.setTimeout(() => { setPage(1); setSearch(query.trim()); }, 300);
+    return () => window.clearTimeout(timer);
+  }, [query]);
 
-        setMaterials(response.data.articles || []);
-        setTotalPages(response.data.totalPages || 1);
-        setStudyCategories(response.data.studyCategories || []);
-      } catch (error) {
-        console.error("Error fetching study materials:", error);
-      } finally {
-        setLoading(false);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+    if (page === 1) { setMaterials([]); setTotal(0); }
+    api.get<Response>("/articles", { params: { isDownloadable: true, page, limit: 9, category, search } })
+      .then(({ data }) => {
+        if (cancelled) return;
+        setMaterials((previous) => page === 1 ? data.articles : [...previous, ...data.articles.filter((item) => !previous.some((existing) => existing._id === item._id))]);
+        setCategories(data.studyCategories || []);
+        setTotalPages(data.totalPages || 1);
+        setTotal(data.total || 0);
+      })
+      .catch(() => { if (!cancelled) setError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [page, category, search, retry]);
+
+  useEffect(() => {
+    if (loading || error || page >= totalPages || !sentinel.current) return;
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setPage((value) => value + 1); }, { rootMargin: "400px" });
+    observer.observe(sentinel.current);
+    return () => observer.disconnect();
+  }, [loading, error, page, totalPages]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const resetPanels = () => { setDrawerOpen(false); setDesktopCategoriesOpen(false); };
+    desktop.addEventListener("change", resetPanels);
+    return () => desktop.removeEventListener("change", resetPanels);
+  }, []);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    drawer.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDrawerOpen(false);
+      if (event.key === "Tab" && drawer.current) {
+        const buttons = drawer.current.querySelectorAll<HTMLButtonElement>("button:not([disabled])");
+        const first = buttons[0], last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
       }
     };
+    document.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", onKey); categoryButton.current?.focus(); };
+  }, [drawerOpen]);
 
-    fetchStudyMaterials();
-  }, [currentPage, selectedCategory]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const selectCategory = (value: string) => { setPage(1); setCategory(value); setDrawerOpen(false); };
+  const share = async (material: Material) => {
+    const url = new URL(`/articles/${material.slug}`, window.location.origin).href;
+    try {
+      if (navigator.share) await navigator.share({ title: material.title, text: material.description || material.excerpt, url });
+      else { await navigator.clipboard.writeText(url); toast.success("Link copied to clipboard"); }
+    } catch (err) {
+      if (err instanceof Error && err.name !== "AbortError") toast.error("Unable to share this link. Please try again.");
+    }
   };
-
-  const getDownloadFilename = (material: PublicArticle) => {
-    return material.fileName || material.title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
-  };
-
-  const getStudyCategoryName = (material: PublicArticle) => {
-    return (
-      studyCategories.find((category) => category.slug === material.studyCategory)?.name ||
-      material.studyCategory ||
-      material.category
-    );
-  };
+  const categoryName = categories.find((item) => item.slug === category)?.name || "All categories";
+  const categoryOptions = [{ name: "All categories", slug: "", count: categories.reduce((sum, item) => sum + item.count, 0) }, ...categories];
+  const categoryList = (closeAfterSelection: boolean) => categoryOptions.map((item) => (
+    <button key={item.slug} onClick={() => { setPage(1); setCategory(item.slug); if (closeAfterSelection) setDrawerOpen(false); }} aria-pressed={category === item.slug} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm ${category === item.slug ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-700 hover:bg-gray-100"}`}>
+      <span className="flex-1">{item.name}</span><span className="text-gray-500">{item.count}</span>{category === item.slug && <Check size={17} />}
+    </button>
+  ));
 
   return (
     <>
-      <SEO
-        title="Study Materials | RemSam Homestead"
-        description="Download free study materials, PDFs, and resources for spiritual growth, homeschooling, and personal development."
-        keywords={[
-          "Study Materials",
-          "PDF Downloads",
-          "Faith Resources",
-          "Homeschooling",
-        ]}
-      />
-
-      {/* HERO SECTION */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={study}
-            alt="Study materials background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/40" />
+      {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 44, 34, .94), rgba(2, 44, 34, .72)), url('/assets/study.jpg')" }} />
+        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Learn and grow</p><h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Study Materials</h1><p className="mt-4 text-base text-emerald-50/90 sm:text-lg">Explore downloadable guides and resources for your faith and learning journey.</p>
         </div>
-
-        <div className="relative z-10 text-center text-white px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold">
-              Study <span className="text-emerald-400">Materials</span>
-            </h1>
-            <p className="mt-4 text-gray-200">
-              Downloadable PDFs, guides, and resources for spiritual growth.
-            </p>
-          </motion.div>
+      </section>}
+      {query && <div className="h-20" aria-hidden="true" />}
+      <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
+        <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
+          <label className="flex min-w-0 flex-1 items-center gap-2 px-2 text-gray-500 sm:px-3"><Search size={20} aria-hidden="true" /><span className="sr-only">Search study materials</span><input type="search" value={query} onChange={(event) => { if (!query && event.target.value) window.scrollTo({ top: 0, behavior: "smooth" }); setQuery(event.target.value); }} placeholder="Search study materials..." className="min-w-0 w-full py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 sm:text-base" /></label>
+          <button ref={categoryButton} onClick={() => { if (window.matchMedia("(min-width: 1024px)").matches) setDesktopCategoriesOpen((open) => !open); else setDrawerOpen(true); }} aria-expanded={drawerOpen || desktopCategoriesOpen} className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 sm:px-5"><span className="max-w-[100px] truncate sm:max-w-[220px]">{category === "" ? "Categories" : categoryName}</span><ChevronDown size={18} /></button>
         </div>
-      </section>
-
-      {/* CATEGORY FILTER BAR (RIGHT AFTER HERO) */}
-      <div className="bg-white py-5 border-b shadow-sm sticky top-0 z-20">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            
-            <button
-              onClick={() => {
-                setSelectedCategory("");
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-full border text-sm ${
-                selectedCategory === ""
-                  ? "bg-emerald-600 text-white"
-                  : "text-gray-700"
-              }`}
-            >
-              All
-            </button>
-
-            {studyCategories.map((category) => (
-              <button
-                key={category.slug}
-                onClick={() => {
-                  setSelectedCategory(category.slug);
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-full border text-sm transition ${
-                  selectedCategory === category.slug
-                    ? "bg-emerald-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {category.name} ({category.count})
-              </button>
-            ))}
+      </div>
+      <section className="bg-gray-50 py-10 sm:py-14" aria-label="Study materials results">
+        <div className="mx-auto flex max-w-7xl items-start gap-8 px-4 sm:px-6">
+          {desktopCategoriesOpen && <aside id="study-categories" aria-label="Study material categories" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] w-60 shrink-0 overflow-y-auto overscroll-contain rounded-xl border border-gray-200 bg-white p-3 lg:block"><h2 className="px-4 py-3 text-base font-bold text-gray-900">Categories</h2>{categoryList(false)}</aside>}
+          <div className="min-w-0 flex-1">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-2"><div><h2 className="text-2xl font-bold text-gray-900">{search ? "Search results" : category === "" ? "Explore resources" : categoryName}</h2><p className="mt-1 text-sm text-gray-500" aria-live="polite">{loading && page === 1 ? "Finding resources..." : `${total} ${total === 1 ? "resource" : "resources"}${search ? ` for “${search}”` : ""}`}</p></div>{category && <button onClick={() => selectCategory("")} className="text-sm font-semibold text-emerald-700 hover:underline">Clear category</button>}</div>
+          {(!loading || page > 1) && materials.length === 0 && !error && <div className="rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center text-gray-600"><FileText className="mx-auto mb-4 text-emerald-600" size={32} /><p className="font-semibold text-gray-900">No resources found</p><p className="mt-1 text-sm">Try another search or category.</p></div>}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {materials.map((material) => <article key={material._id} className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
+              <Link href={`/articles/${material.slug}`} className="block aspect-video overflow-hidden bg-emerald-50">{material.thumbnail || material.featuredImage ? <img src={material.thumbnail || material.featuredImage} alt="" className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" /> : <div className="flex h-full items-center justify-center text-emerald-700"><FileText size={44} /></div>}</Link>
+              <div className="flex flex-1 flex-col p-5"><p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{categories.find((item) => item.slug === material.studyCategory)?.name || material.studyCategory || material.category}</p><h3 className="mt-2 text-lg font-bold leading-snug text-gray-900"><Link href={`/articles/${material.slug}`} className="hover:text-emerald-700">{material.title}</Link></h3><p className="mt-2 line-clamp-3 text-sm leading-6 text-gray-600">{material.description || material.excerpt}</p><div className="mt-auto flex items-center gap-2 pt-5">{material.fileUrl && <a href={material.fileUrl} download={material.fileName || undefined} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"><Download size={16} /> Download</a>}<Link href={`/articles/${material.slug}`} className="rounded-lg bg-gray-100 px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200">View</Link><button onClick={() => share(material)} aria-label={`Share ${material.title}`} title="Share" className="ml-auto inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-gray-600 hover:bg-gray-100"><Share2 size={18} aria-hidden="true" /></button></div></div>
+            </article>)}
+          </div>
+          {loading && <p className="py-10 text-center text-sm text-gray-500" role="status">Loading resources...</p>}
+          {error && <div className="py-8 text-center text-sm text-gray-600" role="alert">Could not load resources. <button onClick={() => setRetry((value) => value + 1)} className="font-semibold text-emerald-700 underline">Try again</button></div>}
+          <div ref={sentinel} aria-hidden="true" />
+          {!loading && !error && page < totalPages && <div className="pt-8 text-center"><button onClick={() => setPage((value) => value + 1)} className="rounded-lg border border-emerald-700 px-5 py-2 text-sm font-semibold text-emerald-700">Load more</button></div>}
           </div>
         </div>
-      </div>
-
-      {/* MATERIALS GRID */}
-      <div className="bg-gray-50 py-12" id="materials">
-        <div className="container mx-auto px-4">
-
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-emerald-600"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-              {materials.map((material, index) => (
-                <AnimatedSection
-                  key={material._id}
-                  delay={index * 0.05}
-                  direction="up"
-                >
-                  <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition flex overflow-hidden border">
-
-                    {/* THUMBNAIL */}
-                    <div className="w-1/3 min-h-[160px]">
-                      <img
-                        src={material.thumbnail || material.featuredImage}
-                        alt={material.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    {/* CONTENT */}
-                    <div className="w-2/3 p-4 flex flex-col">
-
-                      <h2 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                        {material.title}
-                      </h2>
-
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                        {material.description || material.excerpt}
-                      </p>
-
-                      <div className="text-xs text-gray-500 mt-2 flex gap-3">
-                        <span>{getStudyCategoryName(material)}</span>
-                        <span>
-                          {typeof material.createdAt === "string" || typeof material.createdAt === "number"
-                            ? new Date(material.createdAt).toLocaleDateString()
-                            : ""}
-                        </span>
-                      </div>
-
-                      <div className="mt-auto flex gap-2 pt-3">
-
-                        <a
-                          href={material.fileUrl || "#"}
-                          download={getDownloadFilename(material)}
-                          className="flex-1 bg-emerald-600 text-white text-sm py-2 rounded-lg text-center hover:bg-emerald-700"
-                        >
-                          <Download size={14} className="inline mr-1" />
-                          Download
-                        </a>
-
-                        <Link
-                          href={`/articles/${material.slug}`}
-                          className="px-3 py-2 bg-gray-100 rounded-lg text-sm"
-                        >
-                          View
-                        </Link>
-
-                      </div>
-
-                    </div>
-                  </div>
-                </AnimatedSection>
-              ))}
-
-            </div>
-          )}
-
-          {/* PAGINATION */}
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-10">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 border rounded-lg disabled:opacity-50"
-              >
-                Prev
-              </button>
-
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => handlePageChange(i + 1)}
-                  className={`px-4 py-2 rounded-lg border ${
-                    currentPage === i + 1
-                      ? "bg-emerald-600 text-white"
-                      : ""
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 border rounded-lg disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          )}
-
-        </div>
-      </div>
+      </section>
+      {drawerOpen && <div className="fixed inset-0 z-[100]" role="presentation"><div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOpen(false)} /><div ref={drawer} role="dialog" aria-modal="true" aria-labelledby="categories-heading" className="absolute inset-y-0 left-0 flex w-[min(85vw,340px)] flex-col bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-gray-100 p-5"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Browse resources</p><h2 id="categories-heading" className="mt-1 text-xl font-bold text-gray-900">Categories</h2></div><button onClick={() => setDrawerOpen(false)} aria-label="Close categories" className="rounded-full p-2 text-gray-600 hover:bg-gray-100"><X size={22} /></button></div><div id="study-categories" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">{categoryList(true)}</div></div></div>}
     </>
   );
-};
-
-export default StudyMaterialsPage;
+}

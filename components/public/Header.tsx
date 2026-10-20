@@ -172,10 +172,14 @@ const Header = () => {
     },
   };
 
+  const hideForStudyScroll = pathname === "/study-materials" && isScrolled;
+
   return (
     <motion.header
       initial={{ y: -100 }}
-      animate={{ y: 0 }}
+      animate={{ y: hideForStudyScroll ? "-100%" : 0 }}
+      aria-hidden={hideForStudyScroll}
+      inert={hideForStudyScroll}
       transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
