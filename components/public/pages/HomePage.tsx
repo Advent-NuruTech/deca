@@ -19,7 +19,8 @@ import {
   Play,
 } from "lucide-react";
 import api from "@/lib/public-api";
-import type { Article, Product } from "@/lib/types";
+import type { Article, Product, StudyCategoryOption } from "@/lib/types";
+import StudyMaterialCard, { type StudyMaterial } from "@/components/public/StudyMaterialCard";
 import SEO from "../SEO";
 import YouTubeVideos from "../YouTubeVideos";
 import ActivityCarousel from "../ActivityCarousel";
@@ -86,7 +87,8 @@ const HomePage = () => {
   const [featuredRecipe, setFeaturedRecipe] = useState<Article | null>(null);
   const [featuredAgriculture, setFeaturedAgriculture] = useState<Article | null>(null);
   const [featuredHomeschool, setFeaturedHomeschool] = useState<Article | null>(null);
-  const [latestStudies, setLatestStudies] = useState<(Article & { _id?: string })[]>([]);
+  const [latestStudies, setLatestStudies] = useState<StudyMaterial[]>([]);
+  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
   const [featuredSeeds, setFeaturedSeeds] = useState<(Product & { _id?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const heroRef = useRef(null);
@@ -125,16 +127,15 @@ const HomePage = () => {
         if (schoolRes.data.articles?.length)
           setFeaturedHomeschool(schoolRes.data.articles[0]);
 
-        const studyRes = await api.get<{ articles: (Article & { _id?: string })[] }>("/articles", {
+        const studyRes = await api.get<{ articles: StudyMaterial[]; studyCategories: StudyCategoryOption[] }>("/articles", {
           params: {
-            category: "study",
             isDownloadable: true,
             limit: 3,
             sort: "-createdAt",
           },
         });
-        if (studyRes.data.articles?.length)
-          setLatestStudies(studyRes.data.articles);
+        setLatestStudies(studyRes.data.articles || []);
+        setStudyCategories(studyRes.data.studyCategories || []);
 
         const seedsRes = await api.get<{ products: (Product & { _id?: string })[] }>("/products", {
           params: { category: "seeds", featured: true, limit: 3 },
@@ -462,55 +463,15 @@ const HomePage = () => {
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Left: Study Materials */}
               <div>
-                <div className="flex items-center gap-2 mb-6">
-                  <Download className="w-6 h-6 text-emerald-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Free Study Materials
-                  </h2>
+                <div className="mb-6 flex items-start justify-between gap-4">
+                  <div><div className="flex items-center gap-2"><Download className="h-6 w-6 text-emerald-600" /><h2 className="text-2xl font-bold text-gray-900">Free Study Materials</h2></div><p className="mt-2 text-sm text-gray-600">Explore free resources for your faith and learning journey.</p></div>
                 </div>
-                {latestStudies.length === 0 ? (
-                  <p className="text-gray-500">
-                    No downloadable resources yet.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {latestStudies.slice(0, 2).map((study) => (
-                      <div
-                        key={study._id}
-                        className="flex gap-4 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition"
-                      >
-                        {study.featuredImage && (
-                          <img
-                            src={study.featuredImage}
-                            alt={study.title}
-                            className="w-20 h-20 object-cover rounded-lg"
-                          />
-                        )}
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 line-clamp-1">
-                            {study.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {study.excerpt}
-                          </p>
-                          <a
-                            href={study.fileUrl || "#"}
-                            download={`${study.title.replace(/[^a-z0-9]/gi, "_")}.pdf`}
-                            className="text-emerald-600 text-sm font-medium inline-flex items-center gap-1 mt-1"
-                          >
-                            Download PDF <Download size={12} />
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                    <Link
-                      href="/study-materials"
-                      className="inline-flex items-center gap-1 text-emerald-600 font-medium mt-2"
-                    >
-                      View all materials <ArrowRight size={14} />
-                    </Link>
+                {loading ? <p className="text-sm text-gray-500" role="status">Loading resources...</p> : latestStudies.length === 0 ? <p className="text-gray-500">No downloadable resources yet.</p> : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {latestStudies.slice(0, 2).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={studyCategories.find((item) => item.slug === study.studyCategory)?.name} />)}
                   </div>
                 )}
+                <Link href="/study-materials" className="mt-6 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900">View all materials <ArrowRight size={16} /></Link>
               </div>
 
               {/* Right: Featured Products */}

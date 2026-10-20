@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { Check, ChevronDown, Download, FileText, Search, Share2, X } from "lucide-react";
-import toast from "react-hot-toast";
+import { Check, ChevronDown, FileText, Search, X } from "lucide-react";
+import StudyMaterialCard from "@/components/public/StudyMaterialCard";
 import api from "@/lib/public-api";
 import type { PublicArticle, StudyCategoryOption } from "@/lib/types";
 
@@ -84,15 +83,6 @@ export default function StudyMaterialsPage() {
   }, [drawerOpen]);
 
   const selectCategory = (value: string) => { setPage(1); setCategory(value); setDrawerOpen(false); };
-  const share = async (material: Material) => {
-    const url = new URL(`/articles/${material.slug}`, window.location.origin).href;
-    try {
-      if (navigator.share) await navigator.share({ title: material.title, text: material.description || material.excerpt, url });
-      else { await navigator.clipboard.writeText(url); toast.success("Link copied to clipboard"); }
-    } catch (err) {
-      if (err instanceof Error && err.name !== "AbortError") toast.error("Unable to share this link. Please try again.");
-    }
-  };
   const categoryName = categories.find((item) => item.slug === category)?.name || "All categories";
   const categoryOptions = [{ name: "All categories", slug: "", count: categories.reduce((sum, item) => sum + item.count, 0) }, ...categories];
   const categoryList = (closeAfterSelection: boolean) => categoryOptions.map((item) => (
@@ -123,10 +113,7 @@ export default function StudyMaterialsPage() {
           <div className="mb-6 flex flex-wrap items-end justify-between gap-2"><div><h2 className="text-2xl font-bold text-gray-900">{search ? "Search results" : category === "" ? "Explore resources" : categoryName}</h2><p className="mt-1 text-sm text-gray-500" aria-live="polite">{loading && page === 1 ? "Finding resources..." : `${total} ${total === 1 ? "resource" : "resources"}${search ? ` for “${search}”` : ""}`}</p></div>{category && <button onClick={() => selectCategory("")} className="text-sm font-semibold text-emerald-700 hover:underline">Clear category</button>}</div>
           {(!loading || page > 1) && materials.length === 0 && !error && <div className="rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center text-gray-600"><FileText className="mx-auto mb-4 text-emerald-600" size={32} /><p className="font-semibold text-gray-900">No resources found</p><p className="mt-1 text-sm">Try another search or category.</p></div>}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {materials.map((material) => <article key={material._id} className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
-              <Link href={`/articles/${material.slug}`} className="block aspect-video overflow-hidden bg-emerald-50">{material.thumbnail || material.featuredImage ? <img src={material.thumbnail || material.featuredImage} alt="" className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" /> : <div className="flex h-full items-center justify-center text-emerald-700"><FileText size={44} /></div>}</Link>
-              <div className="flex flex-1 flex-col p-5"><p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{categories.find((item) => item.slug === material.studyCategory)?.name || material.studyCategory || material.category}</p><h3 className="mt-2 text-lg font-bold leading-snug text-gray-900"><Link href={`/articles/${material.slug}`} className="hover:text-emerald-700">{material.title}</Link></h3><p className="mt-2 line-clamp-3 text-sm leading-6 text-gray-600">{material.description || material.excerpt}</p><div className="mt-auto flex items-center gap-2 pt-5">{material.fileUrl && <a href={material.fileUrl} download={material.fileName || undefined} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"><Download size={16} /> Download</a>}<Link href={`/articles/${material.slug}`} className="rounded-lg bg-gray-100 px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200">View</Link><button onClick={() => share(material)} aria-label={`Share ${material.title}`} title="Share" className="ml-auto inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-gray-600 hover:bg-gray-100"><Share2 size={18} aria-hidden="true" /></button></div></div>
-            </article>)}
+            {materials.map((material) => <StudyMaterialCard key={material._id} material={material} categoryName={categories.find((item) => item.slug === material.studyCategory)?.name} />)}
           </div>
           {loading && <p className="py-10 text-center text-sm text-gray-500" role="status">Loading resources...</p>}
           {error && <div className="py-8 text-center text-sm text-gray-600" role="alert">Could not load resources. <button onClick={() => setRetry((value) => value + 1)} className="font-semibold text-emerald-700 underline">Try again</button></div>}
