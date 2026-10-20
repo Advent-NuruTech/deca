@@ -35,3 +35,6 @@ empty (the application is at the repository root). Add all variables from
 `.env.example` in Vercel, then deploy using the default `npm run build` command.
 
 Follow `DEPLOYMENT.md` for the complete pre-deployment and production checklist.
+
+The resource/category data contract, legacy adoption behavior, and deletion rules are
+documented in `RESOURCE_TAXONOMY.md`.

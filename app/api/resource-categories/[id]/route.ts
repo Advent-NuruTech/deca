@@ -1,0 +1,97 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { NextRequest, NextResponse } from "next/server";
+import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
+import { firestore } from "@/lib/firestore";
+import {
+  assertUniqueCategorySlug,
+  categorySlug,
+  getResourceTaxonomy,
+  updateArticlesForTaxonomyChange,
+} from "@/lib/resource-taxonomy";
+
+async function jsonBody(request: NextRequest) {
+  try {
+    const value: unknown = await request.json();
+    return value && typeof value === "object" ? value as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await requireAdmin(request);
+    await getResourceTaxonomy({ initialize: true, includeDrafts: true });
+    const { id } = await params;
+    const reference = firestore().collection("resourceCategories").doc(id);
+    const existing = await reference.get();
+    if (!existing.exists || (existing.data()?.kind !== "major" && existing.data()?.kind !== "subcategory")) throw new HttpError(404, "Category not found");
+    const current = existing.data()!;
+    const body = await jsonBody(request);
+    const updates: Record<string, unknown> = {};
+    if ("name" in body) {
+      const name = typeof body.name === "string" ? body.name.trim() : "";
+      if (!name || name.length > 100) throw new HttpError(400, "Category name must be between 1 and 100 characters");
+      const slug = categorySlug(name);
+      await assertUniqueCategorySlug(current.kind, slug, current.parentId, id);
+      updates.name = name;
+      updates.slug = slug;
+    }
+    if (current.kind === "subcategory" && "parentId" in body) {
+      const parentId = typeof body.parentId === "string" ? body.parentId : "";
+      const parent = await firestore().collection("resourceCategories").doc(parentId).get();
+      if (!parent.exists || parent.data()?.kind !== "major") throw new HttpError(400, "Select a valid major category");
+      updates.parentId = parentId;
+      if (parentId !== current.parentId) {
+        await assertUniqueCategorySlug("subcategory", String(updates.slug ?? current.slug), parentId, id);
+        await updateArticlesForTaxonomyChange((data) => data.subcategoryId === id, { majorCategoryId: parentId });
+      }
+    }
+    if (!Object.keys(updates).length) throw new HttpError(400, "No supported category changes were provided");
+    updates.updatedAt = FieldValue.serverTimestamp();
+    await reference.update(updates);
+    return NextResponse.json({ id, ...current, ...updates });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await requireAdmin(request);
+    const taxonomy = await getResourceTaxonomy({ initialize: true, includeDrafts: true });
+    const { id } = await params;
+    const reference = firestore().collection("resourceCategories").doc(id);
+    const existing = await reference.get();
+    if (!existing.exists || (existing.data()?.kind !== "major" && existing.data()?.kind !== "subcategory")) throw new HttpError(404, "Category not found");
+    const category = existing.data()!;
+    const body = await jsonBody(request);
+    const replacementId = typeof body.replacementId === "string" ? body.replacementId : "";
+
+    if (category.kind === "subcategory") {
+      const assigned = taxonomy.subcategories.find((item) => item.id === id)?.count ?? 0;
+      if (assigned > 0) {
+        const replacement = taxonomy.subcategories.find((item) => item.id === replacementId && item.id !== id);
+        if (!replacement) throw new HttpError(409, "Choose another subcategory to receive the resources before deleting this one");
+        await updateArticlesForTaxonomyChange((data) => data.subcategoryId === id, {
+          majorCategoryId: replacement.parentId,
+          subcategoryId: replacement.id,
+        });
+      }
+    } else {
+      const children = taxonomy.subcategories.filter((item) => item.parentId === id);
+      const assigned = taxonomy.majors.find((item) => item.id === id)?.count ?? 0;
+      if (children.length || assigned > 0) {
+        const replacement = taxonomy.majors.find((item) => item.id === replacementId && item.id !== id);
+        if (!replacement) throw new HttpError(409, "Choose another major category to receive its subcategories and resources before deleting this one");
+        const db = firestore();
+        for (const child of children) await db.collection("resourceCategories").doc(child.id).update({ parentId: replacement.id, updatedAt: FieldValue.serverTimestamp() });
+        await updateArticlesForTaxonomyChange((data) => data.majorCategoryId === id, { majorCategoryId: replacement.id });
+      }
+    }
+    await reference.delete();
+    return NextResponse.json({ message: "Category deleted", replacementId: replacementId || null });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}

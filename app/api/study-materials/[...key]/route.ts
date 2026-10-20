@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { deleteFromR2, getR2Object } from "@/lib/r2";
 import { attachmentHeader, validateStudyMaterialKey } from "@/lib/study-materials";
+import { firestore } from "@/lib/firestore";
 
 export const runtime = "nodejs";
 
@@ -55,6 +56,8 @@ export async function DELETE(
     await requireAdmin(request);
     const { key: segments } = await params;
     const key = validateStudyMaterialKey(segments.join("/"));
+    const references = await firestore().collection("articles").where("fileKey", "==", key).limit(1).get();
+    if (!references.empty) throw new HttpError(409, "This document is still attached to a resource");
     await deleteFromR2(key);
     return NextResponse.json({ message: "Document deleted successfully" });
   } catch (error) {

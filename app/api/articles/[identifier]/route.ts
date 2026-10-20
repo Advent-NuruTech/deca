@@ -10,6 +10,10 @@ import {
 } from "@/lib/articles";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
+import { deleteImage, publicIdFromManagedUrl } from "@/lib/cloudinary";
+import { deleteFromR2 } from "@/lib/r2";
+import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
+import { validateStudyMaterialKey } from "@/lib/study-materials";
 
 export async function GET(
   request: NextRequest,
@@ -31,11 +35,16 @@ export async function GET(
 
     const content = await getArticleContent(document.id);
     if (content === null) throw new HttpError(404, "Article content not found");
+    const taxonomy = await getResourceTaxonomy({ initialize: adminView, includeDrafts: adminView });
+    const serializeWithAssignment = (value: typeof document, body: string) => ({
+      ...serializeArticle(value, body),
+      ...resolveArticleAssignment(value.data() ?? {}, taxonomy),
+    });
     if (!adminView) {
       await document.ref.update({ views: FieldValue.increment(1) });
-      return NextResponse.json(serializeArticle(await document.ref.get(), content));
+      return NextResponse.json(serializeWithAssignment(await document.ref.get(), content));
     }
-    return NextResponse.json(serializeArticle(document, content));
+    return NextResponse.json(serializeWithAssignment(document, content));
   } catch (error) {
     return errorResponse(error);
   }
@@ -64,6 +73,7 @@ export async function PUT(
       if (key in input && (input[key] === "" || input[key] === null)) metadata[key] = FieldValue.delete();
     }
     const existingData = existing.data() ?? {};
+    await validateResourceAssignment(metadata, existingData);
     if (metadata.isDownloadable === true && !metadata.fileKey && !existingData.fileKey) {
       throw new HttpError(400, "fileKey is required for a downloadable article");
     }
@@ -118,6 +128,13 @@ export async function DELETE(
     if (!existing.exists) throw new HttpError(404, "Article not found");
 
     const oldContent = await getArticleContent(identifier);
+    const existingData = existing.data() ?? {};
+    const fileKey = typeof existingData.fileKey === "string" ? validateStudyMaterialKey(existingData.fileKey) : "";
+    const imagePublicId = typeof existingData.featuredImage === "string" ? publicIdFromManagedUrl(existingData.featuredImage) : null;
+    await Promise.all([
+      ...(fileKey ? [deleteFromR2(fileKey)] : []),
+      ...(imagePublicId ? [deleteImage(imagePublicId)] : []),
+    ]);
     await deleteArticleContent(identifier);
     try {
       await reference.delete();

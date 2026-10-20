@@ -19,7 +19,7 @@ import {
   Play,
 } from "lucide-react";
 import api from "@/lib/public-api";
-import type { Article, Product, StudyCategoryOption } from "@/lib/types";
+import type { Article, Product, ResourceTaxonomy } from "@/lib/types";
 import StudyMaterialCard, { type StudyMaterial } from "@/components/public/StudyMaterialCard";
 import SEO from "../SEO";
 import YouTubeVideos from "../YouTubeVideos";
@@ -88,7 +88,7 @@ const HomePage = () => {
   const [featuredAgriculture, setFeaturedAgriculture] = useState<Article | null>(null);
   const [featuredHomeschool, setFeaturedHomeschool] = useState<Article | null>(null);
   const [latestStudies, setLatestStudies] = useState<StudyMaterial[]>([]);
-  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
+  const [resourceTaxonomy, setResourceTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const [featuredSeeds, setFeaturedSeeds] = useState<(Product & { _id?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const heroRef = useRef(null);
@@ -127,15 +127,15 @@ const HomePage = () => {
         if (schoolRes.data.articles?.length)
           setFeaturedHomeschool(schoolRes.data.articles[0]);
 
-        const studyRes = await api.get<{ articles: StudyMaterial[]; studyCategories: StudyCategoryOption[] }>("/articles", {
+        const studyRes = await api.get<{ articles: StudyMaterial[]; resourceCategories: ResourceTaxonomy }>("/articles", {
           params: {
-            isDownloadable: true,
+            majorCategoryId: "study-library",
             limit: 3,
             sort: "-createdAt",
           },
         });
         setLatestStudies(studyRes.data.articles || []);
-        setStudyCategories(studyRes.data.studyCategories || []);
+        setResourceTaxonomy(studyRes.data.resourceCategories || { majors: [], subcategories: [] });
 
         const seedsRes = await api.get<{ products: (Product & { _id?: string })[] }>("/products", {
           params: { category: "seeds", featured: true, limit: 3 },
@@ -464,11 +464,11 @@ const HomePage = () => {
               {/* Left: Study Materials */}
               <div>
                 <div className="mb-6 flex items-start justify-between gap-4">
-                  <div><div className="flex items-center gap-2"><Download className="h-6 w-6 text-emerald-600" /><h2 className="text-2xl font-bold text-gray-900">Free Study Materials</h2></div><p className="mt-2 text-sm text-gray-600">Explore free resources for your faith and learning journey.</p></div>
+                  <div><div className="flex items-center gap-2"><Download className="h-6 w-6 text-emerald-600" /><h2 className="text-2xl font-bold text-gray-900">{resourceTaxonomy.majors.find((item) => item.id === "study-library")?.name ?? "Study Library"}</h2></div><p className="mt-2 text-sm text-gray-600">Explore free resources for your faith and learning journey.</p></div>
                 </div>
                 {loading ? <p className="text-sm text-gray-500" role="status">Loading resources...</p> : latestStudies.length === 0 ? <p className="text-gray-500">No downloadable resources yet.</p> : (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {latestStudies.slice(0, 2).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={studyCategories.find((item) => item.slug === study.studyCategory)?.name} />)}
+                    {latestStudies.slice(0, 2).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={resourceTaxonomy.subcategories.find((item) => item.id === study.subcategoryId)?.name} />)}
                   </div>
                 )}
                 <Link href="/study-materials" className="mt-6 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900">View all materials <ArrowRight size={16} /></Link>

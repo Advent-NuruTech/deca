@@ -1,10 +1,11 @@
 "use client";
 
 // src/components/Footer.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import type { ResourceTaxonomy } from "@/lib/types";
 import {
   Mail,
   Phone,
@@ -20,14 +21,15 @@ const logo = "/assets/logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
+
+  useEffect(() => {
+    fetch("/api/resource-categories").then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject()).then(setTaxonomy).catch(() => undefined);
+  }, []);
 
   const quickLinks = [
     { name: "Home", path: "/" },
-    { name: "Faith Blogs", path: "/articles?category=faith" },
-    { name: "Recipes", path: "/articles?category=recipe" },
-    { name: "Agriculture", path: "/articles?category=agriculture" },
-    { name: "Homeschooling", path: "/articles?category=homeschooling" },
-    { name: "Study Materials", path: "/study-materials" },
+    ...taxonomy.majors.map((major) => ({ name: major.name, path: major.id === "study-library" ? "/study-materials" : `/articles?major=${encodeURIComponent(major.id)}` })),
     { name: "Shop", path: "/products" },
     { name: "Donate", path: "/donate" },
     { name: "About Us", path: "/about" },

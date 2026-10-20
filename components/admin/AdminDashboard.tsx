@@ -5,11 +5,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, FileText, MessageCircle, Package, Plus, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import { api } from "@/lib/api";
-import type { PublicArticle, PublicOrder, PublicProduct, StudyCategoryOption } from "@/lib/types";
+import type { PublicArticle, PublicOrder, PublicProduct, ResourceTaxonomy } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 
 type ProductsResponse = { products: PublicProduct[] };
-type ArticlesResponse = { articles: PublicArticle[]; studyCategories: StudyCategoryOption[] };
+type ArticlesResponse = { articles: PublicArticle[]; resourceCategories: ResourceTaxonomy };
 type OrdersResponse = { orders: PublicOrder[] };
 
 const colorStyles = {
@@ -35,7 +35,7 @@ function StatCard({ title, value, icon: Icon, color, href }: { title: string; va
 export default function AdminDashboard() {
   const [products, setProducts] = useState<PublicProduct[]>([]);
   const [articles, setArticles] = useState<PublicArticle[]>([]);
-  const [studyCategories, setStudyCategories] = useState<StudyCategoryOption[]>([]);
+  const [resourceCategories, setResourceCategories] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const [orders, setOrders] = useState<PublicOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
       ]);
       setProducts(productData.products ?? []);
       setArticles(articleData.articles ?? []);
-      setStudyCategories(articleData.studyCategories ?? []);
+      setResourceCategories(articleData.resourceCategories ?? { majors: [], subcategories: [] });
       setOrders(orderData.orders ?? []);
     } catch (nextError) {
       setError(errorMessage(nextError, "Dashboard data could not be loaded"));
@@ -72,33 +72,10 @@ export default function AdminDashboard() {
     paymentRate: orders.length ? Math.round((orders.filter((order) => order.paymentStatus === "paid").length / orders.length) * 100) : 0,
   }), [articles, orders, products]);
 
-  const articleCategoryStats = useMemo(() => {
-    const standardCategories = [
-      { name: "Faith", slug: "faith" },
-      { name: "Recipes", slug: "recipe" },
-      { name: "Agriculture", slug: "agriculture" },
-      { name: "Homeschooling", slug: "homeschooling" },
-    ].map((category) => ({
-      ...category,
-      count: articles.filter((article) => article.category === category.slug).length,
-      filter: category.slug,
-    }));
-    const originalStudyCategories = studyCategories.map((category) => ({
-      ...category,
-      filter: `study:${category.slug}`,
-    }));
-    const uncategorizedStudyCount = articles.filter(
-      (article) => article.category === "study" && !article.studyCategory,
-    ).length;
-
-    return [
-      ...standardCategories,
-      ...originalStudyCategories,
-      ...(uncategorizedStudyCount
-        ? [{ name: "Uncategorized Study Materials", slug: "uncategorized-study", count: uncategorizedStudyCount, filter: "study:uncategorized" }]
-        : []),
-    ];
-  }, [articles, studyCategories]);
+  const articleCategoryStats = useMemo(() => resourceCategories.majors.flatMap((major) => [
+    { id: major.id, name: major.name, count: major.count },
+    ...resourceCategories.subcategories.filter((item) => item.parentId === major.id).map((item) => ({ id: item.id, name: `${major.name} / ${item.name}`, count: item.count })),
+  ]), [resourceCategories]);
 
   return (
     <main className="pb-16 pt-10">
@@ -115,9 +92,9 @@ export default function AdminDashboard() {
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard title="Total Products" value={products.length} icon={Package} color="emerald" href="/admin/products" />
           <StatCard title="Active Products" value={stats.activeProducts} icon={Star} color="emerald" />
-          <StatCard title="Published Articles" value={stats.publishedArticles} icon={FileText} color="blue" href="/admin/articles" />
+          <StatCard title="Published Resources" value={stats.publishedArticles} icon={FileText} color="blue" href="/admin/articles" />
           <StatCard title="Total Orders" value={orders.length} icon={ShoppingCart} color="orange" href="/admin/orders" />
-          <StatCard title="Draft Articles" value={stats.draftArticles} icon={Clock} color="yellow" />
+          <StatCard title="Draft Resources" value={stats.draftArticles} icon={Clock} color="yellow" />
           <StatCard title="Paid Revenue" value={formatMoney(stats.revenue)} icon={TrendingUp} color="emerald" />
           <StatCard title="Pending Orders" value={stats.pendingOrders} icon={Clock} color="red" href="/admin/orders?status=pending" />
           <StatCard title="Customers" value={stats.customers} icon={Users} color="blue" />
@@ -125,12 +102,12 @@ export default function AdminDashboard() {
 
         <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <div><h2 className="text-xl font-bold text-gray-900">Article Categories</h2><p className="mt-1 text-sm text-gray-500">Counts include published articles and drafts.</p></div>
-            <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage articles</Link>
+            <div><h2 className="text-xl font-bold text-gray-900">Resource Categories</h2><p className="mt-1 text-sm text-gray-500">Major categories and their editable subcategories.</p></div>
+            <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage resources</Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {articleCategoryStats.map((category) => (
-              <Link key={category.slug} href={`/admin/articles?category=${encodeURIComponent(category.filter)}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50">
+              <Link key={category.id} href={`/admin/articles?category=${encodeURIComponent(category.id)}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50">
                 <span className="text-sm font-medium text-gray-700">{category.name}</span>
                 <span className="rounded-full bg-blue-100 px-2.5 py-1 text-sm font-bold text-blue-700">{category.count}</span>
               </Link>
@@ -142,7 +119,7 @@ export default function AdminDashboard() {
           <h2 className="mb-4 text-xl font-bold text-gray-900">Quick Actions</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/admin/products?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700"><Plus size={18} /> Add Product</Link>
-            <Link href="/admin/articles?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700"><Plus size={18} /> Write Article</Link>
+            <Link href="/admin/articles?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700"><Plus size={18} /> Add Resource</Link>
             <Link href="/admin/orders?status=pending" className="flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 font-semibold text-white hover:bg-orange-600"><ShoppingCart size={18} /> Process Orders</Link>
             <Link href="/admin/chat" className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> Edit Chat</Link>
           </div>

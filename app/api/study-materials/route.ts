@@ -8,6 +8,7 @@ import {
   validateStudyDocument,
   validateStudyMaterialKey,
 } from "@/lib/study-materials";
+import { firestore } from "@/lib/firestore";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,8 @@ export async function DELETE(request: NextRequest) {
     const key = validateStudyMaterialKey(
       body && typeof body === "object" && "key" in body ? (body as { key: unknown }).key : undefined,
     );
+    const references = await firestore().collection("articles").where("fileKey", "==", key).limit(1).get();
+    if (!references.empty) throw new HttpError(409, "This document is still attached to a resource");
     await deleteFromR2(key);
     return NextResponse.json({ message: "Document deleted successfully" });
   } catch (error) {

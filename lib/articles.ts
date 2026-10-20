@@ -7,8 +7,6 @@ import { firestore } from "@/lib/firestore";
 import { keyFromStudyMaterialUrl, studyMaterialUrl, validateStudyMaterialKey } from "@/lib/study-materials";
 import type { PublicArticle } from "@/lib/types";
 
-const CATEGORIES = ["faith", "recipe", "agriculture", "homeschooling", "study"] as const;
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -64,9 +62,7 @@ export function validateArticleBody(value: unknown, partial = false): ValidatedA
   const content = stringField(value, "content", { required: !partial, max: 1_000_000 });
   const excerpt = stringField(value, "excerpt", { required: !partial, max: 1000 });
   const category = value.category;
-  if (category !== undefined && !CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
-    throw new HttpError(400, "category must be faith, recipe, agriculture, homeschooling or study");
-  }
+  if (category !== undefined && typeof category !== "string") throw new HttpError(400, "category must be a string");
 
   const metadata: Record<string, unknown> = {};
   const assign = (key: string, next: unknown) => {
@@ -76,8 +72,10 @@ export function validateArticleBody(value: unknown, partial = false): ValidatedA
   assign("title", title);
   assign("excerpt", excerpt);
   assign("featuredImage", optionalString(value, "featuredImage", 2000));
-  assign("category", category);
+  assign("category", typeof category === "string" ? category.trim().toLowerCase() : undefined);
   assign("studyCategory", optionalString(value, "studyCategory", 120));
+  assign("majorCategoryId", optionalString(value, "majorCategoryId", 120));
+  assign("subcategoryId", optionalString(value, "subcategoryId", 120));
   assign("tags", stringArrayField(value, "tags"));
   assign("seoTitle", optionalString(value, "seoTitle", 180));
   assign("seoDescription", optionalString(value, "seoDescription", 500));

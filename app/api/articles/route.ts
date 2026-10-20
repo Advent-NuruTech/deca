@@ -10,81 +10,42 @@ import {
   validateArticleBody,
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
-import type { StudyCategoryOption } from "@/lib/types";
-
-function categoryNameFromSlug(slug: string) {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
-    .join(" ");
-}
+import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
 
 export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
     const category = request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ?? "";
+    const requestedMajor = request.nextUrl.searchParams.get("majorCategoryId")?.trim() ?? request.nextUrl.searchParams.get("major")?.trim() ?? "";
+    const requestedSubcategory = request.nextUrl.searchParams.get("subcategoryId")?.trim() ?? "";
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
     const downloadable = request.nextUrl.searchParams.get("isDownloadable");
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
     const db = firestore();
-    const [snapshot, categorySnapshot] = await Promise.all([
+    const [snapshot, resourceCategories] = await Promise.all([
       db.collection("articles").get(),
-      downloadable === "true" || adminView
-        ? db.collection("categories").get()
-        : Promise.resolve(null),
+      getResourceTaxonomy({ initialize: adminView, includeDrafts: adminView }),
     ]);
     const visibleDocuments = snapshot.docs.filter(
       (document) => adminView || document.data().published === true,
     );
 
-    const studyCategoryCounts = new Map<string, number>();
-    for (const document of visibleDocuments) {
-      const data = document.data();
-      if (data.isDownloadable !== true || typeof data.studyCategory !== "string") continue;
-      const slug = data.studyCategory.trim().toLowerCase();
-      if (slug) studyCategoryCounts.set(slug, (studyCategoryCounts.get(slug) ?? 0) + 1);
-    }
-
-    const studyCategories: StudyCategoryOption[] = (categorySnapshot?.docs ?? [])
-      .map((document) => document.data())
-      .filter(
-        (data) =>
-          typeof data.name === "string" &&
-          typeof data.slug === "string" &&
-          (adminView || studyCategoryCounts.has(data.slug.trim().toLowerCase())),
-      )
-      .sort((left, right) => Number(left.order ?? 0) - Number(right.order ?? 0))
-      .map((data) => {
-        const slug = String(data.slug).trim().toLowerCase();
-        return { name: String(data.name).trim(), slug, count: studyCategoryCounts.get(slug) ?? 0 };
-      });
-
-    const knownStudyCategorySlugs = new Set(studyCategories.map((item) => item.slug));
-    for (const [slug, count] of studyCategoryCounts) {
-      if (!knownStudyCategorySlugs.has(slug)) {
-        studyCategories.push({ name: categoryNameFromSlug(slug), slug, count });
-      }
-    }
-
-    const resolvedCategory =
-      studyCategories.find(
-        (item) => item.slug === category || item.name.toLowerCase() === category,
-      )?.slug ?? category;
+    const legacySubcategory = resourceCategories.subcategories.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
+    const legacyMajor = resourceCategories.majors.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
 
     const matching = visibleDocuments
       .filter((document) => {
-        if (!resolvedCategory) return true;
         const data = document.data();
-        const articleCategory = String(data.category ?? "").toLowerCase();
-        const studyCategory = String(data.studyCategory ?? "").toLowerCase();
-        return (
-          articleCategory === resolvedCategory ||
-          (data.isDownloadable === true && studyCategory === resolvedCategory)
-        );
+        const assignment = resolveArticleAssignment(data, resourceCategories);
+        if (requestedMajor && assignment.majorCategoryId !== requestedMajor) return false;
+        if (requestedSubcategory && assignment.subcategoryId !== requestedSubcategory) return false;
+        if (!category) return true;
+        if (legacySubcategory) return assignment.subcategoryId === legacySubcategory.id;
+        if (legacyMajor) return assignment.majorCategoryId === legacyMajor.id;
+        return String(data.category ?? "").toLowerCase() === category || String(data.studyCategory ?? "").toLowerCase() === category;
       })
       .filter((document) => {
         if (downloadable === null) return true;
@@ -108,9 +69,13 @@ export async function GET(request: NextRequest) {
     const currentPage = Math.min(page, totalPages);
     const articles = matching
       .slice((currentPage - 1) * limit, currentPage * limit)
-      .map((document) => serializeArticle(document));
+      .map((document) => ({ ...serializeArticle(document), ...resolveArticleAssignment(document.data(), resourceCategories) }));
 
-    return NextResponse.json({ articles, total, totalPages, currentPage, studyCategories });
+    const studyCategories = resourceCategories.subcategories
+      .filter((item) => item.parentId === "study-library")
+      .map((item) => ({ id: item.id, name: item.name, slug: item.slug, count: item.count }));
+
+    return NextResponse.json({ articles, total, totalPages, currentPage, studyCategories, resourceCategories });
   } catch (error) {
     return errorResponse(error);
   }
@@ -127,6 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { content, metadata } = validateArticleBody(body);
+    await validateResourceAssignment(metadata);
     const slug = articleSlug(metadata.title as string);
     await assertUniqueArticleSlug(slug);
 

@@ -46,6 +46,22 @@ export async function deleteImage(publicId: string): Promise<void> {
   await client().uploader.destroy(publicId, { resource_type: "image" });
 }
 
+export function publicIdFromManagedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.endsWith("cloudinary.com")) return null;
+    const marker = "/upload/";
+    const start = parsed.pathname.indexOf(marker);
+    if (start < 0) return null;
+    const parts = parsed.pathname.slice(start + marker.length).split("/").filter(Boolean);
+    if (/^v\d+$/.test(parts[0] ?? "")) parts.shift();
+    const publicId = decodeURIComponent(parts.join("/")).replace(/\.[^.]+$/, "");
+    return publicId.startsWith(`${CLOUDINARY_FOLDER}/`) ? publicId : null;
+  } catch {
+    return null;
+  }
+}
+
 export function validateManagedPublicId(value: unknown): string {
   if (typeof value !== "string" || !value.trim()) {
     throw new Error("A Cloudinary publicId is required");

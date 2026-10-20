@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { PublicArticle } from "@/lib/types";
+import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 
 export default function ArticleSidebar({ article }: { article: PublicArticle }) {
   const [currentUrl, setCurrentUrl] = useState("");
+  const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   useEffect(() => setCurrentUrl(window.location.href), []);
+  useEffect(() => {
+    fetch("/api/resource-categories").then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject()).then(setTaxonomy).catch(() => undefined);
+  }, []);
   const shareText = `Check out this article: ${article.title}`;
 
   return (
@@ -30,21 +34,16 @@ export default function ArticleSidebar({ article }: { article: PublicArticle }) 
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
         <div className="flex flex-wrap gap-2">
-          {[
-            ["faith", "Faith Blogs"],
-            ["recipe", "Recipes"],
-            ["agriculture", "Agriculture"],
-            ["homeschooling", "Homeschooling"],
-            ["study", "Study Materials"],
-          ].map(([value, label]) => (
-            <Link
-              key={value}
-              href={`/articles?category=${value}`}
+          {taxonomy.subcategories.map((category) => {
+            const basePath = category.parentId === "study-library" ? "/study-materials" : `/articles?major=${encodeURIComponent(category.parentId)}`;
+            return <Link
+              key={category.id}
+              href={`${basePath}${basePath.includes("?") ? "&" : "?"}category=${encodeURIComponent(category.id)}`}
               className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-emerald-100 hover:text-emerald-700 transition"
             >
-              {label}
-            </Link>
-          ))}
+              {category.name}
+            </Link>;
+          })}
         </div>
       </div>
 

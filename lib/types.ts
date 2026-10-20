@@ -54,9 +54,34 @@ export interface ArticleAuthor {
 }
 
 export interface StudyCategoryOption {
+  id?: string;
   name: string;
   slug: string;
   count: number;
+}
+
+export interface ResourceMajorCategory {
+  id: string;
+  kind: "major";
+  name: string;
+  slug: string;
+  order: number;
+  count: number;
+}
+
+export interface ResourceSubcategory {
+  id: string;
+  kind: "subcategory";
+  parentId: string;
+  name: string;
+  slug: string;
+  order: number;
+  count: number;
+}
+
+export interface ResourceTaxonomy {
+  majors: ResourceMajorCategory[];
+  subcategories: ResourceSubcategory[];
 }
 
 export interface ChatCategory {
@@ -77,8 +102,12 @@ export interface Article {
   content: string;
   excerpt: string;
   featuredImage?: string;
-  category: "faith" | "recipe" | "agriculture" | "homeschooling" | "study";
+  /** @deprecated Compatibility field for records created before resource taxonomy v2. */
+  category: string;
+  /** @deprecated Compatibility field for records created before resource taxonomy v2. */
   studyCategory?: string;
+  majorCategoryId: string;
+  subcategoryId?: string;
   tags: string[];
   author: ArticleAuthor;
   seoTitle?: string;

@@ -6,24 +6,18 @@ import Link from "next/link";
 import { Check, ChevronDown, FileText, Search, X } from "lucide-react";
 import StudyMaterialCard from "@/components/public/StudyMaterialCard";
 import api from "@/lib/public-api";
-import type { PublicArticle } from "@/lib/types";
+import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 export type { PublicArticle } from "@/lib/types";
 
 type Material = PublicArticle & { thumbnail?: string; description?: string };
-type Response = { articles: Material[]; totalPages: number; total: number };
-const categories = [
-  { slug: "", name: "All articles" },
-  { slug: "faith", name: "Faith Blogs" },
-  { slug: "recipe", name: "Cookery & Recipes" },
-  { slug: "agriculture", name: "Agriculture Tips" },
-  { slug: "homeschooling", name: "Homeschooling" },
-  { slug: "study", name: "Study Materials" },
-];
+type Response = { articles: Material[]; totalPages: number; total: number; resourceCategories: ResourceTaxonomy };
 
 export default function ArticlesPage({ initialCategory = "" }: { initialCategory?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [materials, setMaterials] = useState<Material[]>([]);
+  const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
+  const [majorCategoryId, setMajorCategoryId] = useState(searchParams.get("major") || "articles-blogs");
   const [category, setCategory] = useState(initialCategory || searchParams.get("category") || "");
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
@@ -42,6 +36,7 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
   useEffect(() => {
     setPage(1);
     setCategory(initialCategory || searchParams.get("category") || "");
+    setMajorCategoryId(searchParams.get("major") || "articles-blogs");
   }, [initialCategory, searchParams]);
 
   useEffect(() => {
@@ -54,17 +49,18 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
     setLoading(true);
     setError(false);
     if (page === 1) { setMaterials([]); setTotal(0); }
-    api.get<Response>("/articles", { params: { page, limit: 9, category, search } })
+    api.get<Response>("/articles", { params: { page, limit: 9, majorCategoryId, category, search } })
       .then(({ data }) => {
         if (cancelled) return;
         setMaterials((previous) => page === 1 ? data.articles : [...previous, ...data.articles.filter((item) => !previous.some((existing) => existing._id === item._id))]);
         setTotalPages(data.totalPages || 1);
         setTotal(data.total || 0);
+        setTaxonomy(data.resourceCategories || { majors: [], subcategories: [] });
       })
       .catch(() => { if (!cancelled) setError(true); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [page, category, search, retry]);
+  }, [page, category, majorCategoryId, search, retry]);
 
   useEffect(() => {
     if (loading || error || page >= totalPages || !sentinel.current) return;
@@ -101,14 +97,17 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
   const selectCategory = (value: string, closeDrawer = true) => {
     setPage(1); setCategory(value); if (closeDrawer) setDrawerOpen(false);
     const params = new URLSearchParams();
+    if (majorCategoryId !== "articles-blogs") params.set("major", majorCategoryId);
     if (value) params.set("category", value);
     router.replace(`/articles${params.size ? `?${params}` : ""}`, { scroll: false });
   };
-  const categoryName = categories.find((item) => item.slug === category)?.name || "All articles";
-  const categoryOptions = categories;
+  const majorCategory = taxonomy.majors.find((item) => item.id === majorCategoryId);
+  const categories = taxonomy.subcategories.filter((item) => item.parentId === majorCategoryId);
+  const categoryName = categories.find((item) => item.id === category || item.slug === category)?.name || `All ${majorCategory?.name ?? "resources"}`;
+  const categoryOptions = [{ id: "", slug: "", name: `All ${majorCategory?.name ?? "resources"}` }, ...categories];
   const categoryList = (closeAfterSelection: boolean) => categoryOptions.map((item) => (
-    <button key={item.slug} onClick={() => selectCategory(item.slug, closeAfterSelection)} aria-pressed={category === item.slug} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm ${category === item.slug ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-700 hover:bg-gray-100"}`}>
-      <span className="flex-1">{item.name}</span>{category === item.slug && <Check size={17} />}
+    <button key={item.id || item.slug} onClick={() => selectCategory(item.id, closeAfterSelection)} aria-pressed={category === item.id || category === item.slug} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm ${category === item.id || category === item.slug ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-700 hover:bg-gray-100"}`}>
+      <span className="flex-1">{item.name}</span>{(category === item.id || category === item.slug) && <Check size={17} />}
     </button>
   ));
 
@@ -117,9 +116,9 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
       {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 35, 27, .67), rgba(2, 35, 27, .48)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80')" }} />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Read &amp; Grow</p>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Stories, Wisdom &amp; <span className="text-emerald-300">Inspiration</span></h1>
-          <p className="mt-4 text-base text-emerald-50 sm:text-lg">Discover articles on faith, family, farming, homeschooling, and free study materials.</p>
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Resources</p>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{majorCategory?.name ?? "Articles & Blogs"}</h1>
+          <p className="mt-4 text-base text-emerald-50 sm:text-lg">Browse the latest resources by category.</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3"><a href="#articles-content" className="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">Browse All</a><Link href="/donate" className="rounded-lg border border-white/70 bg-black/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/15">Support Our Work</Link></div>
         </div>
       </section>}
@@ -137,7 +136,7 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
           <div className="mb-6 flex flex-wrap items-end justify-between gap-2"><div><h2 className="text-2xl font-bold text-gray-900">{search ? "Search results" : category === "" ? "Explore articles" : categoryName}</h2><p className="mt-1 text-sm text-gray-500" aria-live="polite">{loading && page === 1 ? "Finding articles..." : `${total} ${total === 1 ? "article" : "articles"}${search ? ` for “${search}”` : ""}`}</p></div>{category && <button onClick={() => selectCategory("")} className="text-sm font-semibold text-emerald-700 hover:underline">Clear category</button>}</div>
           {(!loading || page > 1) && materials.length === 0 && !error && <div className="rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center text-gray-600"><FileText className="mx-auto mb-4 text-emerald-600" size={32} /><p className="font-semibold text-gray-900">No articles found</p><p className="mt-1 text-sm">Try another search or category.</p></div>}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {materials.map((material) => <StudyMaterialCard key={material._id} material={material} hideEmptyImage categoryName={categories.find((item) => item.slug === material.category)?.name} />)}
+            {materials.map((material) => <StudyMaterialCard key={material._id} material={material} hideEmptyImage categoryName={taxonomy.subcategories.find((item) => item.id === material.subcategoryId)?.name ?? majorCategory?.name} />)}
           </div>
           {loading && <p className="py-10 text-center text-sm text-gray-500" role="status">Loading articles...</p>}
           {error && <div className="py-8 text-center text-sm text-gray-600" role="alert">Could not load articles. <button onClick={() => setRetry((value) => value + 1)} className="font-semibold text-emerald-700 underline">Try again</button></div>}

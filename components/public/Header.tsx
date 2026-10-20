@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart } from "@/components/providers/CartProvider";
+import type { ResourceTaxonomy } from "@/lib/types";
 import {
   Menu,
   X,
@@ -39,6 +40,7 @@ function NavLink({ href, className, ...props }: NavLinkProps) {
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [resourceTaxonomy, setResourceTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
@@ -52,6 +54,15 @@ const Header = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/resource-categories")
+      .then((response) => response.ok ? response.json() as Promise<ResourceTaxonomy> : Promise.reject())
+      .then((data) => { if (!cancelled) setResourceTaxonomy(data); })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -103,16 +114,24 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const categoryItems = resourceTaxonomy.majors.flatMap((major) => {
+    const basePath = major.id === "study-library" ? "/study-materials" : `/articles?major=${encodeURIComponent(major.id)}`;
+    return [
+      { name: major.name, path: basePath, major: true },
+      ...resourceTaxonomy.subcategories.filter((item) => item.parentId === major.id).map((item) => ({
+        name: item.name,
+        path: `${basePath}${basePath.includes("?") ? "&" : "?"}category=${encodeURIComponent(item.id)}`,
+        major: false,
+      })),
+    ];
+  });
   const resourcesItems = [
-  { name: "Faith Blogs", path: "/articles?category=faith" },
-  { name: "Recipes", path: "/articles?category=recipe" },
-  { name: "Agriculture", path: "/articles?category=agriculture" },
-  { name: "Homeschooling", path: "/articles?category=homeschooling" },
-  { name: "Study Materials", path: "/study-materials" },
-  { name: "Videos", path: "/videos" },
-
- 
-];
+    ...(categoryItems.length ? categoryItems : [
+      { name: "Articles & Blogs", path: "/articles", major: true },
+      { name: "Study Library", path: "/study-materials", major: true },
+    ]),
+    { name: "Videos", path: "/videos", major: true },
+  ];
   const shopItems = [
     { name: "Seeds Shop", path: "/products?category=seeds" },
     { name: "Fresh Produce", path: "/products?category=produce" },
@@ -256,10 +275,10 @@ const Header = () => {
                 >
                   {resourcesItems.map((item) => (
                     <NavLink
-                      key={item.name}
+                      key={`${item.path}-${item.name}`}
                       href={item.path}
                       className={({ isActive }) =>
-                        `block px-4 py-2 text-sm ${
+                        `block px-4 py-2 text-sm ${item.major ? "font-semibold" : "pl-7"} ${
                           isActive
                             ? isScrolled || isLightHeroPage
                               ? "bg-emerald-50 text-emerald-600"
@@ -451,7 +470,7 @@ const Header = () => {
                         </summary>
                         <div className="ml-4 border-l border-gray-200 pl-2">
                           {section.items.map((item) => (
-                            <NavLink key={item.name} href={item.path} className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-50">
+                            <NavLink key={`${item.path}-${item.name}`} href={item.path} className={`block rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-50 ${"major" in item && item.major ? "font-semibold" : "ml-3 text-sm"}`}>
                               {item.name}
                             </NavLink>
                           ))}
