@@ -1,11 +1,81 @@
--- Cloudflare D1 is intentionally limited to article body text.
--- Article metadata, users, products, orders, contacts and donations live in
--- Firestore. Images live in Cloudinary. Downloadable documents live in R2.
+-- D1 stores article bodies and the indexed public read models for articles and
+-- products. Firestore remains authoritative for auth, taxonomy administration,
+-- inventory, orders, contacts and donations. Images live in Cloudinary and
+-- downloadable documents live in R2.
 -- Apply with: node --env-file=.env.local scripts/d1-migrate.mjs
 
 CREATE TABLE IF NOT EXISTS article_content (
   article_id  TEXT PRIMARY KEY,
   content     TEXT NOT NULL,
   created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS public_articles (
+  id                 TEXT PRIMARY KEY,
+  slug               TEXT NOT NULL UNIQUE,
+  title              TEXT NOT NULL,
+  excerpt            TEXT NOT NULL,
+  featured_image     TEXT,
+  legacy_category    TEXT,
+  legacy_study_category TEXT,
+  major_category_id  TEXT NOT NULL,
+  subcategory_id     TEXT,
+  tags_json          TEXT NOT NULL DEFAULT '[]',
+  author_json        TEXT NOT NULL DEFAULT '{}',
+  seo_title          TEXT,
+  seo_description    TEXT,
+  seo_keywords_json  TEXT NOT NULL DEFAULT '[]',
+  published_at       TEXT,
+  views              INTEGER NOT NULL DEFAULT 0,
+  is_downloadable    INTEGER NOT NULL DEFAULT 0,
+  file_key           TEXT,
+  file_name          TEXT,
+  file_type          TEXT,
+  created_at         TEXT,
+  updated_at         TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_public_articles_published
+  ON public_articles(published_at DESC, id);
+CREATE INDEX IF NOT EXISTS idx_public_articles_major
+  ON public_articles(major_category_id, published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_public_articles_subcategory
+  ON public_articles(subcategory_id, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS public_products (
+  id                  TEXT PRIMARY KEY,
+  slug                TEXT NOT NULL UNIQUE,
+  name                TEXT NOT NULL,
+  description         TEXT NOT NULL,
+  features            TEXT,
+  category            TEXT NOT NULL,
+  price               REAL NOT NULL,
+  original_price      REAL,
+  images_json         TEXT NOT NULL DEFAULT '[]',
+  in_stock            INTEGER NOT NULL DEFAULT 0,
+  stock_quantity      INTEGER NOT NULL DEFAULT 0,
+  specifications_json TEXT NOT NULL DEFAULT '{}',
+  brand               TEXT,
+  model               TEXT,
+  featured            INTEGER NOT NULL DEFAULT 0,
+  seo_title           TEXT,
+  seo_description     TEXT,
+  seo_keywords_json   TEXT NOT NULL DEFAULT '[]',
+  organic_certified   INTEGER NOT NULL DEFAULT 0,
+  harvest_date        TEXT,
+  seed_type           TEXT,
+  created_at          TEXT,
+  updated_at          TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_public_products_category
+  ON public_products(category, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_public_products_featured
+  ON public_products(featured, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS public_read_model_state (
+  area        TEXT PRIMARY KEY,
+  ready       INTEGER NOT NULL DEFAULT 0,
   updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );

@@ -14,6 +14,7 @@ When service changes need live verification, also run the relevant commands:
 
 ```powershell
 npm run migrate:d1
+npm run sync:d1-public
 npm run smoke:firebase
 npm run smoke:cloudinary
 npm run smoke:r2
@@ -67,3 +68,9 @@ npm run phase8:smoke -- https://your-production-domain.example
 ```
 
 Monitor Vercel, Firebase, Cloudinary, and Cloudflare logs during acceptance.
+
+For the D1 public read model, run `npm run migrate:d1` first and then
+`npm run sync:d1-public`. Confirm that both areas report synchronized counts
+before promotion. Public requests fall back to cached Firestore data if the D1
+schema is missing, unavailable, or marked incomplete, so schema deployment and
+application deployment can be rolled out without an outage.

@@ -3,6 +3,11 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin, requireAuth } from "@/lib/auth";
 import { PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
+import {
+  beginD1ReadModelUpdate,
+  markD1ReadModelReady,
+  syncD1ProductDocument,
+} from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import {
   createOrderNumber,
@@ -66,6 +71,17 @@ export async function POST(request: NextRequest) {
         ...orderTimestamps(),
       });
     });
+
+    const syncD1 = await beginD1ReadModelUpdate("products");
+    if (syncD1) {
+      try {
+        const updatedProducts = await database.getAll(...productReferences);
+        await Promise.all(updatedProducts.map(syncD1ProductDocument));
+        await markD1ReadModelReady("products");
+      } catch (error) {
+        console.error("Order completed safely in Firestore; D1 product projection remains disabled until resynchronized.", error);
+      }
+    }
 
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeOrder(await orderReference.get()), { status: 201 });

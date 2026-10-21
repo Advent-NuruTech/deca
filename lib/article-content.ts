@@ -4,7 +4,7 @@ import { d1First, d1Run } from "@/lib/d1";
 
 interface ArticleContentRow { content: string }
 
-/** D1 is reserved solely for the long-form body of an article. */
+/** Long-form article bodies live in D1 rather than consuming Firestore reads. */
 export async function getArticleContent(articleId: string): Promise<string | null> {
   const row = await d1First<ArticleContentRow>(
     "SELECT content FROM article_content WHERE article_id = ? LIMIT 1", [articleId],

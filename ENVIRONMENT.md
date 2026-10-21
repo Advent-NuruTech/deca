@@ -10,13 +10,36 @@ project settings for deployment. Never prefix a secret with `NEXT_PUBLIC_`.
 | Admin signup | `SIGN_UP_CODE` | Server-only access code required by `/admin/signup` |
 | Cloudinary | `CLOUDINARY_CLOUD_NAME` (or existing `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Product/article images |
 | Cloudflare R2 | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, optional `R2_PUBLIC_URL` | PDFs, DOC/DOCX and PPT/PPTX downloads |
-| Cloudflare D1 | `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `D1_DATABASE_ID` | Article body text only |
+| Cloudflare D1 | `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `D1_DATABASE_ID` | Article bodies and public article/product read models |
 | YouTube | `YOUTUBE_API_KEY` | Server-side YouTube Data API key for the channel feeds |
 
 Study-material uploads are accepted at `POST /api/study-materials` as a
 multipart `file` (or `document`) field. Store the returned `fileKey`,
 `fileName`, and `fileType` on the article payload. Downloads use the returned
 same-origin `fileUrl`; the R2 bucket does not need to be public.
+
+## D1 public read model
+
+Public article listings, article details, product listings and product details
+read from indexed D1 tables. Firestore remains authoritative for administrator
+records, category management, inventory and checkout transactions. If D1 is
+unavailable or a synchronization is incomplete, the application automatically
+uses the cached Firestore read path instead of serving stale D1 data.
+
+After applying a deployment that changes `db/schema.sql`, initialize and
+backfill the read model before directing production traffic to it:
+
+```powershell
+npm run migrate:d1
+npm run sync:d1-public
+```
+
+Both commands use the server-only credentials above. The synchronization
+replaces only `public_articles` and `public_products`; it does not modify
+article bodies, orders, users, media or R2 documents. Normal administrator
+article/product writes keep the D1 projection synchronized. An administrator
+can also repair it with `POST /api/admin/d1-sync` (optionally with
+`?area=articles` or `?area=products`).
 
 `CF_API_TOKEN` needs D1 permissions. R2 credentials must be scoped to the
 documents bucket. Use the matching Vercel Development, Preview and Production

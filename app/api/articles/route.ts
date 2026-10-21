@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
-import { saveArticleContent } from "@/lib/article-content";
+import { deleteArticleContent, saveArticleContent } from "@/lib/article-content";
 import {
   articleSlug,
   assertUniqueArticleSlug,
@@ -12,6 +12,12 @@ import {
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
 import { PUBLIC_ARTICLES_TAG, PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
+import {
+  beginD1ReadModelUpdate,
+  deleteD1Article,
+  markD1ReadModelReady,
+  syncD1ArticleDocument,
+} from "@/lib/d1-public-store";
 import { getCachedPublishedArticles } from "@/lib/public-content";
 import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
@@ -108,19 +114,32 @@ export async function POST(request: NextRequest) {
     await validateResourceAssignment(metadata);
     const slug = articleSlug(metadata.title as string);
     await assertUniqueArticleSlug(slug);
+    const syncD1 = await beginD1ReadModelUpdate("articles");
 
     const reference = firestore().collection("articles").doc();
     const author = { uid: admin.uid, name: admin.name, email: admin.email };
-    await reference.set(createArticleMetadata({ ...metadata, slug, author }));
 
     try {
+      await reference.set(createArticleMetadata({ ...metadata, slug, author }));
       await saveArticleContent(reference.id, content!);
+      const created = await reference.get();
+      if (syncD1) {
+        await syncD1ArticleDocument(created);
+        await markD1ReadModelReady("articles");
+      }
     } catch (error) {
-      try {
-        await reference.delete();
-      } catch (rollbackError) {
+      const rollback = await Promise.allSettled([
+        deleteArticleContent(reference.id),
+        reference.delete(),
+        ...(syncD1 ? [deleteD1Article(reference.id)] : []),
+      ]);
+      const criticalFailure = rollback.slice(0, 2).find((result) => result.status === "rejected");
+      if (syncD1 && rollback[2]?.status === "fulfilled") {
+        await markD1ReadModelReady("articles").catch(() => undefined);
+      }
+      if (criticalFailure?.status === "rejected") {
         throw new Error(
-          `Article content write failed and Firestore rollback also failed: ${rollbackError instanceof Error ? rollbackError.message : "unknown rollback error"}`,
+          `Article creation failed and rollback also failed: ${criticalFailure.reason instanceof Error ? criticalFailure.reason.message : "unknown rollback error"}`,
           { cause: error },
         );
       }

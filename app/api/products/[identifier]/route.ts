@@ -3,6 +3,12 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
+import {
+  beginD1ReadModelUpdate,
+  deleteD1Product,
+  markD1ReadModelReady,
+  syncD1ProductDocument,
+} from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import { getCachedActiveProductBySlug } from "@/lib/public-content";
 import {
@@ -57,8 +63,30 @@ export async function PUT(
       await assertUniqueProductSlug(slug, identifier);
       data.slug = slug;
     }
-    await reference.update(withUpdateTimestamp(data));
-    const updated = await reference.get();
+    const syncD1 = await beginD1ReadModelUpdate("products");
+    let updated;
+    try {
+      await reference.update(withUpdateTimestamp(data));
+      updated = await reference.get();
+      if (syncD1) {
+        await syncD1ProductDocument(updated);
+        await markD1ReadModelReady("products");
+      }
+    } catch (error) {
+      try {
+        await reference.set(existing.data() ?? {});
+        if (syncD1) {
+          await syncD1ProductDocument(existing);
+          await markD1ReadModelReady("products");
+        }
+      } catch (rollbackError) {
+        throw new Error(
+          `Product update failed and rollback also failed: ${rollbackError instanceof Error ? rollbackError.message : "unknown rollback error"}`,
+          { cause: error },
+        );
+      }
+      throw error;
+    }
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeProduct(updated));
   } catch (error) {
@@ -76,7 +104,28 @@ export async function DELETE(
     const reference = firestore().collection("products").doc(identifier);
     const existing = await reference.get();
     if (!existing.exists) throw new HttpError(404, "Product not found");
-    await reference.delete();
+    const syncD1 = await beginD1ReadModelUpdate("products");
+    try {
+      await reference.delete();
+      if (syncD1) {
+        await deleteD1Product(identifier);
+        await markD1ReadModelReady("products");
+      }
+    } catch (error) {
+      try {
+        await reference.set(existing.data() ?? {});
+        if (syncD1) {
+          await syncD1ProductDocument(existing);
+          await markD1ReadModelReady("products");
+        }
+      } catch (rollbackError) {
+        throw new Error(
+          `Product deletion failed and rollback also failed: ${rollbackError instanceof Error ? rollbackError.message : "unknown rollback error"}`,
+          { cause: error },
+        );
+      }
+      throw error;
+    }
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {

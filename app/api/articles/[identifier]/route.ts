@@ -11,6 +11,12 @@ import {
 } from "@/lib/articles";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { PUBLIC_ARTICLES_TAG } from "@/lib/cache-tags";
+import {
+  beginD1ReadModelUpdate,
+  deleteD1Article,
+  markD1ReadModelReady,
+  syncD1ArticleDocument,
+} from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import { getCachedPublishedArticleBySlug } from "@/lib/public-content";
 import { deleteImage, publicIdFromManagedUrl } from "@/lib/cloudinary";
@@ -100,21 +106,32 @@ export async function PUT(
     }
 
     const oldContent = content === undefined ? undefined : await getArticleContent(identifier);
-    if (content !== undefined) await saveArticleContent(identifier, content);
+    const syncD1 = await beginD1ReadModelUpdate("articles");
 
     try {
+      if (content !== undefined) await saveArticleContent(identifier, content);
       await reference.update(updateArticleMetadata(metadata, existingData.published === true));
+      const updated = await reference.get();
+      if (syncD1) {
+        await syncD1ArticleDocument(updated);
+        await markD1ReadModelReady("articles");
+      }
     } catch (error) {
-      if (content !== undefined) {
-        try {
+      try {
+        await reference.set(existingData);
+        if (content !== undefined) {
           if (oldContent === null) await deleteArticleContent(identifier);
           else if (typeof oldContent === "string") await saveArticleContent(identifier, oldContent);
-        } catch (rollbackError) {
-          throw new Error(
-            `Firestore update failed and D1 rollback also failed: ${rollbackError instanceof Error ? rollbackError.message : "unknown rollback error"}`,
-            { cause: error },
-          );
         }
+        if (syncD1) {
+          await syncD1ArticleDocument(existing);
+          await markD1ReadModelReady("articles");
+        }
+      } catch (rollbackError) {
+        throw new Error(
+          `Article update failed and rollback also failed: ${rollbackError instanceof Error ? rollbackError.message : "unknown rollback error"}`,
+          { cause: error },
+        );
       }
       throw error;
     }
@@ -138,7 +155,6 @@ export async function DELETE(
     const reference = firestore().collection("articles").doc(identifier);
     const existing = await reference.get();
     if (!existing.exists) throw new HttpError(404, "Article not found");
-
     const oldContent = await getArticleContent(identifier);
     const existingData = existing.data() ?? {};
     const fileKey = typeof existingData.fileKey === "string" ? validateStudyMaterialKey(existingData.fileKey) : "";
@@ -147,6 +163,7 @@ export async function DELETE(
       ...(fileKey ? [deleteFromR2(fileKey)] : []),
       ...(imagePublicId ? [deleteImage(imagePublicId)] : []),
     ]);
+    const syncD1 = await beginD1ReadModelUpdate("articles");
     await deleteArticleContent(identifier);
     try {
       await reference.delete();
@@ -162,6 +179,15 @@ export async function DELETE(
         }
       }
       throw error;
+    }
+
+    if (syncD1) {
+      try {
+        await deleteD1Article(identifier);
+        await markD1ReadModelReady("articles");
+      } catch (error) {
+        console.error("Article was deleted, but the D1 read model needs resynchronization.", error);
+      }
     }
 
     revalidateTag(PUBLIC_ARTICLES_TAG, { expire: 0 });

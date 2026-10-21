@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
+import {
+  beginD1ReadModelUpdate,
+  deleteD1Product,
+  markD1ReadModelReady,
+  syncD1ProductDocument,
+} from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import { getCachedActiveProducts } from "@/lib/public-content";
 import {
@@ -73,10 +79,35 @@ export async function POST(request: NextRequest) {
     const data = validateProductBody(body);
     const slug = productSlug(data.name as string);
     await assertUniqueProductSlug(slug);
-    const reference = await firestore()
-      .collection("products")
-      .add(withCreateTimestamps({ ...data, slug }));
+    const syncD1 = await beginD1ReadModelUpdate("products");
+    let reference;
+    try {
+      reference = await firestore()
+        .collection("products")
+        .add(withCreateTimestamps({ ...data, slug }));
+    } catch (error) {
+      if (syncD1) await markD1ReadModelReady("products").catch(() => undefined);
+      throw error;
+    }
     const created = await reference.get();
+    if (syncD1) {
+      try {
+        await syncD1ProductDocument(created);
+        await markD1ReadModelReady("products");
+      } catch (error) {
+        const rollback = await Promise.allSettled([reference.delete(), deleteD1Product(reference.id)]);
+        if (rollback[1]?.status === "fulfilled") {
+          await markD1ReadModelReady("products").catch(() => undefined);
+        }
+        if (rollback[0]?.status === "rejected") {
+          throw new Error(
+            `Product creation failed and Firestore rollback also failed: ${rollback[0].reason instanceof Error ? rollback[0].reason.message : "unknown rollback error"}`,
+            { cause: error },
+          );
+        }
+        throw error;
+      }
+    }
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     return NextResponse.json(serializeProduct(created), { status: 201 });
   } catch (error) {
