@@ -43,10 +43,13 @@ body {
 }
 
 .home-loading-screen {
-  position: relative;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   isolation: isolate;
   display: grid;
-  min-height: clamp(32rem, 72vh, 52rem);
+  min-height: 100vh;
+  min-height: 100dvh;
   place-items: center;
   overflow: hidden;
   padding: 3rem 1.25rem;
@@ -155,7 +158,6 @@ body {
 
 @media (max-width: 640px) {
   .home-loading-screen {
-    min-height: 65vh;
     padding: 2.5rem 1rem;
   }
 }
