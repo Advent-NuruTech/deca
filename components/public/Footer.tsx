@@ -7,7 +7,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ResourceTaxonomy } from "@/lib/types";
 import { getPublicTaxonomy } from "@/lib/public-settings-client";
-import NewsletterSignup from "@/components/public/newsletter-signup";
 import {
   Mail,
   Phone,
@@ -20,6 +19,39 @@ import {
   Sprout,
 } from "lucide-react";
 const logo = "/assets/logo.png";
+const poweredByText = "Powered by Ants";
+const antsContactUrl = "https://wa.me/254142225233?text=hello%20advent%20nurutech%20services%20%2C%20iam%20from%20remsam%20website%20i%20would%20like%20to%20know%20about%20your%20services";
+
+function PoweredByAnts() {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setText(poweredByText);
+      return;
+    }
+    let position = 0;
+    let deleting = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const type = () => {
+      position += deleting ? -1 : 1;
+      setText(poweredByText.slice(0, position));
+      let delay = deleting ? 45 : 90;
+      if (position === poweredByText.length) { deleting = true; delay = 1800; }
+      else if (position === 0) { deleting = false; delay = 500; }
+      timer = setTimeout(type, delay);
+    };
+    timer = setTimeout(type, 350);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <a href={antsContactUrl} target="_blank" rel="noopener noreferrer" aria-label="Powered by Ants. Contact Ants on WhatsApp" className="group grid min-h-8 place-items-center rounded-full px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+      <span className="invisible col-start-1 row-start-1" aria-hidden="true">{poweredByText}|</span>
+      <span className="col-start-1 row-start-1" aria-hidden="true">{text}<span className="animate-pulse text-amber-500 motion-reduce:hidden">|</span></span>
+    </a>
+  );
+}
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -97,7 +129,7 @@ const Footer = () => {
 
       <div className="relative container mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
           {/* Brand & Mission */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -226,7 +258,7 @@ const Footer = () => {
             </div>
           </motion.div>
 
-          {/* Contact & Newsletter */}
+          {/* Contact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -238,25 +270,23 @@ const Footer = () => {
             <ul className="space-y-3 mb-5">
               <li className="flex items-start gap-3 text-gray-500 text-sm">
                 <Mail size={16} className="text-emerald-500 mt-0.5" />
-                <a
-                  href="mailto:linksstan@gmail.com / remmyviolita27@gmail.com"
-                  className="hover:text-emerald-600"
-                >
-                  linksstan@gmail.com / remmyviolita27@gmail.com
-                </a>
+                <span className="flex min-w-0 flex-col gap-1">
+                  <a href="mailto:linksstan@gmail.com" className="break-all hover:text-emerald-600">linksstan@gmail.com</a>
+                  <a href="mailto:remmyviolita27@gmail.com" className="break-all hover:text-emerald-600">remmyviolita27@gmail.com</a>
+                </span>
               </li>
               <li className="flex items-center gap-3 text-gray-500 text-sm">
                 <Phone size={16} className="text-emerald-500" />
-                <a href="tel:++254721627977 / +254746840322" className="hover:text-emerald-600">
-                 +254721627977 / +254746840322
-                </a>
+                <span className="flex flex-col gap-1">
+                  <a href="tel:+254721627977" className="hover:text-emerald-600">+254 721 627 977</a>
+                  <a href="tel:+254746840322" className="hover:text-emerald-600">+254 746 840 322</a>
+                </span>
               </li>
               <li className="flex items-center gap-3 text-gray-500 text-sm">
                 <MapPin size={16} className="text-emerald-500" />
                 <span>Butere, Kenya</span>
               </li>
             </ul>
-            <NewsletterSignup compact />
           </motion.div>
         </div>
 
@@ -267,26 +297,12 @@ const Footer = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="border-t border-gray-200 mt-10 pt-6"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm">
-            <p className="text-gray-500 flex items-center gap-2">
+          <div className="mb-3 flex justify-center">
+            <PoweredByAnts />
+          </div>
+          <div className="flex flex-col items-center justify-between gap-4 text-sm md:flex-row">
+            <p className="text-center text-gray-500 md:text-left">
               © {currentYear} RemSam Homestead. All rights reserved.
-              <span className="hidden md:inline">•</span>
-              <motion.span
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="inline-flex items-center gap-1"
-              >
-                Powered by{" "}
-                <a
-                  href="https://wa.me/254142225233?text=hello%20advent%20nurutech%20services%20%2C%20iam%20from%20remsam%20website%20i%20would%20like%20to%20know%20about%20your%20services"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Contact Ants on WhatsApp"
-                  className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-                >
-                  Ants
-                </a>
-              </motion.span>
             </p>
             <div className="flex items-center gap-5">
               <Link

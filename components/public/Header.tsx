@@ -459,6 +459,14 @@ const Header = () => {
                         {item.name}
                       </NavLink>
                     ))}
+                    <NavLink
+                      href="/newsletter"
+                      className={({ isActive }) =>
+                        `block rounded-lg px-4 py-3 font-medium ${isActive ? "bg-emerald-50 text-emerald-700" : "text-gray-800 hover:bg-gray-50"}`
+                      }
+                    >
+                      Newsletter
+                    </NavLink>
                     {[
                       { name: "Resources", items: resourcesItems },
                       { name: "Shop", items: shopItems },
