@@ -8,6 +8,10 @@ import { firestore } from "@/lib/firestore";
 import { requireAdmin } from "@/lib/auth";
 import { brand } from "@/lib/brand";
 import { automaticPreviewText, inlineVideoLinks, personalizedGreeting, richTextToPlainText, sanitizeRichText } from "@/lib/rich-text";
+import { getCachedPublishedArticles } from "@/lib/public-content";
+import { timestamp } from "@/lib/articles";
+import { STUDY_MAJOR_ID } from "@/lib/resource-taxonomy";
+import { getChannels, listVideos, type Video } from "@/lib/youtube";
 
 export { FieldValue, Timestamp };
 
@@ -32,6 +36,7 @@ export type CampaignAudience = {
 type Recipient = { id: string; email: string; name?: string };
 type DeliveryFailure = { id: string; email: string; error: string; retryable: boolean };
 type DeliveryResult = { sent: number; failures: DeliveryFailure[] };
+type DeliveryOptions = { contentAfterBody?: string; textSuffix?: string };
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function escapeHtml(value: string) {
@@ -57,7 +62,7 @@ function unsubscribeUrl(recipientId: string, baseUrl: string) {
   return `${safeSiteUrl(baseUrl)}/api/mailing/unsubscribe?id=${recipientId}&sig=${signature}`;
 }
 
-function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string) {
+function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string, options: DeliveryOptions = {}) {
   const greeting = personalizedGreeting(recipient.name);
   const preview = campaign.preheader || automaticPreviewText(campaign.body);
   const body = inlineVideoLinks(sanitizeRichText(campaign.body));
@@ -65,10 +70,15 @@ function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string
   const button = campaign.buttonUrl && campaign.buttonLabel
     ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:28px 0"><tr><td style="border-radius:10px;background:${brand.colors.primary}"><a href="${escapeHtml(campaign.buttonUrl)}" style="display:inline-block;padding:14px 24px;color:#fff;text-decoration:none;font:700 15px Arial,sans-serif">${escapeHtml(campaign.buttonLabel)}</a></td></tr></table>`
     : "";
-  const footer = unsubscribe
-    ? `You are receiving this because you subscribed to Remsam Homestead. <a href="${escapeHtml(unsubscribe)}" style="color:${brand.colors.primaryDark}">Unsubscribe</a>`
-    : "You are receiving this message from Remsam Homestead.";
-  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(campaign.subject)}</title></head><body style="margin:0;background:${brand.colors.canvas};color:${brand.colors.ink};font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preview)}</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${brand.colors.canvas};padding:28px 12px"><tr><td align="center"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:18px;overflow:hidden"><tr><td style="height:7px;background:${brand.colors.primary}"></td></tr><tr><td style="padding:34px 38px 16px"><p style="margin:0;color:${brand.colors.primaryDark};font-size:12px;font-weight:800;letter-spacing:2px">REMSAM HOMESTEAD</p><p style="margin:9px 0 0;color:${brand.colors.muted};font-size:13px">Faith · Family · Farming</p></td></tr><tr><td style="padding:12px 38px 36px"><p style="margin:0 0 18px;color:${brand.colors.muted};font-size:13px;font-weight:700;text-transform:uppercase">${escapeHtml(campaign.letterTitle)}</p><h1 style="margin:0 0 24px;color:${brand.colors.ink};font:700 32px/1.2 Georgia,serif">${escapeHtml(campaign.headline)}</h1><p style="margin:0 0 18px;font-size:17px;line-height:1.7">${escapeHtml(greeting)}</p><div style="font-size:17px;line-height:1.75;color:${brand.colors.ink}">${body}</div>${button}</td></tr><tr><td style="padding:24px 38px;background:${brand.colors.soft};border-top:1px solid ${brand.colors.border}"><p style="margin:0 0 7px;color:${brand.colors.primaryDark};font-size:13px;font-weight:800">Remsam Homestead</p><p style="margin:0;color:${brand.colors.muted};font-size:12px;line-height:1.6">${footer}</p></td></tr></table></td></tr></table></body></html>`;
+  const siteUrl = safeSiteUrl(baseUrl);
+  const footerLinks = [
+    `<a href="${siteUrl}/about" style="color:${brand.colors.primaryDark};text-decoration:underline">About Us</a>`,
+    `<a href="${siteUrl}/contact" style="color:${brand.colors.primaryDark};text-decoration:underline">Contact Us</a>`,
+    `<a href="${siteUrl}/study-materials" style="color:${brand.colors.primaryDark};text-decoration:underline">Study Library</a>`,
+    ...(unsubscribe ? [`<a href="${escapeHtml(unsubscribe)}" style="color:${brand.colors.primaryDark};text-decoration:underline">Unsubscribe</a>`] : []),
+  ].join(` <span style="color:${brand.colors.muted}">·</span> `);
+  const logoUrl = `${siteUrl}/assets/logo.png`;
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(campaign.subject)}</title><style>@media only screen and (max-width:600px){.email-outer{padding:6px!important}.email-card{width:100%!important;border-radius:8px!important}.email-brand{padding:22px 12px!important}.email-content{padding:22px 18px 28px!important}.email-headline{font-size:30px!important;line-height:1.16!important}.email-footer{padding:20px 12px!important}.content-card{padding:12px!important}.content-copy{padding-left:12px!important}.content-thumb{width:104px!important}}</style></head><body style="margin:0;background:${brand.colors.canvas};color:${brand.colors.ink};font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preview)}</div><table role="presentation" class="email-outer" width="100%" cellspacing="0" cellpadding="0" style="width:100%;background:${brand.colors.canvas};padding:18px 8px"><tr><td align="center"><table role="presentation" class="email-card" width="720" cellspacing="0" cellpadding="0" style="width:100%;max-width:720px;background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:12px;overflow:hidden"><tr><td class="email-brand" align="center" style="padding:28px 24px;background:${brand.colors.primaryDeep};background-image:linear-gradient(145deg,${brand.colors.primaryDark},${brand.colors.primaryDeep});color:#fff"><img src="${logoUrl}" alt="Remsam Homestead" width="78" height="78" style="display:block;width:78px;height:78px;object-fit:contain;margin:0 auto 12px;border:0"><div style="font-size:12px;letter-spacing:3px;font-weight:800;color:#fde68a">REMSAM HOMESTEAD</div><div style="height:1px;width:64px;background:${brand.colors.accent};margin:15px auto 11px"></div><div style="font-size:17px;line-height:1.4;font-style:italic;color:#fff">${escapeHtml(campaign.letterTitle)}</div></td></tr><tr><td class="email-content" style="padding:34px 38px 38px"><div style="height:3px;width:42px;background:${brand.colors.accent};margin:0 0 20px"></div><p style="margin:0 0 16px;color:${brand.colors.ink};font-size:17px;line-height:1.5">${escapeHtml(greeting)}</p><h1 class="email-headline" style="font-size:34px;line-height:1.18;letter-spacing:-.5px;margin:0 0 24px;color:${brand.colors.ink};font-family:Georgia,serif">${escapeHtml(campaign.headline)}</h1><div style="font-size:17px;line-height:1.7;color:${brand.colors.ink}">${body}</div>${options.contentAfterBody ?? ""}${button}</td></tr><tr><td class="email-footer" style="padding:22px 24px;background:${brand.colors.soft};border-top:1px solid ${brand.colors.border};color:${brand.colors.muted};font-size:13px;line-height:1.8;text-align:center"><strong style="color:${brand.colors.primaryDark};letter-spacing:1.5px">REMSAM HOMESTEAD</strong><br>Faith, Family, Farming<br>${footerLinks}<br><a href="${siteUrl}" style="color:${brand.colors.primaryDark};text-decoration:underline">Visit Remsam Homestead</a><br><span style="font-size:11px;color:${brand.colors.muted}">© Remsam Homestead</span></td></tr></table></td></tr></table></body></html>`;
 }
 
 export function getMailDb() { return firestore(); }
@@ -113,7 +123,7 @@ export async function getEmailsSentCount(mailDb: Firestore) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
-async function sendWithResend(campaign: Campaign, recipient: Recipient, baseUrl: string, key: string) {
+async function sendWithResend(campaign: Campaign, recipient: Recipient, baseUrl: string, key: string, options: DeliveryOptions = {}) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !from) throw new Error("Email delivery is not configured.");
@@ -123,8 +133,8 @@ async function sendWithResend(campaign: Campaign, recipient: Recipient, baseUrl:
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": `${key}:${recipient.id}`.slice(0, 256) },
     body: JSON.stringify({
       from, to: [recipient.email], subject: campaign.subject,
-      html: emailDocument(campaign, recipient, baseUrl),
-      text: `${personalizedGreeting(recipient.name)}\n\n${campaign.headline}\n\n${richTextToPlainText(campaign.body)}${campaign.buttonUrl ? `\n\n${campaign.buttonLabel}: ${campaign.buttonUrl}` : ""}${unsubscribe ? `\n\nUnsubscribe: ${unsubscribe}` : ""}`,
+      html: emailDocument(campaign, recipient, baseUrl, options),
+      text: `${personalizedGreeting(recipient.name)}\n\n${campaign.headline}\n\n${richTextToPlainText(campaign.body)}${options.textSuffix ? `\n\n${options.textSuffix}` : ""}${campaign.buttonUrl ? `\n\n${campaign.buttonLabel}: ${campaign.buttonUrl}` : ""}${unsubscribe ? `\n\nUnsubscribe: ${unsubscribe}` : ""}`,
       ...(unsubscribe ? { headers: { "List-Unsubscribe": `<${unsubscribe}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } } : {}),
     }),
   });
@@ -136,12 +146,12 @@ async function sendWithResend(campaign: Campaign, recipient: Recipient, baseUrl:
   }
 }
 
-export async function deliverCampaign(campaign: Campaign, recipients: Recipient[], baseUrl: string, key: string): Promise<DeliveryResult> {
+export async function deliverCampaign(campaign: Campaign, recipients: Recipient[], baseUrl: string, key: string, options: DeliveryOptions = {}): Promise<DeliveryResult> {
   const failures: DeliveryFailure[] = [];
   let sent = 0;
   for (let index = 0; index < recipients.length; index += 8) {
     await Promise.all(recipients.slice(index, index + 8).map(async (recipient) => {
-      try { await sendWithResend(campaign, recipient, baseUrl, key); sent += 1; }
+      try { await sendWithResend(campaign, recipient, baseUrl, key, options); sent += 1; }
       catch (reason) {
         const status = typeof reason === "object" && reason !== null && "status" in reason ? Number(reason.status) : 0;
         failures.push({ id: recipient.id, email: recipient.email, error: reason instanceof Error ? reason.message : "Unknown delivery error", retryable: status === 0 || status === 429 || status >= 500 });
@@ -151,13 +161,108 @@ export async function deliverCampaign(campaign: Campaign, recipients: Recipient[
   return { sent, failures };
 }
 
+type WelcomeItem = { eyebrow: string; title: string; description: string; url: string; image: string };
+
+function absolutePublicUrl(value: string | undefined, baseUrl: string) {
+  if (!value) return "";
+  try {
+    const url = new URL(value, `${safeSiteUrl(baseUrl)}/`);
+    return url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+async function latestVideo(): Promise<Video | null> {
+  try {
+    const channels = await getChannels();
+    const requests = channels.flatMap((channel, index) => channel ? [listVideos(channel, index + 1, "", 1)] : []);
+    const results = await Promise.allSettled(requests);
+    return results.flatMap((result) => result.status === "fulfilled" ? result.value.videos : [])
+      .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function latestWelcomeItems(baseUrl: string): Promise<WelcomeItem[]> {
+  const [video, articleResult] = await Promise.all([
+    latestVideo(),
+    getCachedPublishedArticles().catch(() => null),
+  ]);
+  const articles = articleResult
+    ? [...articleResult.articles].sort((left, right) => timestamp(right.publishedAt ?? right.createdAt) - timestamp(left.publishedAt ?? left.createdAt))
+    : [];
+  const article = articles.find((item) => item.majorCategoryId !== STUDY_MAJOR_ID);
+  const study = articles.find((item) => item.majorCategoryId === STUDY_MAJOR_ID);
+  return [
+    video ? {
+      eyebrow: "Latest video",
+      title: video.title,
+      description: "Watch the newest story from Remsam Homestead.",
+      url: `https://www.youtube.com/watch?v=${encodeURIComponent(video.id)}`,
+      image: absolutePublicUrl(video.thumbnail, baseUrl),
+    } : {
+      eyebrow: "Latest video",
+      title: "Watch the latest from Remsam Homestead",
+      description: "Visit our video library for the newest story and update.",
+      url: absolutePublicUrl("/videos", baseUrl),
+      image: "",
+    },
+    article ? {
+      eyebrow: "Latest article",
+      title: article.title,
+      description: article.excerpt || "Read the newest article from Remsam Homestead.",
+      url: absolutePublicUrl(`/articles/${encodeURIComponent(article.slug)}`, baseUrl),
+      image: absolutePublicUrl(article.featuredImage, baseUrl),
+    } : {
+      eyebrow: "Latest article",
+      title: "Read our newest article",
+      description: "Explore recent stories about faith, family, and farming.",
+      url: absolutePublicUrl("/articles", baseUrl),
+      image: "",
+    },
+    study ? {
+      eyebrow: "From the study library",
+      title: study.title,
+      description: study.excerpt || "Explore the newest resource in the Remsam study library.",
+      url: absolutePublicUrl(`/articles/${encodeURIComponent(study.slug)}`, baseUrl),
+      image: absolutePublicUrl(study.featuredImage, baseUrl),
+    } : {
+      eyebrow: "From the study library",
+      title: "Explore the Remsam study library",
+      description: "Find the latest learning resource and downloadable material.",
+      url: absolutePublicUrl("/study-materials", baseUrl),
+      image: "",
+    },
+  ];
+}
+
+function welcomeItemsHtml(items: WelcomeItem[]) {
+  if (!items.length) return "";
+  return `<div style="margin:30px 0 4px"><p style="margin:0 0 14px;color:${brand.colors.primaryDark};font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase">Start exploring</p>${items.map((item) => {
+    const thumbnail = item.image
+      ? `<td class="content-thumb" width="132" style="width:132px"><a href="${escapeHtml(item.url)}"><img src="${escapeHtml(item.image)}" alt="" width="132" style="display:block;width:132px;height:96px;object-fit:cover;border:0;border-radius:8px"></a></td>`
+      : `<td class="content-thumb" width="72" style="width:72px"><a href="${escapeHtml(item.url)}" style="display:block;width:72px;height:72px;border-radius:8px;background:${brand.colors.primary};color:#fff;text-align:center;text-decoration:none;font:700 30px/72px Georgia,serif">R</a></td>`;
+    return `<table role="presentation" class="content-card" width="100%" cellspacing="0" cellpadding="0" style="width:100%;margin:0 0 12px;padding:14px;border:1px solid ${brand.colors.border};border-radius:12px;background:${brand.colors.canvas}"><tr>${thumbnail}<td class="content-copy" style="padding-left:16px;vertical-align:middle"><p style="margin:0 0 5px;color:${brand.colors.primaryDark};font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase">${escapeHtml(item.eyebrow)}</p><a href="${escapeHtml(item.url)}" style="color:${brand.colors.ink};font:700 17px/1.3 Georgia,serif;text-decoration:none">${escapeHtml(item.title)}</a><p style="margin:6px 0 0;color:${brand.colors.muted};font-size:13px;line-height:1.45">${escapeHtml(item.description.slice(0, 150))}</p></td></tr></table>`;
+  }).join("")}</div>`;
+}
+
+function welcomeItemsText(items: WelcomeItem[]) {
+  return items.map((item) => `${item.eyebrow}: ${item.title}\n${item.url}`).join("\n\n");
+}
+
 export async function sendNewsletterWelcome(recipient: Recipient, baseUrl: string) {
+  const items = await latestWelcomeItems(baseUrl);
   return deliverCampaign({
     kind: "newsletter", subject: "Welcome to Remsam Homestead", letterTitle: "Welcome to the homestead",
     headline: "Faith, family, and farming—delivered with care", preheader: "You’re now part of the Remsam Homestead community.",
-    body: "<p>Thank you for joining us. You’ll receive thoughtful stories, practical homestead ideas, faith-filled encouragement, and news from our farm in Kenya.</p><p>We’re grateful to have you here.</p>",
+    body: "<p>Thank you for joining us. You’ll receive thoughtful stories, practical homestead ideas, faith-filled encouragement, and news from our farm in Kenya.</p><p>Here are three fresh places to begin: our newest video, latest article, and newest study-library resource.</p>",
     buttonLabel: "Visit Remsam Homestead", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
-  }, [recipient], baseUrl, `newsletter-welcome:${recipient.id}`);
+  }, [recipient], baseUrl, `newsletter-welcome:${recipient.id}`, {
+    contentAfterBody: welcomeItemsHtml(items),
+    textSuffix: welcomeItemsText(items),
+  });
 }
 
 export async function sendMeetingRequestWelcome(recipient: Recipient, baseUrl: string) {
