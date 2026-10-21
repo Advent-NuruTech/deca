@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarClock, CheckCircle2, Clock3, History, Mail, Plus, RefreshCw, Send, Trash2, Users } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, History, Mail, Pause, Play, Plus, RefreshCw, Send, Trash2, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import RichTextEditor from "@/components/admin/rich-text-editor";
 
@@ -13,10 +13,10 @@ type HistoryItem = { id: string; kind: MailKind; subject: string; headline?: str
 type Campaign = { kind: MailKind; subject: string; letterTitle: string; headline: string; preheader: string; body: string; buttonLabel: string; buttonUrl: string; videoUrl: string };
 type MailingData = {
   members: Recipient[]; subscribers: Recipient[]; schedules: Schedule[]; history: HistoryItem[];
-  counts: { verified: number; pending: number; active: number; unsubscribed: number; totalMembers: number; totalSubscribers: number; emailsSent: number };
+  counts: { verified: number; pending: number; active: number; paused: number; unsubscribed: number; totalMembers: number; totalSubscribers: number; emailsSent: number };
 };
 
-const emptyData: MailingData = { members: [], subscribers: [], schedules: [], history: [], counts: { verified: 0, pending: 0, active: 0, unsubscribed: 0, totalMembers: 0, totalSubscribers: 0, emailsSent: 0 } };
+const emptyData: MailingData = { members: [], subscribers: [], schedules: [], history: [], counts: { verified: 0, pending: 0, active: 0, paused: 0, unsubscribed: 0, totalMembers: 0, totalSubscribers: 0, emailsSent: 0 } };
 const initialCampaign: Campaign = {
   kind: "newsletter",
   subject: "A new letter from Remsam Homestead",
@@ -96,9 +96,9 @@ export default function MailingManager() {
     finally { setWorking(false); }
   }
 
-  async function updateRecord(payload: Record<string, string>) {
+  async function updateRecord(payload: Record<string, string>, successMessage = "Mailing record updated.") {
     setWorking(true); setError("");
-    try { await api.patch("/api/mailing", payload); setNotice("Mailing record updated."); await load(); }
+    try { await api.patch("/api/mailing", payload); setNotice(successMessage); await load(); }
     catch (reason) { setError(reason instanceof Error ? reason.message : "Could not update the record."); }
     finally { setWorking(false); }
   }
@@ -117,8 +117,8 @@ export default function MailingManager() {
 
       {(error || notice) && <p role={error ? "alert" : "status"} className={`mt-6 rounded-xl border px-4 py-3 text-sm font-medium ${error ? "border-red-200 bg-red-50 text-red-700" : "border-brand-border bg-brand-soft text-brand-dark"}`}>{error || notice}</p>}
 
-      <section className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={Users} label="Newsletter readers" value={data.counts.active} detail={`${data.counts.unsubscribed} unsubscribed`} />
+      <section className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat icon={Users} label="Newsletter readers" value={data.counts.active} detail={`${data.counts.totalSubscribers} total subscribers`} />
         <Stat icon={CheckCircle2} label="Meeting members" value={data.counts.verified} detail={`${data.counts.pending} awaiting review`} />
         <Stat icon={CalendarClock} label="Active schedules" value={data.schedules.filter((item) => item.active).length} detail={`${data.schedules.length} total`} />
         <Stat icon={Send} label="Emails delivered" value={data.counts.emailsSent} detail="Recorded deliveries" />
@@ -157,6 +157,27 @@ export default function MailingManager() {
         <Panel title="Delivery history" icon={History}>{data.history.length ? data.history.map((item) => <Row key={item.id} title={item.subject} detail={`${dateLabel(item.sentAt)} · ${item.sent ?? 0} sent${item.failed ? ` · ${item.failed} failed` : ""}`} badge={item.kind} action={<button disabled={working} onClick={() => void updateRecord({ collection: "history", id: item.id, status: "delete" })} aria-label={`Delete ${item.subject}`} className="rounded-lg p-2 text-red-600 hover:bg-red-50"><Trash2 size={16} /></button>} />) : <Empty text="Sent campaigns will appear here." />}</Panel>
       </section>
 
+      <section className="mt-8 overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-brand-border p-5 md:p-6">
+          <div><h2 className="text-xl font-bold text-brand-ink">Newsletter subscribers</h2><p className="mt-1 text-sm text-brand-muted">Review everyone who has subscribed, including paused and unsubscribed readers.</p></div>
+          <div className="grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4">
+            <SubscriberCount label="Total" value={data.counts.totalSubscribers} />
+            <SubscriberCount label="Active" value={data.counts.active} />
+            <SubscriberCount label="Paused" value={data.counts.paused} />
+            <SubscriberCount label="Unsubscribed" value={data.counts.unsubscribed} />
+          </div>
+        </div>
+        <div className="divide-y divide-brand-border">
+          {data.subscribers.map((subscriber) => <div key={subscriber.id} className="flex flex-wrap items-center gap-3 px-5 py-4 md:px-6">
+            <div className="min-w-0 flex-[1_1_220px]"><p className="truncate font-semibold text-brand-ink">{subscriber.name || "Newsletter reader"}</p><p className="truncate text-sm text-brand-muted">{subscriber.email}</p><p className="mt-1 text-xs text-brand-muted">Joined {dateLabel(subscriber.createdAt)}</p></div>
+            <span className={`rounded-full px-2.5 py-1 text-xs font-bold capitalize ${subscriber.status === "active" ? "bg-brand-soft text-brand-dark" : subscriber.status === "paused" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{subscriber.status}</span>
+            {subscriber.status === "active" ? <button disabled={working} onClick={() => void updateRecord({ collection: "subscribers", id: subscriber.id, status: "paused" }, `${subscriber.email} is paused.`)} className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50"><Pause size={15} /> Pause</button> : subscriber.status === "paused" ? <button disabled={working} onClick={() => void updateRecord({ collection: "subscribers", id: subscriber.id, status: "active" }, `${subscriber.email} is active again.`)} className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-brand-dark hover:bg-brand-soft disabled:opacity-50"><Play size={15} /> Resume</button> : null}
+            <button disabled={working} onClick={() => { if (window.confirm(`Permanently delete ${subscriber.email} from the subscriber list? They can subscribe again later.`)) void updateRecord({ collection: "subscribers", id: subscriber.id, status: "delete" }, `${subscriber.email} was deleted.`); }} aria-label={`Delete ${subscriber.email}`} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50"><Trash2 size={16} /></button>
+          </div>)}
+          {!data.subscribers.length && <Empty text="No newsletter subscribers yet." />}
+        </div>
+      </section>
+
       <section className="mt-8 rounded-2xl border border-brand-border bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-4 border-b border-brand-border p-5 md:p-6"><div><h2 className="text-xl font-bold text-brand-ink">Online meeting list</h2><p className="text-sm text-brand-muted">Verify requests or add a trusted member directly.</p></div><form onSubmit={addMember} className="flex flex-wrap gap-2"><input value={memberName} onChange={(event) => setMemberName(event.target.value)} placeholder="First name" className="input-field w-auto min-w-36" /><input required type="email" value={memberEmail} onChange={(event) => setMemberEmail(event.target.value)} placeholder="Email address" className="input-field w-auto min-w-56" /><button disabled={working} className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 font-semibold text-white"><Plus size={17} /> Add</button></form></div><div className="divide-y divide-brand-border">{data.members.map((member) => <div key={member.id} className="flex flex-wrap items-center gap-3 px-5 py-4 md:px-6"><div className="min-w-0 flex-1"><p className="truncate font-semibold text-brand-ink">{member.name || "Unnamed member"}</p><p className="truncate text-sm text-brand-muted">{member.email}</p></div><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${member.status === "verified" ? "bg-brand-soft text-brand-dark" : "bg-amber-50 text-amber-700"}`}>{member.status}</span>{member.status === "pending" && <button disabled={working} onClick={() => void updateRecord({ collection: "members", id: member.id, status: "verified" })} className="text-sm font-semibold text-brand-dark hover:underline">Verify</button>}<button disabled={working} onClick={() => void updateRecord({ collection: "members", id: member.id, status: "delete" })} aria-label={`Delete ${member.email}`} className="rounded-lg p-2 text-red-600 hover:bg-red-50"><Trash2 size={16} /></button></div>)}{!data.members.length && <Empty text="No meeting members yet." />}</div></section>
     </main>
   );
@@ -164,6 +185,7 @@ export default function MailingManager() {
 
 function Field({ label, wide, children }: { label: string; wide?: boolean; children: React.ReactNode }) { return <label className={`block text-sm font-semibold text-gray-700 ${wide ? "sm:col-span-2" : ""}`}>{label}{children}</label>; }
 function Stat({ icon: Icon, label, value, detail }: { icon: typeof Mail; label: string; value: number; detail: string }) { return <div className="rounded-2xl border border-brand-border bg-white p-5 shadow-sm"><div className="flex items-start justify-between"><div><p className="text-sm font-medium text-brand-muted">{label}</p><p className="mt-1 text-3xl font-bold text-brand-ink">{value.toLocaleString()}</p></div><span className="rounded-xl bg-brand-soft p-2.5 text-brand-dark"><Icon size={20} /></span></div><p className="mt-3 text-xs text-brand-muted">{detail}</p></div>; }
+function SubscriberCount({ label, value }: { label: string; value: number }) { return <div className="min-w-20 rounded-xl bg-brand-soft px-3 py-2"><strong className="block text-base text-brand-ink">{value.toLocaleString()}</strong><span className="text-brand-muted">{label}</span></div>; }
 function Panel({ title, icon: Icon, children }: { title: string; icon: typeof Mail; children: React.ReactNode }) { return <section className="overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm"><div className="flex items-center gap-2 border-b border-brand-border px-5 py-4"><Icon size={19} className="text-brand-dark" /><h2 className="font-bold text-brand-ink">{title}</h2></div><div className="divide-y divide-brand-border">{children}</div></section>; }
 function Row({ title, detail, badge, action }: { title: string; detail: string; badge: string; action?: React.ReactNode }) { return <div className="flex items-center gap-3 px-5 py-4"><div className="min-w-0 flex-1"><p className="truncate font-semibold text-brand-ink">{title}</p><p className="mt-1 truncate text-xs text-brand-muted">{detail}</p></div><span className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold capitalize text-brand-dark">{badge}</span>{action}</div>; }
 function Empty({ text }: { text: string }) { return <p className="p-6 text-sm text-brand-muted">{text}</p>; }

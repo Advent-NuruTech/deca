@@ -25,10 +25,10 @@ export async function POST(request: Request) {
       }
       transaction.set(subscriber, {
         email,
-        ...(name ? { name } : {}),
+        ...(name ? { name } : prior.exists && prior.get("name") ? { name: prior.get("name") } : {}),
         status: "active",
         source: "homepage",
-        ...(prior.exists ? { createdAt: prior.get("createdAt") } : { createdAt: FieldValue.serverTimestamp() }),
+        ...(prior.exists && prior.get("createdAt") ? { createdAt: prior.get("createdAt") } : { createdAt: FieldValue.serverTimestamp() }),
         subscribedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });

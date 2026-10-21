@@ -105,15 +105,16 @@ export async function GET(request: Request) {
   try {
     if (!await requireMailAdmin(request)) return Response.json({ error: "Administrator access is required." }, { status: 401 });
     const mailDb = getMailDb();
-    const [emailsSent, members, subscribers, schedules, history, verifiedMembers, pendingMembers, activeSubscribers, unsubscribed, totalMembers, totalSubscribers] = await Promise.all([
+    const [emailsSent, members, subscribers, schedules, history, verifiedMembers, pendingMembers, activeSubscribers, pausedSubscribers, unsubscribed, totalMembers, totalSubscribers] = await Promise.all([
       getEmailsSentCount(mailDb),
       mailDb.collection("onlineMeetingMembers").orderBy("createdAt", "desc").limit(500).get(),
-      mailDb.collection("newsletterSubscribers").orderBy("createdAt", "desc").limit(500).get(),
+      mailDb.collection("newsletterSubscribers").orderBy("createdAt", "desc").get(),
       mailDb.collection("mailingSchedules").orderBy("createdAt", "desc").limit(100).get(),
       mailDb.collection("mailingHistory").orderBy("sentAt", "desc").limit(50).get(),
       mailDb.collection("onlineMeetingMembers").where("status", "==", "verified").count().get(),
       mailDb.collection("onlineMeetingMembers").where("status", "==", "pending").count().get(),
       mailDb.collection("newsletterSubscribers").where("status", "==", "active").count().get(),
+      mailDb.collection("newsletterSubscribers").where("status", "==", "paused").count().get(),
       mailDb.collection("newsletterSubscribers").where("status", "==", "unsubscribed").count().get(),
       mailDb.collection("onlineMeetingMembers").count().get(),
       mailDb.collection("newsletterSubscribers").count().get(),
@@ -129,6 +130,7 @@ export async function GET(request: Request) {
         verified: verifiedMembers.data().count,
         pending: pendingMembers.data().count,
         active: activeSubscribers.data().count,
+        paused: pausedSubscribers.data().count,
         unsubscribed: unsubscribed.data().count,
         totalMembers: totalMembers.data().count,
         totalSubscribers: totalSubscribers.data().count,
@@ -311,6 +313,24 @@ export async function PATCH(request: Request) {
     }
     if (body.collection === "members" && body.status === "delete") {
       await mailDb.collection("onlineMeetingMembers").doc(body.id).delete();
+      return Response.json({ ok: true });
+    }
+    if (body.collection === "subscribers" && ["active", "paused"].includes(body.status ?? "")) {
+      const subscriber = mailDb.collection("newsletterSubscribers").doc(body.id);
+      const prior = await subscriber.get();
+      if (!prior.exists) return Response.json({ error: "The subscriber no longer exists." }, { status: 404 });
+      await subscriber.update({
+        status: body.status,
+        updatedAt: FieldValue.serverTimestamp(),
+        updatedBy: adminId,
+        ...(body.status === "paused"
+          ? { pausedAt: FieldValue.serverTimestamp(), pausedBy: adminId }
+          : { pausedAt: FieldValue.delete(), pausedBy: FieldValue.delete(), unsubscribedAt: FieldValue.delete() }),
+      });
+      return Response.json({ ok: true });
+    }
+    if (body.collection === "subscribers" && body.status === "delete") {
+      await mailDb.collection("newsletterSubscribers").doc(body.id).delete();
       return Response.json({ ok: true });
     }
     return Response.json({ error: "Unsupported mailing update." }, { status: 400 });
