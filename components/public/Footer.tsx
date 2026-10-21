@@ -276,14 +276,15 @@ const Footer = () => {
                 transition={{ duration: 1, repeat: Infinity }}
                 className="inline-flex items-center gap-1"
               >
-                powered by{" "}
+                Powered by{" "}
                 <a
-                  href="https://fancytechintegration.com"
+                  href="https://wa.me/254142225233?text=hello%20advent%20nurutech%20services%20%2C%20iam%20from%20remsam%20website%20i%20would%20like%20to%20know%20about%20your%20services"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 hover:text-emerald-700 transition"
+                  aria-label="Contact Ants on WhatsApp"
+                  className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
                 >
-                  fancy tech integration
+                  Ants
                 </a>
               </motion.span>
             </p>

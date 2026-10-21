@@ -10,7 +10,6 @@ import {
   Apple,
   Sprout,
   School,
-  Download,
   ShoppingBag,
   Gift,
   ArrowRight,
@@ -26,6 +25,7 @@ import YouTubeVideos from "../YouTubeVideos";
 import ActivityCarousel from "../ActivityCarousel";
 import YouTubeVideos2 from "../YouTubeVideos2";
 import NewsletterSignup from "../newsletter-signup";
+import HomeLoadingScreen from "../HomeLoadingScreen";
 const remsamVideo = "/assets/remsam.mp4";
 const heroPhrase = "Faith, Family, Farming";
 
@@ -141,6 +141,14 @@ const HomePage = () => {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
   };
+  const featuredArticles = [
+    featuredFaith && { icon: <BookOpen className="h-5 w-5 text-white" />, bgGradient: "from-emerald-500 to-teal-500", title: "Faith Blog", item: featuredFaith },
+    featuredRecipe && { icon: <Apple className="h-5 w-5 text-white" />, bgGradient: "from-amber-500 to-orange-500", title: "Organic Recipe", item: featuredRecipe },
+    featuredAgriculture && { icon: <Sprout className="h-5 w-5 text-white" />, bgGradient: "from-green-500 to-emerald-500", title: "Agriculture Tip", item: featuredAgriculture },
+    featuredHomeschool && { icon: <School className="h-5 w-5 text-white" />, bgGradient: "from-blue-500 to-indigo-500", title: "Homeschooling", item: featuredHomeschool },
+  ].filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+
+  if (loading) return <HomeLoadingScreen />;
 
   return (
     <>
@@ -380,7 +388,7 @@ const HomePage = () => {
         </section>
 
         {/* ========== 5. WHAT'S NEW (Featured Articles) ========== */}
-        <section className="py-16 bg-white">
+        {(loading || featuredArticles.length > 0) && <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -397,73 +405,39 @@ const HomePage = () => {
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600" />
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <FeatureCard
-                  icon={<BookOpen className="w-5 h-5 text-white" />}
-                  bgGradient="from-emerald-500 to-teal-500"
-                  title="Faith Blog"
-                  item={featuredFaith}
-                  linkTo={`/articles/${featuredFaith?.slug}`}
-                  placeholder="Latest devotional"
-                />
-                <FeatureCard
-                  icon={<Apple className="w-5 h-5 text-white" />}
-                  bgGradient="from-amber-500 to-orange-500"
-                  title="Organic Recipe"
-                  item={featuredRecipe}
-                  linkTo={`/articles/${featuredRecipe?.slug}`}
-                  placeholder="Wholesome cooking"
-                />
-                <FeatureCard
-                  icon={<Sprout className="w-5 h-5 text-white" />}
-                  bgGradient="from-green-500 to-emerald-500"
-                  title="Agriculture Tip"
-                  item={featuredAgriculture}
-                  linkTo={`/articles/${featuredAgriculture?.slug}`}
-                  placeholder="Grow your own food"
-                />
-                <FeatureCard
-                  icon={<School className="w-5 h-5 text-white" />}
-                  bgGradient="from-blue-500 to-indigo-500"
-                  title="Homeschooling"
-                  item={featuredHomeschool}
-                  linkTo={`/articles/${featuredHomeschool?.slug}`}
-                  placeholder="Joyful learning"
-                />
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {featuredArticles.map((entry) => <FeatureCard key={entry.item.slug} {...entry} linkTo={`/articles/${entry.item.slug}`} />)}
               </div>
             )}
           </div>
-        </section>
+        </section>}
 
-        {/* ========== 6. STUDY MATERIALS & SHOP ========== */}
+        {/* ========== 6. STUDY LIBRARY ========== */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12">
-              {/* Left: Study Materials */}
-              <div>
-                <div className="mb-6 flex items-start justify-between gap-4">
-                  <div><div className="flex items-center gap-2"><Download className="h-6 w-6 text-emerald-600" /><h2 className="text-2xl font-bold text-gray-900">{resourceTaxonomy.majors.find((item) => item.id === "study-library")?.name ?? "Study Library"}</h2></div><p className="mt-2 text-sm text-gray-600">Explore free resources for your faith and learning journey.</p></div>
-                </div>
-                {loading ? <p className="text-sm text-gray-500" role="status">Loading resources...</p> : latestStudies.length === 0 ? <p className="text-gray-500">No downloadable resources yet.</p> : (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {latestStudies.slice(0, 2).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={resourceTaxonomy.subcategories.find((item) => item.id === study.subcategoryId)?.name} />)}
-                  </div>
-                )}
-                <Link href="/study-materials" className="mt-6 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900">View all materials <ArrowRight size={16} /></Link>
+            <div className="mb-10 text-center">
+              <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">{resourceTaxonomy.majors.find((item) => item.id === "study-library")?.name ?? "Study Library"}</h2>
+              <div className="mx-auto mt-3 h-1 w-24 rounded-full bg-gradient-to-r from-emerald-400 to-blue-400" />
+              <p className="mt-4 text-gray-600">Explore free resources for your faith and learning journey.</p>
+            </div>
+            {loading ? <p className="text-center text-sm text-gray-500" role="status">Loading resources...</p> : latestStudies.length === 0 ? <p className="text-center text-gray-500">No downloadable resources yet.</p> : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {latestStudies.slice(0, 12).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={resourceTaxonomy.subcategories.find((item) => item.id === study.subcategoryId)?.name} />)}
               </div>
+            )}
+            <div className="mt-8 text-center"><Link href="/study-materials" className="inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900">View all materials <ArrowRight size={16} /></Link></div>
+          </div>
+        </section>
 
-              {/* Right: Featured Products */}
-              <div>
-                <div className="flex items-center gap-2 mb-6">
-                  <ShoppingBag className="w-6 h-6 text-amber-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    From Our Farm
-                  </h2>
-                </div>
-                {featuredSeeds.length === 0 ? (
-                  <p className="text-gray-500">No products yet.</p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-4">
+        {/* ========== 7. FROM OUR FARM ========== */}
+        {featuredSeeds.length > 0 && <section className="bg-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-5xl">
+              <div className="mb-8 flex items-center justify-center gap-2">
+                <ShoppingBag className="h-7 w-7 text-amber-600" />
+                <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">From Our Farm</h2>
+              </div>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {featuredSeeds.slice(0, 2).map((product) => (
                       <Link
                         key={product._id}
@@ -491,16 +465,14 @@ const HomePage = () => {
                     ))}
                     <Link
                       href="/products?category=seeds"
-                      className="col-span-2 text-center text-emerald-600 font-medium mt-2 inline-block"
+                      className="text-center text-emerald-600 font-medium mt-2 inline-block sm:col-span-2"
                     >
                       Shop all seeds →
                     </Link>
                   </div>
-                )}
-              </div>
             </div>
           </div>
-        </section>
+        </section>}
 
         {/* ========== 7. YOUTUBE VIDEOS ========== */}
         <section className="py-16 bg-white">
@@ -513,7 +485,9 @@ const HomePage = () => {
             <YouTubeVideos2 />
           </div>
         </section>
-        <NewsletterSignup />
+        <div className="bg-white px-4 py-8 sm:px-6 sm:py-12">
+          <div className="container mx-auto"><NewsletterSignup /></div>
+        </div>
       </div>
     </>
   );
@@ -526,14 +500,12 @@ const FeatureCard = ({
   title,
   item,
   linkTo,
-  placeholder,
 }: {
   icon: ReactNode;
   bgGradient: string;
   title: string;
-  item: Article | null;
+  item: Article;
   linkTo: string;
-  placeholder: string;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -549,8 +521,7 @@ const FeatureCard = ({
       <h3 className="font-semibold text-white">{title}</h3>
     </div>
     <div className="p-5 flex flex-col flex-grow">
-      {item ? (
-        <>
+      <>
           {item.featuredImage && (
             <img
               src={item.featuredImage}
@@ -570,10 +541,7 @@ const FeatureCard = ({
           >
             Read More <ArrowRight size={14} />
           </Link>
-        </>
-      ) : (
-        <p className="text-gray-400 italic text-sm">{placeholder}</p>
-      )}
+      </>
     </div>
   </motion.div>
 );

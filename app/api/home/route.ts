@@ -42,7 +42,7 @@ export async function GET() {
     featuredHomeschool: featured("homeschooling"),
     latestStudies: newestArticles
       .filter((article) => article.majorCategoryId === STUDY_MAJOR_ID)
-      .slice(0, 3),
+      .slice(0, 12),
     resourceTaxonomy: resourceCategories,
     featuredSeeds,
   }, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
