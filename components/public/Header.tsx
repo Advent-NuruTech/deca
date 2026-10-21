@@ -41,6 +41,8 @@ function NavLink({ href, className, ...props }: NavLinkProps) {
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<"resources" | "shop" | null>(null);
+  const desktopNavRef = useRef<HTMLDivElement>(null);
   const [resourceTaxonomy, setResourceTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +69,24 @@ const Header = () => {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setOpenDropdown(null);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!openDropdown) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!desktopNavRef.current?.contains(event.target as Node)) setOpenDropdown(null);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        desktopNavRef.current?.querySelector<HTMLButtonElement>(`[aria-controls="${openDropdown}-dropdown"]`)?.focus();
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", dismiss); document.removeEventListener("keydown", escape); };
+  }, [openDropdown]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -240,7 +259,7 @@ const Header = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div ref={desktopNavRef} className="hidden md:flex items-center space-x-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
@@ -261,75 +280,46 @@ const Header = () => {
               </NavLink>
             ))}
 
-            {/* Resources Dropdown */}
-            <div className="relative group">
-              <button
-                className={`inline-flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${linkColor} ${linkHoverBg}`}
-              >
-                Resources{" "}
-                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
-              </button>
-              <div className="absolute left-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div
-                  className={`rounded-lg shadow-lg py-1 ${isScrolled ? "bg-white border border-gray-200" : isLightHeroPage ? "bg-white border border-gray-200" : "bg-gray-800 border border-white/10"}`}
+            {/* Desktop dropdowns */}
+            {([
+              { id: "resources" as const, label: "Resources", items: resourcesItems },
+              { id: "shop" as const, label: "Shop", items: shopItems },
+            ]).map((section) => (
+              <div key={section.id} className="relative">
+                <button
+                  type="button"
+                  aria-expanded={openDropdown === section.id}
+                  aria-controls={`${section.id}-dropdown`}
+                  onClick={() => setOpenDropdown((current) => current === section.id ? null : section.id)}
+                  className={`inline-flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${linkColor} ${linkHoverBg}`}
                 >
-                  {resourcesItems.map((item) => (
-                    <NavLink
-                      key={`${item.path}-${item.name}`}
-                      href={item.path}
-                      className={({ isActive }) =>
-                        `block px-4 py-2 text-sm ${item.major ? "font-semibold" : "pl-7"} ${
-                          isActive
-                            ? isScrolled || isLightHeroPage
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-white/10 text-emerald-300"
-                            : isScrolled || isLightHeroPage
-                              ? "text-gray-700 hover:bg-gray-50"
-                              : "text-gray-200 hover:bg-white/10"
-                        }`
-                      }
-                    >
-                      {item.name}
-                    </NavLink>
-                  ))}
-                </div>
+                  {section.label}
+                  <ChevronDown aria-hidden="true" className={`h-4 w-4 transition-transform ${openDropdown === section.id ? "rotate-180" : ""}`} />
+                </button>
+                {openDropdown === section.id && (
+                  <div id={`${section.id}-dropdown`} className="absolute left-0 top-full z-50 pt-2">
+                    <div className={`max-h-[min(70vh,calc(100dvh-6rem))] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-xl border p-2 shadow-xl ${isScrolled || isLightHeroPage ? "border-gray-200 bg-white" : "border-white/10 bg-gray-800"}`}>
+                      {section.items.map((item) => (
+                        <NavLink
+                          key={`${item.path}-${item.name}`}
+                          href={item.path}
+                          onClick={() => setOpenDropdown(null)}
+                          className={({ isActive }) =>
+                            `block rounded-lg px-4 py-2.5 text-sm leading-5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-500 ${"major" in item && item.major ? "font-semibold" : section.id === "resources" ? "pl-7" : ""} ${
+                              isActive
+                                ? isScrolled || isLightHeroPage ? "bg-emerald-50 text-emerald-700" : "bg-white/10 text-emerald-300"
+                                : isScrolled || isLightHeroPage ? "text-gray-700 hover:bg-gray-50" : "text-gray-200 hover:bg-white/10"
+                            }`
+                          }
+                        >
+                          {item.name}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Shop Dropdown */}
-            <div className="relative group">
-              <button
-                className={`inline-flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${linkColor} ${linkHoverBg}`}
-              >
-                Shop{" "}
-                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
-              </button>
-              <div className="absolute left-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div
-                  className={`rounded-lg shadow-lg py-1 ${isScrolled ? "bg-white border border-gray-200" : isLightHeroPage ? "bg-white border border-gray-200" : "bg-gray-800 border border-white/10"}`}
-                >
-                  {shopItems.map((item) => (
-                    <NavLink
-                      key={item.name}
-                      href={item.path}
-                      className={({ isActive }) =>
-                        `block px-4 py-2 text-sm ${
-                          isActive
-                            ? isScrolled || isLightHeroPage
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-white/10 text-emerald-300"
-                            : isScrolled || isLightHeroPage
-                              ? "text-gray-700 hover:bg-gray-50"
-                              : "text-gray-200 hover:bg-white/10"
-                        }`
-                      }
-                    >
-                      {item.name}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
 
             {/* Donate Button */}
             <NavLink

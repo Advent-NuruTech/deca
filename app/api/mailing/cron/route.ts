@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import {
   FieldValue, getCampaignRecipients, getEmailsSentCount, getMailDb, parseCampaignAudience, Timestamp,
-  type Campaign, deliverCampaign,
+  type Campaign, deliverCampaign, saveDeliveryHistory,
 } from "@/lib/mailing-server";
 
 export const maxDuration = 300;
@@ -15,6 +15,9 @@ type MailSchedule = Campaign & {
   audienceMode?: "all" | "selected" | "new";
   recipientIds?: string[];
   audienceSince?: string;
+  parentHistoryId?: string;
+  rootHistoryId?: string;
+  baseline?: number;
 };
 
 function zonedParts(date: Date, timeZone: string) {
@@ -128,18 +131,13 @@ export async function GET(request: Request) {
         }
         await getEmailsSentCount(mailDb);
         const delivery = await deliverCampaign(campaign, recipients, baseUrl, `${ref.id}:${claim.scheduledAt.toMillis()}`);
-        const historyRef = mailDb.collection("mailingHistory").doc();
-        const batch = mailDb.batch();
-        batch.set(historyRef, {
+        await saveDeliveryHistory(mailDb, {
           scheduleId: ref.id, kind: campaign.kind, subject: campaign.subject, headline: campaign.headline,
           campaign, audienceMode: audience.mode,
+          ...(claim.data.parentHistoryId ? { parentHistoryId: claim.data.parentHistoryId } : {}),
           requested: recipients.length, sent: delivery.sent, failed: delivery.failures.length,
           failures: delivery.failures.slice(0, 100), sentAt: FieldValue.serverTimestamp(), scheduledFor: claim.scheduledAt.toDate().toISOString(),
-        });
-        batch.set(mailDb.collection("mailingStats").doc("summary"), {
-          emailsSent: FieldValue.increment(delivery.sent),
-        }, { merge: true });
-        await batch.commit();
+        }, delivery.sent, claim.data.rootHistoryId, claim.data.baseline);
         sent += delivery.sent;
         failed += delivery.failures.length;
         const retryCount = claim.data.retryCount ?? 0;

@@ -92,7 +92,7 @@ export async function requireMailAdmin(request: Request) {
 export function parseCampaignAudience(mode: unknown, recipientIds: unknown, since: unknown): CampaignAudience | string {
   if (mode !== "all" && mode !== "selected" && mode !== "new") return "Choose who should receive this email.";
   const ids = Array.isArray(recipientIds)
-    ? [...new Set(recipientIds.filter((id): id is string => typeof id === "string" && id.length > 0 && id.length <= 150))].slice(0, 500)
+    ? [...new Set(recipientIds.filter((id): id is string => typeof id === "string" && id.length > 0 && id.length <= 150))]
     : [];
   if (mode === "selected" && ids.length === 0) return "Select at least one recipient.";
   const date = typeof since === "string" && since ? new Date(since) : null;
@@ -103,7 +103,7 @@ export function parseCampaignAudience(mode: unknown, recipientIds: unknown, sinc
 export async function getCampaignRecipients(mailDb: Firestore, campaign: Campaign, audience: CampaignAudience): Promise<Recipient[]> {
   const collection = campaign.kind === "meeting" ? "onlineMeetingMembers" : "newsletterSubscribers";
   const status = campaign.kind === "meeting" ? "verified" : "active";
-  const snapshot = await mailDb.collection(collection).where("status", "==", status).limit(500).get();
+  const snapshot = await mailDb.collection(collection).where("status", "==", status).get();
   const selected = new Set(audience.recipientIds);
   const since = audience.since ? new Date(audience.since).getTime() : 0;
   return snapshot.docs.flatMap((document) => {
@@ -114,6 +114,27 @@ export async function getCampaignRecipients(mailDb: Firestore, campaign: Campaig
     const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toMillis() : 0;
     if (audience.mode === "new" && createdAt <= since) return [];
     return [{ id: document.id, email, ...(typeof data.name === "string" && data.name.trim() ? { name: data.name.trim() } : {}) }];
+  });
+}
+
+export async function saveDeliveryHistory(
+  mailDb: Firestore,
+  data: FirebaseFirestore.DocumentData,
+  sent: number,
+  rootHistoryId?: string,
+  baseline = 1,
+) {
+  const historyRef = mailDb.collection("mailingHistory").doc();
+  await mailDb.runTransaction(async (transaction) => {
+    let deliveryNumber = 1;
+    if (rootHistoryId) {
+      const counterRef = mailDb.collection("mailingDeliveryCounters").doc(rootHistoryId);
+      const counter = await transaction.get(counterRef);
+      deliveryNumber = Math.max(Number(counter.get("count")) || 1, baseline) + 1;
+      transaction.set(counterRef, { count: deliveryNumber });
+    }
+    transaction.set(historyRef, { ...data, rootHistoryId: rootHistoryId || historyRef.id, deliveryNumber });
+    transaction.set(mailDb.collection("mailingStats").doc("summary"), { emailsSent: FieldValue.increment(sent) }, { merge: true });
   });
 }
 

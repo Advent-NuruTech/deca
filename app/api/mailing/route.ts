@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import {
   FieldValue, getCampaignRecipients, getEmailsSentCount, getMailDb, parseCampaignAudience, requireMailAdmin, Timestamp,
-  type Campaign, type CampaignAudience, deliverCampaign,
+  type Campaign, type CampaignAudience, deliverCampaign, saveDeliveryHistory,
 } from "@/lib/mailing-server";
 import { extractFeaturedVideoUrl, richTextToPlainText, sanitizeRichText } from "@/lib/rich-text";
 
@@ -72,15 +72,15 @@ async function recordDelivery(
   campaign: Campaign,
   audience: CampaignAudience,
   parentHistoryId?: string,
+  rootHistoryId?: string,
+  baseline = 1,
 ) {
   const recipients = await getCampaignRecipients(mailDb, campaign, audience);
   if (!recipients.length) return Response.json({ error: "No eligible recipients match this selection." }, { status: 400 });
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || `https://${process.env.VERCEL_URL ?? new URL(request.url).host}`;
   await getEmailsSentCount(mailDb);
   const result = await deliverCampaign(campaign, recipients, baseUrl, randomUUID());
-  const historyRef = mailDb.collection("mailingHistory").doc();
-  const batch = mailDb.batch();
-  batch.set(historyRef, {
+  await saveDeliveryHistory(mailDb, {
     kind: campaign.kind,
     subject: campaign.subject,
     headline: campaign.headline,
@@ -93,11 +93,7 @@ async function recordDelivery(
     ...(parentHistoryId ? { parentHistoryId } : {}),
     sentAt: FieldValue.serverTimestamp(),
     sentBy: adminId,
-  });
-  batch.set(mailDb.collection("mailingStats").doc("summary"), {
-    emailsSent: FieldValue.increment(result.sent),
-  }, { merge: true });
-  await batch.commit();
+  }, result.sent, rootHistoryId, baseline);
   return Response.json({ sent: result.sent, failed: result.failures.length, failures: result.failures.slice(0, 20) });
 }
 
@@ -107,10 +103,10 @@ export async function GET(request: Request) {
     const mailDb = getMailDb();
     const [emailsSent, members, subscribers, schedules, history, verifiedMembers, pendingMembers, activeSubscribers, pausedSubscribers, unsubscribed, totalMembers, totalSubscribers] = await Promise.all([
       getEmailsSentCount(mailDb),
-      mailDb.collection("onlineMeetingMembers").orderBy("createdAt", "desc").limit(500).get(),
-      mailDb.collection("newsletterSubscribers").orderBy("createdAt", "desc").get(),
+      mailDb.collection("onlineMeetingMembers").get(),
+      mailDb.collection("newsletterSubscribers").get(),
       mailDb.collection("mailingSchedules").orderBy("createdAt", "desc").limit(100).get(),
-      mailDb.collection("mailingHistory").orderBy("sentAt", "desc").limit(50).get(),
+      mailDb.collection("mailingHistory").get(),
       mailDb.collection("onlineMeetingMembers").where("status", "==", "verified").count().get(),
       mailDb.collection("onlineMeetingMembers").where("status", "==", "pending").count().get(),
       mailDb.collection("newsletterSubscribers").where("status", "==", "active").count().get(),
@@ -121,11 +117,16 @@ export async function GET(request: Request) {
     ]);
     const serialize = (snapshot: FirebaseFirestore.QuerySnapshot) =>
       snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+    const sorted = (snapshot: FirebaseFirestore.QuerySnapshot, field: string) =>
+      snapshot.docs.sort((a, b) => {
+        const aTime = a.get(field); const bTime = b.get(field);
+        return (bTime instanceof Timestamp ? bTime.toMillis() : 0) - (aTime instanceof Timestamp ? aTime.toMillis() : 0) || a.id.localeCompare(b.id);
+      }).map((item) => ({ id: item.id, ...item.data() }));
     return Response.json({
-      members: serialize(members),
-      subscribers: serialize(subscribers),
+      members: sorted(members, "createdAt"),
+      subscribers: sorted(subscribers, "createdAt"),
       schedules: serialize(schedules),
-      history: serialize(history),
+      history: sorted(history, "sentAt"),
       counts: {
         verified: verifiedMembers.data().count,
         pending: pendingMembers.data().count,
@@ -180,7 +181,7 @@ export async function POST(request: Request) {
       return Response.json({ status: result }, { status: result === "verified" ? 201 : 200 });
     }
     if (body.action === "history-send") {
-      if (typeof body.historyId !== "string" || !body.historyId || body.historyId.length > 150) {
+      if (typeof body.historyId !== "string" || !body.historyId || body.historyId.length > 150 || body.historyId.includes("/")) {
         return Response.json({ error: "Choose a valid email from history." }, { status: 400 });
       }
       const history = await mailDb.collection("mailingHistory").doc(body.historyId).get();
@@ -201,15 +202,28 @@ export async function POST(request: Request) {
         recipientIds: [],
         since: mode === "new" ? (sentAt as Timestamp).toDate().toISOString() : "",
       };
-      return await recordDelivery(request, mailDb, adminId, campaign, audience, body.historyId);
+      return await recordDelivery(request, mailDb, adminId, campaign, audience, body.historyId, history.get("rootHistoryId") || body.historyId, Number(history.get("deliveryNumber")) || 1);
     }
     const campaign = parseCampaign(body);
     if (typeof campaign === "string") return Response.json({ error: campaign }, { status: 400 });
 
+    let parentHistory: FirebaseFirestore.DocumentSnapshot | undefined;
+    if (body.historyId) {
+      if (typeof body.historyId !== "string" || body.historyId.length > 150 || body.historyId.includes("/")) return Response.json({ error: "Choose a valid email from history." }, { status: 400 });
+      parentHistory = await mailDb.collection("mailingHistory").doc(body.historyId).get();
+      if (!parentHistory.exists || parentHistory.get("kind") !== campaign.kind) return Response.json({ error: "The original email is unavailable or belongs to a different mailing list." }, { status: 409 });
+      if (body.audienceMode === "new") {
+        const sentAt = parentHistory.get("sentAt");
+        if (!(sentAt instanceof Timestamp)) return Response.json({ error: "The original send date is unavailable." }, { status: 409 });
+        body.audienceSince = sentAt.toDate().toISOString();
+      }
+    }
+    const rootHistoryId = parentHistory ? (parentHistory.get("rootHistoryId") || body.historyId) : undefined;
+    const baseline = parentHistory ? (Number(parentHistory.get("deliveryNumber")) || 1) : 1;
     if (body.action === "send") {
       const audience = parseCampaignAudience(body.audienceMode, body.recipientIds, body.audienceSince);
       if (typeof audience === "string") return Response.json({ error: audience }, { status: 400 });
-      return await recordDelivery(request, mailDb, adminId, campaign, audience);
+      return await recordDelivery(request, mailDb, adminId, campaign, audience, body.historyId, rootHistoryId, baseline);
     }
 
     if (body.action === "schedule") {
@@ -229,6 +243,7 @@ export async function POST(request: Request) {
       const startsAt = new Date(body.startsAt);
       const schedule = await mailDb.collection("mailingSchedules").add({
         ...campaign,
+        ...(body.historyId ? { parentHistoryId: body.historyId, rootHistoryId, baseline } : {}),
         audienceMode: audience.mode,
         recipientIds: audience.recipientIds,
         audienceSince: audience.since,
