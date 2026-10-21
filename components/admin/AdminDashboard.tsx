@@ -22,10 +22,10 @@ const colorStyles = {
 
 function StatCard({ title, value, icon: Icon, color, href }: { title: string; value: string | number; icon: typeof Package; color: keyof typeof colorStyles; href?: string }) {
   const card = (
-    <motion.div whileHover={{ y: -3 }} className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex items-center justify-between gap-4">
-        <div><p className="text-sm text-gray-500">{title}</p><p className="mt-2 text-2xl font-bold text-gray-900">{value}</p></div>
-        <div className={`rounded-xl p-3 ${colorStyles[color]}`}><Icon size={24} /></div>
+    <motion.div whileHover={{ y: -3 }} className="h-full rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-6">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
+        <div className="min-w-0"><p className="text-sm text-gray-500">{title}</p><p className="mt-2 break-words text-xl font-bold text-gray-900 sm:text-2xl">{value}</p></div>
+        <div className={`shrink-0 rounded-xl p-2 sm:p-3 ${colorStyles[color]}`}><Icon size={24} /></div>
       </div>
     </motion.div>
   );
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
         </div>
 
         {error && <div role="alert" className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           <StatCard title="Total Products" value={products.length} icon={Package} color="emerald" href="/admin/products" />
           <StatCard title="Active Products" value={stats.activeProducts} icon={Star} color="emerald" />
           <StatCard title="Published Resources" value={stats.publishedArticles} icon={FileText} color="blue" href="/admin/articles" />

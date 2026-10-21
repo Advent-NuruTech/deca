@@ -1,109 +1,386 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, Leaf, Mail, Share2 } from "lucide-react";
+import type { FormEvent } from "react";
 
-type NewsletterSignupProps = { compact?: boolean };
+type SubscribeResponse = {
+status?: string;
+error?: string;
+welcomeEmailSent?: boolean;
+welcomeEmailError?: string;
+};
 
-export default function NewsletterSignup({ compact = false }: NewsletterSignupProps) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "existing" | "error">("idle");
-  const [message, setMessage] = useState("");
-  const [shareMessage, setShareMessage] = useState("");
+const GENERIC_ERROR =
+"We could not save your subscription. Please try again.";
 
-  async function subscribe(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setStatus("loading");
-    setMessage("");
-    try {
-      const response = await fetch("/api/mailing/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ email, name }),
-      });
-      const result = await response.json() as { status?: string; error?: string; welcomeEmailError?: string };
-      if (!response.ok) throw new Error(result.error || "Could not save your subscription.");
-      const existing = result.status === "already-subscribed";
-      setStatus(existing ? "existing" : "success");
-      setMessage(existing
-        ? "You’re already part of the Remsam community."
-        : result.welcomeEmailError || "Welcome to Remsam Homestead—please check your inbox.");
-      if (!existing) { setEmail(""); setName(""); }
-    } catch (reason) {
-      setStatus("error");
-      setMessage(reason instanceof Error ? reason.message : "Could not save your subscription.");
-    }
+export default function NewsletterSignup({ compact = false }: { compact?: boolean }) {
+const [name, setName] = useState("");
+const [email, setEmail] = useState("");
+const [busy, setBusy] = useState(false);
+const [message, setMessage] = useState("");
+const [failed, setFailed] = useState(false);
+
+async function submit(event: FormEvent<HTMLFormElement>) {
+event.preventDefault();
+
+
+if (busy) return;
+
+setBusy(true);
+setMessage("");
+setFailed(false);
+
+try {
+  const response = await fetch("/api/mailing/subscribe", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+  });
+
+  let result: SubscribeResponse;
+
+  try {
+    result = (await response.json()) as SubscribeResponse;
+  } catch {
+    throw new Error(GENERIC_ERROR);
   }
 
-  async function shareNewsletter() {
-    const url = `${window.location.origin}/#newsletter`;
-    const shareData = {
-      title: "Remsam Homestead Newsletter",
-      text: "Subscribe to the Remsam Homestead Newsletter for practical farm notes, encouragement, resources, and seasonal updates.",
-      url,
-    };
-
-    setShareMessage("");
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        setShareMessage("Newsletter shared.");
-      } else {
-        await navigator.clipboard.writeText(url);
-        setShareMessage("Newsletter link copied.");
-      }
-    } catch (reason) {
-      if (reason instanceof DOMException && reason.name === "AbortError") return;
-      setShareMessage("Could not share the link. Please try again.");
-    }
-  }
-
-  if (compact) {
-    return (
-      <form onSubmit={subscribe} className="mt-4" aria-label="Newsletter subscription">
-        <label htmlFor="footer-newsletter-email" className="mb-2 block text-sm text-gray-600">Stay encouraged</label>
-        <div className="flex">
-          <input id="footer-newsletter-email" required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email" className="min-w-0 flex-1 rounded-l-lg border border-brand-border bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
-          <button disabled={status === "loading"} className="rounded-r-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-60">
-            {status === "loading" ? "Joining…" : "Subscribe"}
-          </button>
-        </div>
-        <p className={`mt-2 text-xs ${status === "error" ? "text-red-600" : status === "success" || status === "existing" ? "text-brand-dark" : "text-gray-400"}`} aria-live="polite">
-          {message || "No spam—just stories, resources, and homestead news."}
-        </p>
-      </form>
+  if (!response.ok) {
+    throw new Error(
+      response.status >= 500
+        ? GENERIC_ERROR
+        : result.error || GENERIC_ERROR
     );
   }
 
-  return (
-    <section id="newsletter" className="scroll-mt-20 bg-brand-canvas px-4 py-16 md:py-24" aria-labelledby="newsletter-heading">
-      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-brand-deep px-6 py-12 text-white shadow-2xl md:px-12 md:py-16">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand/30 blur-3xl" aria-hidden="true" />
-        <div className="absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-brand-accent/20 blur-3xl" aria-hidden="true" />
-        <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_1.05fr]">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[.16em] text-emerald-100"><Leaf size={14} /> Newsletter</span>
-            <h2 id="newsletter-heading" className="mt-5 max-w-xl text-3xl font-bold leading-tight md:text-5xl">The Remsam Homestead Newsletter</h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-emerald-50/80">Join Remsam Homestead for practical farm notes, encouraging reflections, new resources, and seasonal updates from Kenya.</p>
-            <button type="button" onClick={() => void shareNewsletter()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 font-semibold text-white transition hover:border-white/40 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-deep"><Share2 size={18} aria-hidden="true" /> Share newsletter</button>
-            <p className="mt-2 min-h-5 text-sm text-emerald-100" aria-live="polite">{shareMessage}</p>
-          </div>
-          <form onSubmit={subscribe} className="rounded-2xl border border-white/15 bg-white p-5 text-brand-ink shadow-xl md:p-7" aria-label="Newsletter subscription">
-            <div className="mb-5 flex items-center gap-3"><span className="rounded-xl bg-brand-soft p-2.5 text-brand-dark"><Mail size={22} /></span><div><p className="font-bold">Join the newsletter</p><p className="text-sm text-brand-muted">Free, useful, and easy to leave anytime.</p></div></div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="text-sm font-semibold text-gray-700">First name <span className="font-normal text-gray-400">(optional)</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="given-name" maxLength={120} placeholder="Your name" className="input-field mt-1.5" /></label>
-              <label className="text-sm font-semibold text-gray-700">Email address<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" maxLength={254} placeholder="you@example.com" className="input-field mt-1.5" /></label>
-            </div>
-            <button disabled={status === "loading"} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3.5 font-bold text-white transition hover:bg-brand-dark disabled:cursor-wait disabled:opacity-60">
-              {status === "loading" ? "Joining the newsletter…" : <>Subscribe to newsletter <ArrowRight size={18} /></>}
-            </button>
-            <p className={`mt-3 flex min-h-5 items-center gap-2 text-sm ${status === "error" ? "text-red-600" : status === "success" || status === "existing" ? "text-brand-dark" : "text-brand-muted"}`} aria-live="polite">
-              {(status === "success" || status === "existing") && <CheckCircle2 size={16} />}{message || "We respect your inbox. Unsubscribe with one click."}
-            </p>
-          </form>
-        </div>
-      </div>
-    </section>
+  if (result.status === "already-subscribed") {
+    setMessage("This email is already subscribed.");
+  } else if (result.welcomeEmailSent) {
+    setMessage("You're subscribed! A welcome email with our three latest videos is on its way.");
+  } else {
+    setFailed(true);
+    setMessage(result.welcomeEmailError || "You're subscribed! Watch your inbox for a welcome email.");
+  }
+
+  setEmail("");
+  setName("");
+} catch (error) {
+  setFailed(true);
+  setMessage(
+    error instanceof Error && error.message === GENERIC_ERROR
+      ? GENERIC_ERROR
+      : error instanceof Error && error.message
+        ? error.message
+        : GENERIC_ERROR
   );
+} finally {
+  setBusy(false);
+}
+
+}
+
+return (
+<section
+  className={`newsletter-signup${compact ? " compact" : ""}`}
+  aria-labelledby="newsletter-title"
+>
+<div className="newsletter-content">
+<span className="about-card-eyebrow">
+SUBSCRIBE TO OUR NEWSLETTER
+</span>
+
+
+    <h2 id="newsletter-title">
+      Faith and encouragement, in your inbox.
+    </h2>
+
+    <p className="newsletter-description">
+      Subscribe for thoughtful updates, new studies, and online
+      fellowship news.
+    </p>
+  </div>
+
+  <form className="newsletter-form" onSubmit={submit}>
+    <label htmlFor="newsletter-name">First name (optional)</label>
+    <input
+      className="newsletter-name-input"
+      id="newsletter-name"
+      name="given-name"
+      type="text"
+      maxLength={120}
+      autoComplete="given-name"
+      value={name}
+      onChange={(event) => setName(event.target.value)}
+      placeholder="Name"
+      disabled={busy}
+    />
+    <label htmlFor="newsletter-email">Email address</label>
+
+    <div className="newsletter-input-group">
+      <input
+        id="newsletter-email"
+        name="email"
+        type="email"
+        required
+        maxLength={254}
+        autoComplete="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        placeholder="you@example.com"
+        disabled={busy}
+      />
+
+      <button type="submit" disabled={busy}>
+        {busy ? "Subscribing…" : "Subscribe"}
+      </button>
+    </div>
+
+    <small className="newsletter-privacy">
+      Unsubscribe at any time using the link in each newsletter.
+    </small>
+
+    {message && (
+      <p
+        className={`newsletter-message ${
+          failed ? "error" : "success"
+        }`}
+        role={failed ? "alert" : "status"}
+      >
+        {message}
+      </p>
+    )}
+  </form>
+
+  <style jsx>{`
+    .newsletter-signup {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: center;
+      gap: 32px;
+      padding: 40px;
+      color: #ffffff;
+      background-color: #0b3d91;
+      background-image: none;
+      border: 1px solid #1d4ed8;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+    }
+
+    .newsletter-signup.compact {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .newsletter-signup.compact .newsletter-content h2 {
+      font-size: 1.25rem;
+    }
+
+    .newsletter-signup.compact .newsletter-description {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .newsletter-signup.compact .newsletter-input-group {
+      flex-direction: column;
+    }
+
+    .newsletter-signup.compact .newsletter-input-group input,
+    .newsletter-signup.compact .newsletter-input-group button {
+      width: 100%;
+    }
+
+    .newsletter-content {
+      min-width: 0;
+    }
+
+    .about-card-eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      color: #bfdbfe;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+    }
+
+    .newsletter-content h2 {
+      margin: 0 0 14px;
+      color: #ffffff;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.2;
+    }
+
+    .newsletter-description {
+      max-width: 440px;
+      margin: 0;
+      color: #dbeafe;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .newsletter-form label {
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .newsletter-input-group {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .newsletter-input-group input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      padding: 12px 14px;
+      color: #0f172a;
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      outline: none;
+      font: inherit;
+      font-size: 0.95rem;
+      transition: border-color 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .newsletter-name-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      color: #0f172a;
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      outline: none;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    .newsletter-input-group input::placeholder {
+      color: #64748b;
+    }
+
+    .newsletter-input-group input:focus-visible {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.35);
+    }
+
+    .newsletter-name-input:focus-visible {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.35);
+    }
+
+    .newsletter-input-group button {
+      flex-shrink: 0;
+      min-height: 48px;
+      padding: 12px 20px;
+      color: #0b3d91;
+      background: #ffffff;
+      border: 1px solid #ffffff;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 160ms ease,
+        transform 160ms ease;
+    }
+
+    .newsletter-input-group button:hover:not(:disabled) {
+      background: #dbeafe;
+    }
+
+    .newsletter-input-group button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .newsletter-input-group button:focus-visible {
+      outline: 3px solid #bfdbfe;
+      outline-offset: 3px;
+    }
+
+    .newsletter-input-group button:disabled,
+    .newsletter-input-group input:disabled,
+    .newsletter-name-input:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .newsletter-privacy {
+      color: #dbeafe;
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+
+    .newsletter-message {
+      margin: 4px 0 0;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .newsletter-message.success {
+      color: #ffffff;
+      background: #164e63;
+      border: 1px solid #67e8f9;
+    }
+
+    .newsletter-message.error {
+      color: #ffffff;
+      background: #7f1d1d;
+      border: 1px solid #fca5a5;
+    }
+
+    @media (max-width: 700px) {
+      .newsletter-signup {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+        padding: 28px 22px;
+        border-radius: 12px;
+      }
+
+      .newsletter-content h2 {
+        font-size: clamp(1.6rem, 6vw, 2rem);
+      }
+
+      .newsletter-input-group {
+        flex-direction: column;
+      }
+
+      .newsletter-input-group input,
+      .newsletter-input-group button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .newsletter-input-group input,
+      .newsletter-input-group button {
+        transition: none;
+      }
+    }
+  `}</style>
+</section>
+
+
+);
 }

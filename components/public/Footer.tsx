@@ -31,6 +31,7 @@ const Footer = () => {
 
   const quickLinks = [
     { name: "Home", path: "/" },
+    { name: "Newsletter", path: "/newsletter" },
     ...taxonomy.majors.map((major) => ({ name: major.name, path: major.id === "study-library" ? "/study-materials" : `/articles?major=${encodeURIComponent(major.id)}` })),
     { name: "Shop", path: "/products" },
     { name: "Donate", path: "/donate" },
