@@ -161,9 +161,9 @@ SUBSCRIBE TO OUR NEWSLETTER
       gap: 32px;
       padding: 40px;
       color: #ffffff;
-      background-color: #0b3d91;
+      background-color: var(--brand-primary-deep);
       background-image: none;
-      border: 1px solid #1d4ed8;
+      border: 1px solid var(--brand-primary-dark);
       border-radius: 16px;
       box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
     }
@@ -199,7 +199,7 @@ SUBSCRIBE TO OUR NEWSLETTER
     .about-card-eyebrow {
       display: inline-block;
       margin-bottom: 14px;
-      color: #bfdbfe;
+      color: #a7f3d0;
       font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -218,7 +218,7 @@ SUBSCRIBE TO OUR NEWSLETTER
     .newsletter-description {
       max-width: 440px;
       margin: 0;
-      color: #dbeafe;
+      color: #d1fae5;
       font-size: 1rem;
       line-height: 1.75;
     }
@@ -251,7 +251,7 @@ SUBSCRIBE TO OUR NEWSLETTER
       padding: 12px 14px;
       color: #0f172a;
       background: #ffffff;
-      border: 1px solid #bfdbfe;
+      border: 1px solid #a7f3d0;
       border-radius: 8px;
       outline: none;
       font: inherit;
@@ -266,7 +266,7 @@ SUBSCRIBE TO OUR NEWSLETTER
       padding: 12px 14px;
       color: #0f172a;
       background: #ffffff;
-      border: 1px solid #bfdbfe;
+      border: 1px solid #a7f3d0;
       border-radius: 8px;
       outline: none;
       font: inherit;
@@ -278,20 +278,20 @@ SUBSCRIBE TO OUR NEWSLETTER
     }
 
     .newsletter-input-group input:focus-visible {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.35);
+      border-color: #6ee7b7;
+      box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.35);
     }
 
     .newsletter-name-input:focus-visible {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.35);
+      border-color: #6ee7b7;
+      box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.35);
     }
 
     .newsletter-input-group button {
       flex-shrink: 0;
       min-height: 48px;
       padding: 12px 20px;
-      color: #0b3d91;
+      color: var(--brand-primary-deep);
       background: #ffffff;
       border: 1px solid #ffffff;
       border-radius: 8px;
@@ -304,7 +304,7 @@ SUBSCRIBE TO OUR NEWSLETTER
     }
 
     .newsletter-input-group button:hover:not(:disabled) {
-      background: #dbeafe;
+      background: #d1fae5;
     }
 
     .newsletter-input-group button:active:not(:disabled) {
@@ -312,7 +312,7 @@ SUBSCRIBE TO OUR NEWSLETTER
     }
 
     .newsletter-input-group button:focus-visible {
-      outline: 3px solid #bfdbfe;
+      outline: 3px solid #a7f3d0;
       outline-offset: 3px;
     }
 
@@ -324,7 +324,7 @@ SUBSCRIBE TO OUR NEWSLETTER
     }
 
     .newsletter-privacy {
-      color: #dbeafe;
+      color: #d1fae5;
       font-size: 0.8rem;
       line-height: 1.6;
     }
@@ -340,8 +340,8 @@ SUBSCRIBE TO OUR NEWSLETTER
 
     .newsletter-message.success {
       color: #ffffff;
-      background: #164e63;
-      border: 1px solid #67e8f9;
+      background: #065f46;
+      border: 1px solid #6ee7b7;
     }
 
     .newsletter-message.error {

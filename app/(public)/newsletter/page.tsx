@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NewsletterSignup from "@/components/public/newsletter-signup";
+import NewsletterShare from "@/components/public/newsletter-share";
 
 export const metadata: Metadata = {
   title: "Newsletter | RemSam Homestead",
@@ -28,6 +29,7 @@ export default function NewsletterPage() {
           Stay connected with thoughtful updates, new studies, and news from our
           online fellowship.
         </p>
+        <NewsletterShare />
       </div>
       <NewsletterSignup />
     </div>
