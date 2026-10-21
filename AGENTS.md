@@ -22,3 +22,11 @@ All interface work must be production-ready, not prototype-grade. Use coherent v
 hierarchy, responsive layouts, accessible semantics and keyboard states, clear loading,
 empty, error, and success feedback, and polished interaction details. Preserve established
 design tokens and patterns, and verify user flows on both mobile and desktop before handoff.
+
+## Search indexing and administrative security
+
+No route under `/admin` may be indexed. Preserve all three enforcement layers:
+the admin layout's `robots` metadata, the `/admin/` exclusion in `robots.ts`, and
+the `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet` response header. New
+admin routes must remain beneath the shared `/admin` layout and must never override
+these directives with indexable metadata.

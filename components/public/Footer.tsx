@@ -19,7 +19,7 @@ import {
   Sprout,
 } from "lucide-react";
 const logo = "/assets/logo.png";
-const poweredByText = "Powered by Ants";
+const poweredByText = "Powered by Advent Nurutech";
 const antsContactUrl = "https://wa.me/254142225233?text=hello%20advent%20nurutech%20services%20%2C%20iam%20from%20remsam%20website%20i%20would%20like%20to%20know%20about%20your%20services";
 
 function PoweredByAnts() {

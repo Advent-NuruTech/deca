@@ -233,7 +233,7 @@ const Header = () => {
                 <span
                   className={`text-xs ${isScrolled ? "text-gray-500" : isLightHeroPage ? "text-gray-500" : "text-gray-200"}`}
                 >
-                  Faith â€¢ Family â€¢ Farming
+                  Faith • Family • Farming
                 </span>
               </div>
             </Link>
@@ -359,7 +359,7 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Admin Section â€“ ONLY when admin is logged in */}
+            {/* Admin Section – ONLY when admin is logged in */}
             {user?.role === "admin" && (
               <div className="hidden items-center gap-2 md:flex">
                 <Link
