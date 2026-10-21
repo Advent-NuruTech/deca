@@ -110,10 +110,24 @@ export function inlineVideoLinks(value: string) {
     if (!href || /<img\b/i.test(whole)) return whole;
     return preview(href) || whole;
   });
-  const videoUrlPattern = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?[^\s<>"']*|embed\/|shorts\/)|youtu\.be\/)[^\s<>"']+/gi;
-  return linked.replace(/>([^<>]+)</g, (whole, text: string) =>
-    `>${text.replace(videoUrlPattern, replaceUrl)}<`,
-  );
+  const urlPattern = /https?:\/\/[^\s<>"']+/gi;
+  let insideLink = false;
+  return linked.split(/(<[^>]+>)/g).map((part) => {
+    if (part.startsWith("<")) {
+      if (/^<a\b/i.test(part)) insideLink = true;
+      else if (/^<\/a\b/i.test(part)) insideLink = false;
+      return part;
+    }
+    if (insideLink) return part;
+    return part.replace(urlPattern, (candidate) => {
+      const punctuation = candidate.match(/[),.;!?]+$/)?.[0] ?? "";
+      const displayedUrl = candidate.slice(0, candidate.length - punctuation.length);
+      const video = replaceUrl(candidate);
+      if (video !== candidate) return video;
+      const href = displayedUrl.replace(/&amp;/gi, "&");
+      return `<a href="${escapeAttribute(href)}" rel="noopener noreferrer">${displayedUrl}</a>${escapeAttribute(punctuation)}`;
+    });
+  }).join("");
 }
 
 export function richTextToPlainText(value: string) {

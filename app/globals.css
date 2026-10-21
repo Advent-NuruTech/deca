@@ -60,13 +60,14 @@ body {
   }
 
   .rich-toolbar {
-    @apply flex flex-wrap items-center gap-1.5 rounded-t-xl border border-brand-border bg-brand-canvas p-2;
+    @apply sticky top-0 z-10 flex flex-nowrap items-center gap-1.5 overflow-x-auto rounded-t-xl border border-brand-border bg-brand-canvas p-2;
+    scrollbar-width: thin;
   }
 
   .rich-toolbar button,
   .rich-toolbar select,
   .rich-color-control {
-    @apply min-h-9 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-sm font-semibold text-brand-ink hover:bg-brand-soft;
+    @apply min-h-9 shrink-0 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-sm font-semibold text-brand-ink hover:bg-brand-soft;
   }
 
   .rich-color-control {
@@ -78,7 +79,7 @@ body {
   }
 
   .rich-editor {
-    @apply prose prose-emerald min-h-64 max-w-none rounded-b-xl border border-t-0 border-brand-border bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-brand;
+    @apply prose prose-emerald min-h-[32rem] max-h-[70vh] max-w-none overflow-y-auto rounded-b-xl border border-t-0 border-brand-border bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-brand;
   }
 
   .rich-editor:empty::before {

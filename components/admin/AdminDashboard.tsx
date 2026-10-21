@@ -102,8 +102,7 @@ export default function AdminDashboard() {
 
         <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <div><h2 className="text-xl font-bold text-gray-900">Resource Categories</h2><p className="mt-1 text-sm text-gray-500">Major categories and their editable subcategories.</p></div>
-            <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage resources</Link>
+           <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage resources</Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {articleCategoryStats.map((category) => (

@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { sanitizeRichText } from "@/lib/rich-text";
+import { inlineVideoLinks, sanitizeRichText } from "@/lib/rich-text";
 
 type RichTextEditorProps = {
   label: string;
@@ -65,7 +65,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
       : clipboardText.replace(/[&<>"]/g, (character) => ({
           "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;",
         })[character] ?? character).replace(/\r?\n/g, "<br>");
-    document.execCommand("insertHTML", false, html);
+    document.execCommand("insertHTML", false, inlineVideoLinks(html));
     if (editor.current) updateContent(editor.current);
   }
 
