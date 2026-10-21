@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FileText, LayoutDashboard, LogOut, MessageCircle, Package, ShoppingCart, Youtube } from "lucide-react";
+import { FileText, LayoutDashboard, LogOut, Mail, MessageCircle, Package, ShoppingCart, Youtube } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const links = [
@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/articles", label: "Resources", icon: FileText },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/youtube", label: "YouTube", icon: Youtube },
+  { href: "/admin/mailing", label: "Mailing", icon: Mail },
   { href: "/admin/chat", label: "Chat", icon: MessageCircle },
 ];
 

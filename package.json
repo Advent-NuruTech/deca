@@ -15,6 +15,7 @@
     "phase8:smoke": "node scripts/phase8-smoke.mjs",
     "migrate:d1": "node --env-file=.env.local scripts/d1-migrate.mjs",
     "sync:d1-public": "node --env-file=.env.local scripts/sync-d1-public.mjs",
+    "sync:mailing-cron": "node --env-file=.env.local scripts/sync-mailing-cron.mjs",
     "migrate:legacy": "node --env-file=.env.local scripts/migrate-legacy-data.mjs",
     "migrate:legacy:apply": "node --env-file=.env.local scripts/migrate-legacy-data.mjs --apply",
     "smoke:cloudinary": "node --env-file=.env.local scripts/cloudinary-smoke.mjs",

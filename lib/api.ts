@@ -30,6 +30,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const message =
       typeof payload === "object" && payload !== null && "message" in payload && typeof payload.message === "string"
         ? payload.message
+        : typeof payload === "object" && payload !== null && "error" in payload && typeof payload.error === "string"
+          ? payload.error
         : "Request failed";
     throw new ApiError(response.status, message);
   }
@@ -42,6 +44,8 @@ export const api = {
     request<T>(path, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) }),
   put: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "PUT", body: body === undefined ? undefined : JSON.stringify(body) }),
+  patch: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "PATCH", body: body === undefined ? undefined : JSON.stringify(body) }),
   delete: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "DELETE", body: body === undefined ? undefined : JSON.stringify(body) }),
   upload: <T>(path: string, body: FormData) => request<T>(path, { method: "POST", body }),

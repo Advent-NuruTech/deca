@@ -7,6 +7,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { ResourceTaxonomy } from "@/lib/types";
 import { getPublicTaxonomy } from "@/lib/public-settings-client";
+import NewsletterSignup from "@/components/public/newsletter-signup";
 import {
   Mail,
   Phone,
@@ -254,27 +255,7 @@ const Footer = () => {
                 <span>Butere, Kenya</span>
               </li>
             </ul>
-            {/* Newsletter */}
-            <div className="mt-4">
-              <p className="text-sm text-gray-600 mb-2">Stay encouraged</p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="flex-1 bg-white border border-gray-200 rounded-l-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-emerald-400"
-                />
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="bg-emerald-600 text-white px-4 py-2 rounded-r-lg text-sm font-medium hover:bg-emerald-700 transition"
-                >
-                  Subscribe
-                </motion.button>
-              </div>
-              <p className="text-xs text-gray-400 mt-2">
-                No spam, only encouragement.
-              </p>
-            </div>
+            <NewsletterSignup compact />
           </motion.div>
         </div>
 

@@ -25,6 +25,7 @@ import SEO from "../SEO";
 import YouTubeVideos from "../YouTubeVideos";
 import ActivityCarousel from "../ActivityCarousel";
 import YouTubeVideos2 from "../YouTubeVideos2";
+import NewsletterSignup from "../newsletter-signup";
 const remsamVideo = "/assets/remsam.mp4";
 const heroPhrase = "Faith, Family, Farming";
 
@@ -198,7 +199,7 @@ const HomePage = () => {
                 variants={fadeUp}
                 className="text-3xl sm:text-5xl md:text-7xl lg:text-4xl font-bold leading-tight"
               >
-                <span className="block text-emerald-400">Remsam Homestade</span>
+                <span className="block text-emerald-400">Remsam Homestead</span>
                 <HeroTypewriter />
 
               </motion.h1>
@@ -512,6 +513,7 @@ const HomePage = () => {
             <YouTubeVideos2 />
           </div>
         </section>
+        <NewsletterSignup />
       </div>
     </>
   );
