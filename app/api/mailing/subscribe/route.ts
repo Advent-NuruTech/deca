@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { getMailDb, FieldValue, sendNewsletterWelcome } from "@/lib/mailing-server";
 
 export async function POST(request: Request) {
@@ -16,6 +16,9 @@ export async function POST(request: Request) {
     if (name.length > 120) return Response.json({ error: "Keep the first name under 120 characters." }, { status: 400 });
     const mailDb = getMailDb();
     const id = createHash("sha256").update(email).digest("hex");
+    // Stable across Firestore transaction retries, but unique for every new
+    // subscription lifecycle so returning readers receive a fresh welcome.
+    const subscriptionCycleId = randomUUID();
     const subscriber = mailDb.collection("newsletterSubscribers").doc(id);
     const result = await mailDb.runTransaction(async (transaction) => {
       const prior = await transaction.get(subscriber);
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
         ...(name ? { name } : prior.exists && prior.get("name") ? { name: prior.get("name") } : {}),
         status: "active",
         source: "homepage",
+        subscriptionCycleId,
         ...(prior.exists && prior.get("createdAt") ? { createdAt: prior.get("createdAt") } : { createdAt: FieldValue.serverTimestamp() }),
         subscribedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -39,7 +43,7 @@ export async function POST(request: Request) {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
       `https://${process.env.VERCEL_URL ?? new URL(request.url).host}`;
     try {
-      const delivery = await sendNewsletterWelcome({ id, email, name }, baseUrl);
+      const delivery = await sendNewsletterWelcome({ id, email, name }, baseUrl, subscriptionCycleId);
       if (delivery.failures.length) {
         console.error("Newsletter welcome email delivery failed", {
           subscriberId: id,

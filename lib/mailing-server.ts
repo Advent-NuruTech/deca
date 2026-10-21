@@ -252,14 +252,14 @@ function welcomeItemsText(items: WelcomeItem[]) {
   return items.map((item) => `${item.eyebrow}: ${item.title}\n${item.url}`).join("\n\n");
 }
 
-export async function sendNewsletterWelcome(recipient: Recipient, baseUrl: string) {
+export async function sendNewsletterWelcome(recipient: Recipient, baseUrl: string, subscriptionCycleId = recipient.id) {
   const items = await latestWelcomeItems(baseUrl);
   return deliverCampaign({
     kind: "newsletter", subject: "Welcome to Remsam Homestead", letterTitle: "Welcome to the homestead",
     headline: "Faith, family, and farming—delivered with care", preheader: "You’re now part of the Remsam Homestead community.",
     body: "<p>Thank you for joining us. You’ll receive thoughtful stories, practical homestead ideas, faith-filled encouragement, and news from our farm in Kenya.</p><p>Here are three fresh places to begin: our newest video, latest article, and newest study-library resource.</p>",
     buttonLabel: "Visit Remsam Homestead", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
-  }, [recipient], baseUrl, `newsletter-welcome:${recipient.id}`, {
+  }, [recipient], baseUrl, `newsletter-welcome:${subscriptionCycleId}`, {
     contentAfterBody: welcomeItemsHtml(items),
     textSuffix: welcomeItemsText(items),
   });

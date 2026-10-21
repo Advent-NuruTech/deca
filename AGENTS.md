@@ -15,3 +15,10 @@ Before changing resources, categories, article APIs, or document deletion, read
 Firestore records referenced by stable IDs. Never restore hardcoded category unions
 or use editable names/slugs as foreign keys. Category moves must update references,
 not re-upload files, and deletion must not leave article bodies or managed media behind.
+
+## Production UI and UX standard
+
+All interface work must be production-ready, not prototype-grade. Use coherent visual
+hierarchy, responsive layouts, accessible semantics and keyboard states, clear loading,
+empty, error, and success feedback, and polished interaction details. Preserve established
+design tokens and patterns, and verify user flows on both mobile and desktop before handoff.

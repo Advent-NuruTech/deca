@@ -5,10 +5,7 @@ import type { ReactNode } from "react";
 export default function ProtectedAdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-gray-50">
-        <AdminNavigation />
-        {children}
-      </div>
+      <AdminNavigation>{children}</AdminNavigation>
     </AdminGuard>
   );
 }
