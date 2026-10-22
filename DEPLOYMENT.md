@@ -74,3 +74,7 @@ For the D1 public read model, run `npm run migrate:d1` first and then
 before promotion. Public requests fall back to cached Firestore data if the D1
 schema is missing, unavailable, or marked incomplete, so schema deployment and
 application deployment can be rolled out without an outage.
+
+## Document upload cleanup
+
+Configure an R2 lifecycle rule to expire objects under `study-upload-parts/` after one day. Uploads normally remove their temporary parts automatically; the rule also cleans up parts if a browser closes or loses connectivity before cleanup can run. Documents remain limited to 20 MB.

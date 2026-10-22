@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Download, FileText, Share2 } from "lucide-react";
+import { BookOpen, Download, FileText, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Article } from "@/lib/types";
 
@@ -31,8 +31,9 @@ export default function StudyMaterialCard({ material, categoryName, hideEmptyIma
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{categoryName || material.studyCategory || material.category}</p>
         <h3 className="mt-2 text-lg font-bold leading-snug text-gray-900 [overflow-wrap:anywhere]"><Link href={`/articles/${material.slug}`} className="hover:text-emerald-700">{material.title}</Link></h3>
         <p className="mt-2 line-clamp-3 text-sm leading-6 text-gray-600">{material.description || material.excerpt}</p>
-        <div className="mt-auto flex items-center gap-2 pt-5">
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
           {material.fileUrl && <a href={material.fileUrl} download={material.fileName || undefined} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"><Download size={16} /> Download</a>}
+          {material.fileUrl && (material.fileType === "application/pdf" || material.fileName?.toLowerCase().endsWith(".pdf")) && <Link href={`/articles/${encodeURIComponent(material.slug)}/read`} className="inline-flex items-center gap-1 rounded-lg border border-emerald-700 px-3 py-2.5 text-sm font-semibold text-emerald-800 hover:bg-emerald-50"><BookOpen size={16} /> Read</Link>}
           <Link href={`/articles/${material.slug}`} className="rounded-lg bg-gray-100 px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200">View</Link>
           <button onClick={share} aria-label={`Share ${material.title}`} title="Share" className="ml-auto inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-gray-600 hover:bg-gray-100"><Share2 size={18} aria-hidden="true" /></button>
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Download } from "lucide-react";
+import { BookOpen, Download } from "lucide-react";
 import { api } from "@/lib/api";
 import type { PublicArticle } from "@/lib/types";
 import SEO from "@/components/public/SEO";
@@ -115,6 +115,7 @@ export default function ArticleDetailPage({ slug }: { slug: string }) {
                   <p className="text-gray-700 mb-4">
                     This content is available as a downloadable file for your convenience.
                   </p>
+                  {((article.fileType === "application/pdf") || article.fileName?.toLowerCase().endsWith(".pdf")) && <Link href={`/articles/${encodeURIComponent(article.slug)}/read`} className="mr-3 mb-2 inline-flex items-center gap-2 rounded-lg border border-emerald-700 px-6 py-3 font-medium text-emerald-800 hover:bg-emerald-100"><BookOpen size={20} /> Read online</Link>}
                   <a
                     href={article.fileUrl}
                     download={article.fileName}

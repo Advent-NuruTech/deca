@@ -19,7 +19,7 @@ function filenameFromObject(key: string, metadata?: Record<string, string>): str
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ key: string[] }> },
 ) {
   try {
@@ -37,7 +37,9 @@ export async function GET(
 
     const headers = new Headers({
       "Content-Type": object.ContentType ?? "application/octet-stream",
-      "Content-Disposition": attachmentHeader(filenameFromObject(key, object.Metadata)),
+      "Content-Disposition": request.nextUrl.searchParams.get("inline") === "1" && object.ContentType === "application/pdf"
+        ? attachmentHeader(filenameFromObject(key, object.Metadata)).replace(/^attachment/, "inline")
+        : attachmentHeader(filenameFromObject(key, object.Metadata)),
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff",
     });
