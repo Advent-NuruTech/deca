@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       <div className="container mx-auto px-4">
         
     <div className="mb-8 flex items-center justify-between gap-4">
-          <div><h1 className="text-4xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Admin Dashboard</span></h1><p className="mt-2 text-gray-600">Manage your store, publishing, and customer orders.</p></div>
+          <div><p className="mt-2 text-gray-600">Manage your store, publishing, and customer orders.</p></div>
           <div className="flex items-center gap-3">
             <button onClick={() => { void load(); void loadEmailActivity(); }} disabled={loading || emailLoading} aria-label="Refresh dashboard" className="rounded-lg border border-gray-200 bg-white p-3 text-gray-600 hover:text-emerald-600 disabled:opacity-50"><RefreshCw size={20} className={loading || emailLoading ? "animate-spin" : ""} /></button>
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="hidden md:block"><Sparkles size={32} className="text-emerald-400/50" /></motion.div>
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
           </section>
           <section aria-labelledby="email-activity-heading" className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between gap-4 border-b border-gray-100 p-5">
-              <div><h2 id="email-activity-heading" className="text-xl font-bold text-gray-900">Latest Email Activity</h2><p className="mt-1 text-sm text-gray-500">The most recent email deliveries</p></div>
+              <div><h2 id="email-activity-heading" className="text-xl font-bold text-gray-900">Latest Email Activity</h2><p className="mt-1 text-sm text-gray-500">The  most recent email deliveries</p></div>
               <Link href="/admin/mailing" className="shrink-0 text-sm font-medium text-emerald-600 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">View all</Link>
             </div>
             {emailLoading ? <p role="status" className="p-6 text-sm text-gray-500">Loading email activity...</p> : emailError ? <div role="alert" className="p-6 text-sm text-red-700">{emailError} <button onClick={() => void loadEmailActivity()} className="ml-2 font-medium underline">Try again</button></div> : emailActivity.length === 0 ? <p className="p-6 text-sm text-gray-500">No email activity yet.</p> : <ul className="max-h-96 divide-y divide-gray-100 overflow-y-auto">{emailActivity.map((item) => <li key={item.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3"><div className="min-w-0"><p className="break-words font-medium text-gray-900">{item.subject || "Untitled email"}</p><p className="text-sm text-gray-500">{item.kind === "meeting" ? "Meeting" : "Newsletter"} · {emailDate(item.sentAt)}</p></div><p className="text-sm text-gray-600">{item.sent ?? 0} sent{(item.failed ?? 0) > 0 && <span className="text-red-700"> · {item.failed} failed</span>}</p></li>)}</ul>}
