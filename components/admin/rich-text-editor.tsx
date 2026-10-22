@@ -21,6 +21,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
   const editor = useRef<HTMLDivElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const savedSelection = useRef<Range | null>(null);
+  const pendingFontSize = useRef("14");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState("");
   useImperativeHandle(forwardedRef, () => editor.current!, []);
@@ -28,27 +29,33 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
   useEffect(() => {
     if (!editor.current || value === undefined) return;
     const safeValue = sanitizeRichText(value);
-    if (editor.current.innerHTML !== safeValue) editor.current.innerHTML = safeValue;
+    if (sanitizeRichText(editor.current.innerHTML) !== safeValue) editor.current.innerHTML = safeValue;
   }, [value]);
 
   function rememberSelection() {
     const selection = window.getSelection();
-    if (selection?.rangeCount) savedSelection.current = selection.getRangeAt(0).cloneRange();
+    if (selection?.rangeCount && editor.current?.contains(selection.anchorNode)) savedSelection.current = selection.getRangeAt(0).cloneRange();
   }
 
   function runCommand(command: string, argument?: string) {
     editor.current?.focus();
-    if (command === "foreColor" && savedSelection.current) {
+    if (savedSelection.current) {
       const selection = window.getSelection();
       selection?.removeAllRanges();
       selection?.addRange(savedSelection.current);
     }
-    document.execCommand(command, false, argument);
+    document.execCommand(command, false, command === "fontSize" ? "7" : argument);
+    if (command === "fontSize" && argument) pendingFontSize.current = argument;
+    if (editor.current) updateContent(editor.current);
+    rememberSelection();
   }
 
   function updateContent(element: HTMLDivElement) {
+    element.querySelectorAll('font[size="7"]:not([data-sized])').forEach((font) => {
+      (font as HTMLElement).style.fontSize = `${pendingFontSize.current}px`;
+      font.setAttribute("data-sized", "true");
+    });
     const safeValue = sanitizeRichText(element.innerHTML);
-    if (safeValue !== element.innerHTML) element.innerHTML = safeValue;
     if (maxTextLength !== undefined && (element.textContent?.length ?? 0) > maxTextLength) {
       element.innerHTML = sanitizeRichText(value ?? "");
       return;
@@ -124,11 +131,14 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
       <button type="button" title="Bold" aria-label="Bold" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("bold")}><b>B</b></button>
       <button type="button" title="Italic" aria-label="Italic" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("italic")}><i>I</i></button>
       <button type="button" title="Underline" aria-label="Underline" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("underline")}><u>U</u></button>
-      <select aria-label="Text style" defaultValue="p" onMouseDown={(event) => event.preventDefault()} onChange={(event) => runCommand("formatBlock", event.target.value)}>
+      <select aria-label="Text style" defaultValue="p" onMouseDown={rememberSelection} onChange={(event) => runCommand("formatBlock", event.target.value)}>
         <option value="p">Paragraph</option><option value="h2">Heading</option><option value="h3">Subheading</option><option value="blockquote">Quote</option>
       </select>
-      <select aria-label="Font family" defaultValue="Times New Roman" onMouseDown={(event) => event.preventDefault()} onChange={(event) => runCommand("fontName", event.target.value)}>
+      <select aria-label="Font family" defaultValue="Times New Roman" onMouseDown={rememberSelection} onChange={(event) => runCommand("fontName", event.target.value)}>
         <option value="Times New Roman">Times New Roman</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option>
+      </select>
+      <select aria-label="Font size" defaultValue="14" onMouseDown={rememberSelection} onChange={(event) => runCommand("fontSize", event.target.value)}>
+        {[10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 72].map((size) => <option key={size} value={size}>{size} px</option>)}
       </select>
       <label className="rich-color-control" title="Text color">
         <span aria-hidden="true">A</span>
@@ -149,6 +159,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
     <div
       ref={editor}
       className={`rich-editor ${className}`.trim()}
+      style={{ fontFamily: "Times New Roman, serif", fontSize: "14px" }}
       contentEditable
       suppressContentEditableWarning
       role="textbox"
@@ -156,6 +167,8 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(function 
       aria-multiline="true"
       data-placeholder={placeholder}
       onInput={(event) => updateContent(event.currentTarget)}
+      onKeyUp={rememberSelection}
+      onMouseUp={rememberSelection}
       onPaste={pasteFormattedContent}
     />
   </>;

@@ -1,6 +1,8 @@
 import "server-only";
 
 import slugify from "slugify";
+import { createHash } from "node:crypto";
+import { richTextToPlainText, sanitizeRichText } from "@/lib/rich-text";
 import { FieldValue, type DocumentData, type DocumentSnapshot } from "firebase-admin/firestore";
 import { HttpError } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
@@ -24,7 +26,7 @@ function stringField(
   if (typeof value !== "string") throw new HttpError(400, `${key} must be a string`);
   const trimmed = value.trim();
   if (!trimmed && !options.allowEmpty) throw new HttpError(400, `${key} must be a non-empty string`);
-  if (trimmed.length > (options.max ?? 5000)) throw new HttpError(400, `${key} is too long`);
+  if (options.max !== undefined && trimmed.length > options.max) throw new HttpError(400, `${key} is too long`);
   return trimmed;
 }
 
@@ -58,9 +60,9 @@ export type ValidatedArticleBody = {
 export function validateArticleBody(value: unknown, partial = false): ValidatedArticleBody {
   if (!isRecord(value)) throw new HttpError(400, "A JSON article body is required");
 
-  const title = stringField(value, "title", { required: !partial, max: 180 });
-  const content = stringField(value, "content", { required: !partial, max: 1_000_000 });
-  const excerpt = stringField(value, "excerpt", { required: !partial, max: 1000 });
+  const title = stringField(value, "title", { required: !partial });
+  const content = stringField(value, "content", { max: 1_000_000, allowEmpty: true });
+  const excerpt = stringField(value, "excerpt", { max: 1000, allowEmpty: true });
   const category = value.category;
   if (category !== undefined && typeof category !== "string") throw new HttpError(400, "category must be a string");
 
@@ -100,12 +102,13 @@ export function validateArticleBody(value: unknown, partial = false): ValidatedA
 
   if (!partial) {
     metadata.category ??= "faith";
+    metadata.excerpt ??= "";
     metadata.tags ??= [];
     metadata.seoKeywords ??= [];
     metadata.published ??= false;
     metadata.isDownloadable ??= false;
     metadata.views = 0;
-    metadata.seoTitle ??= title;
+    metadata.seoTitle ??= title?.slice(0, 180);
     metadata.seoDescription ??= excerpt?.slice(0, 160);
   }
 
@@ -119,13 +122,21 @@ export function validateArticleBody(value: unknown, partial = false): ValidatedA
     delete metadata.fileType;
   }
 
+  if (!partial) assertArticleHasContent(content ?? "", metadata);
   return { content, metadata };
+}
+
+export function assertArticleHasContent(content: string, metadata: Record<string, unknown>) {
+  const safe = sanitizeRichText(content);
+  if (!richTextToPlainText(safe) && !/<img\b/i.test(safe) && !metadata.featuredImage && !(metadata.isDownloadable && metadata.fileKey)) {
+    throw new HttpError(400, "Add content, an image, or a document.");
+  }
 }
 
 export function articleSlug(title: string): string {
   const slug = slugify(title, { lower: true, strict: true });
   if (!slug) throw new HttpError(400, "title must contain letters or numbers");
-  return slug;
+  return slug.length > 120 ? `${slug.slice(0, 100).replace(/-+$/, "")}-${createHash("sha256").update(slug).digest("hex").slice(0, 12)}` : slug;
 }
 
 export async function assertUniqueArticleSlug(slug: string, excludingId?: string) {

@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
     const downloadable = request.nextUrl.searchParams.get("isDownloadable");
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
+    const allAdmin = adminView && request.nextUrl.searchParams.get("all") === "true";
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
     let availableArticles: PublicArticle[];
@@ -82,10 +83,9 @@ export async function GET(request: NextRequest) {
       );
 
     const total = matching.length;
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const totalPages = allAdmin ? 1 : Math.max(1, Math.ceil(total / limit));
     const currentPage = Math.min(page, totalPages);
-    const articles = matching
-      .slice((currentPage - 1) * limit, currentPage * limit);
+    const articles = allAdmin ? matching : matching.slice((currentPage - 1) * limit, currentPage * limit);
 
     const studyCategories = resourceCategories.subcategories
       .filter((item) => item.parentId === "study-library")
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await reference.set(createArticleMetadata({ ...metadata, slug, author }));
-      await saveArticleContent(reference.id, content!);
+      await saveArticleContent(reference.id, content ?? "");
       const created = await reference.get();
       if (syncD1) {
         await syncD1ArticleDocument(created);

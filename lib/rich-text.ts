@@ -50,7 +50,10 @@ export function sanitizeRichText(value: string) {
         const color = attributes.match(/\bcolor\s*=\s*(?:"(#[\da-f]{3,8})"|'(#[\da-f]{3,8})'|(#[\da-f]{3,8}))/i)?.slice(1).find(Boolean);
         const font = attributes.match(/\bface\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i)?.slice(1).find(Boolean);
         const safeFont = font && allowedFonts.has(font) ? font : "";
-        const style = [color ? `color:${color}` : "", safeFont ? `font-family:${safeFont}` : ""].filter(Boolean).join(";");
+        const inlineStyle = attributes.match(/\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)')/i)?.slice(1).find(Boolean) ?? "";
+        const size = inlineStyle.match(/(?:^|;)\s*font-size\s*:\s*(\d{1,2})px\s*(?:;|$)/i)?.[1];
+        const safeSize = size && Number(size) >= 8 && Number(size) <= 72 ? size : "";
+        const style = [color ? `color:${color}` : "", safeFont ? `font-family:${safeFont}` : "", safeSize ? `font-size:${safeSize}px` : ""].filter(Boolean).join(";");
         return style ? `<span style="${style}">` : "<span>";
       }
       if (tag === "span") {
@@ -58,7 +61,9 @@ export function sanitizeRichText(value: string) {
         const color = style.match(/\bcolor\s*:\s*(#[\da-f]{3,8})/i)?.[1];
         const font = style.match(/\bfont-family\s*:\s*([^;]+)/i)?.[1]?.replace(/['"]/g, "").trim();
         const safeFont = font && allowedFonts.has(font) ? font : "";
-        const safeStyle = [color ? `color:${color}` : "", safeFont ? `font-family:${safeFont}` : ""].filter(Boolean).join(";");
+        const size = style.match(/(?:^|;)\s*font-size\s*:\s*(\d{1,2})px\s*(?:;|$)/i)?.[1];
+        const safeSize = size && Number(size) >= 8 && Number(size) <= 72 ? size : "";
+        const safeStyle = [color ? `color:${color}` : "", safeFont ? `font-family:${safeFont}` : "", safeSize ? `font-size:${safeSize}px` : ""].filter(Boolean).join(";");
         return safeStyle ? `<span style="${safeStyle}">` : "<span>";
       }
       return `<${tag}>`;

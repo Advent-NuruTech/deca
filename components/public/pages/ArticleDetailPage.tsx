@@ -93,7 +93,7 @@ export default function ArticleDetailPage({ slug }: { slug: string }) {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
               <div className="bg-white rounded-xl shadow-sm p-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{article.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 break-words [overflow-wrap:anywhere]">{article.title}</h1>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span>{formatDate(article.publishedAt || article.createdAt)}</span>
                   <span>•</span>
@@ -102,7 +102,7 @@ export default function ArticleDetailPage({ slug }: { slug: string }) {
               </div>
 
               {article.featuredImage && <ArticleFeaturedImage image={article.featuredImage} title={article.title} />}
-              <ArticleContent content={article.content} tags={article.tags} />
+              {article.content && <ArticleContent content={article.content} tags={article.tags} />}
 
               {article.isDownloadable && article.fileUrl && (
                 <motion.div

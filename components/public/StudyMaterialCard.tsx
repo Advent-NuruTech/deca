@@ -29,7 +29,7 @@ export default function StudyMaterialCard({ material, categoryName, hideEmptyIma
       </Link>}
       <div className="flex flex-1 flex-col p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{categoryName || material.studyCategory || material.category}</p>
-        <h3 className="mt-2 text-lg font-bold leading-snug text-gray-900"><Link href={`/articles/${material.slug}`} className="hover:text-emerald-700">{material.title}</Link></h3>
+        <h3 className="mt-2 text-lg font-bold leading-snug text-gray-900 [overflow-wrap:anywhere]"><Link href={`/articles/${material.slug}`} className="hover:text-emerald-700">{material.title}</Link></h3>
         <p className="mt-2 line-clamp-3 text-sm leading-6 text-gray-600">{material.description || material.excerpt}</p>
         <div className="mt-auto flex items-center gap-2 pt-5">
           {material.fileUrl && <a href={material.fileUrl} download={material.fileName || undefined} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"><Download size={16} /> Download</a>}

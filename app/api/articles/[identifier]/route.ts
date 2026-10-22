@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { deleteArticleContent, getArticleContent, saveArticleContent } from "@/lib/article-content";
 import {
   articleSlug,
+  assertArticleHasContent,
   assertUniqueArticleSlug,
   serializeArticle,
   updateArticleMetadata,
@@ -99,13 +100,17 @@ export async function PUT(
       metadata.fileName = FieldValue.delete();
       metadata.fileType = FieldValue.delete();
     }
-    if (typeof metadata.title === "string") {
+    const oldContent = await getArticleContent(identifier);
+    const nextData = { ...existingData, ...metadata };
+    if (input.featuredImage === "" || input.featuredImage === null) nextData.featuredImage = undefined;
+    if (metadata.isDownloadable === false) nextData.fileKey = undefined;
+    assertArticleHasContent(content ?? oldContent ?? "", nextData);
+    if (typeof metadata.title === "string" && metadata.title !== existingData.title) {
       const slug = articleSlug(metadata.title);
       await assertUniqueArticleSlug(slug, identifier);
       metadata.slug = slug;
     }
 
-    const oldContent = content === undefined ? undefined : await getArticleContent(identifier);
     const syncD1 = await beginD1ReadModelUpdate("articles");
 
     try {

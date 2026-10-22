@@ -1,10 +1,11 @@
 import { Tag } from "lucide-react";
+import { sanitizeRichText } from "@/lib/rich-text";
 
 export default function ArticleContent({ content, tags }: { content: string; tags?: string[] }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 md:p-8">
       <div
-        className="prose prose-lg max-w-none
+        className="article-rich-content prose max-w-none
           prose-headings:text-gray-900
           prose-h1:text-4xl prose-h1:font-bold
           prose-h2:text-3xl prose-h2:font-semibold
@@ -21,7 +22,8 @@ export default function ArticleContent({ content, tags }: { content: string; tag
           prose-img:rounded-lg prose-img:shadow-md
           prose-pre:bg-gray-100 prose-pre:text-gray-800
           prose-code:text-emerald-700 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
-        dangerouslySetInnerHTML={{ __html: content }}
+        style={{ fontFamily: "Times New Roman, serif", fontSize: "14px" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichText(content ?? "") }}
       />
       {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-gray-200">
