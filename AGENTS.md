@@ -34,3 +34,7 @@ these directives with indexable metadata.
 ## Content editing
 
 Reuse `components/admin/rich-text-editor.tsx` and its existing interface for rich-text content wherever writing is needed. Keep the experience consistent with the email editor.
+
+## Admin release updates
+
+Keep the admin Updates page current when a feature is fully released and verified end to end. Add a concise D1 update explaining what changed and how an administrator can use it, in simple language. Do not announce unfinished or unverified work as released. Use the admin Updates page or the parameterized `scripts/publish-admin-update.mjs` script, and avoid duplicates. Keep entries accurate when behavior changes.

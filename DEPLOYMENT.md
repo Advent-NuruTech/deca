@@ -78,3 +78,15 @@ application deployment can be rolled out without an outage.
 ## Document upload cleanup
 
 Configure an R2 lifecycle rule to expire objects under `study-upload-parts/` after one day. Uploads normally remove their temporary parts automatically; the rule also cleans up parts if a browser closes or loses connectivity before cleanup can run. Documents remain limited to 20 MB.
+
+## Admin updates
+
+Run `npm run migrate:d1` when deploying the Updates page. The migration creates the D1 table and adds the initial author-management announcement once. Subsequent migrations preserve edits and deletions. Administrators can maintain entries in **Updates**.
+
+For a completed feature, an authorized maintainer can also publish directly to D1 using a stable, unique ID and plain language:
+
+```powershell
+node --env-file=.env.local scripts/publish-admin-update.mjs "feature-id" "Short title" "What changed and how to use it."
+```
+
+Run this against the intended environment only after the feature is released and verified for users. The script does not overwrite an existing ID.

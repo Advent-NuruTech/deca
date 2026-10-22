@@ -79,3 +79,23 @@ CREATE TABLE IF NOT EXISTS public_read_model_state (
   ready       INTEGER NOT NULL DEFAULT 0,
   updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Admin release notes are stored directly in D1, independent of the public read model.
+CREATE TABLE IF NOT EXISTS admin_updates (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_updates_created ON admin_updates(created_at DESC, id DESC);
+
+-- Record one-time seeds so a deleted or edited update is not restored on migration.
+CREATE TABLE IF NOT EXISTS admin_update_seeds (id TEXT PRIMARY KEY);
+
+INSERT OR IGNORE INTO admin_updates (id, title, content)
+  SELECT 'authors-management', 'Create and edit authors', '<p>You can now add and edit author profiles, including their biographies.</p><p>Open Authors in the admin menu to manage profiles, then select an author when creating or editing a resource.</p>'
+  WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'authors-management');
+
+INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('authors-management');
