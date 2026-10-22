@@ -11,6 +11,16 @@ import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-
 type ProductsResponse = { products: PublicProduct[] };
 type ArticlesResponse = { articles: PublicArticle[]; resourceCategories: ResourceTaxonomy };
 type OrdersResponse = { orders: PublicOrder[] };
+type EmailActivity = { id: string; subject: string; kind: "newsletter" | "meeting"; sent?: number; failed?: number; sentAt?: unknown };
+
+function emailDate(value: unknown) {
+  let date: Date;
+  if (typeof value === "string") date = new Date(value);
+  else if (typeof value === "object" && value !== null && "_seconds" in value) date = new Date(Number(value._seconds) * 1000);
+  else if (typeof value === "object" && value !== null && "seconds" in value) date = new Date(Number(value.seconds) * 1000);
+  else return "Date unavailable";
+  return Number.isNaN(date.getTime()) ? "Date unavailable" : date.toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" });
+}
 
 const colorStyles = {
   emerald: "bg-emerald-100 text-emerald-700",
@@ -39,6 +49,22 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<PublicOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [emailActivity, setEmailActivity] = useState<EmailActivity[]>([]);
+  const [emailLoading, setEmailLoading] = useState(true);
+  const [emailError, setEmailError] = useState("");
+
+  const loadEmailActivity = useCallback(async () => {
+    setEmailLoading(true);
+    setEmailError("");
+    try {
+      const data = await api.get<{ history: EmailActivity[] }>("/api/mailing");
+      setEmailActivity((data.history ?? []).slice(0, 2));
+    } catch (reason) {
+      setEmailError(errorMessage(reason, "Email activity could not be loaded"));
+    } finally {
+      setEmailLoading(false);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -60,7 +86,7 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(); void loadEmailActivity(); }, [load, loadEmailActivity]);
 
   const stats = useMemo(() => ({
     activeProducts: products.filter((product) => product.status === "active").length,
@@ -80,13 +106,57 @@ export default function AdminDashboard() {
   return (
     <main className="pb-16 pt-10">
       <div className="container mx-auto px-4">
-        <div className="mb-8 flex items-center justify-between gap-4">
+        
+    <div className="mb-8 flex items-center justify-between gap-4">
           <div><h1 className="text-4xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Admin Dashboard</span></h1><p className="mt-2 text-gray-600">Manage your store, publishing, and customer orders.</p></div>
           <div className="flex items-center gap-3">
-            <button onClick={() => void load()} disabled={loading} aria-label="Refresh dashboard" className="rounded-lg border border-gray-200 bg-white p-3 text-gray-600 hover:text-emerald-600 disabled:opacity-50"><RefreshCw size={20} className={loading ? "animate-spin" : ""} /></button>
+            <button onClick={() => { void load(); void loadEmailActivity(); }} disabled={loading || emailLoading} aria-label="Refresh dashboard" className="rounded-lg border border-gray-200 bg-white p-3 text-gray-600 hover:text-emerald-600 disabled:opacity-50"><RefreshCw size={20} className={loading || emailLoading ? "animate-spin" : ""} /></button>
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="hidden md:block"><Sparkles size={32} className="text-emerald-400/50" /></motion.div>
           </div>
+          
+
+
         </div>
+
+<section className="mb-8 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+  <h2 className="mb-4 text-xl font-bold text-gray-900">
+    Quick Actions
+  </h2>
+
+  <div className="grid grid-cols-4 gap-2 sm:gap-3">
+    <Link
+      href="/admin/products?action=new"
+      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-emerald-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-emerald-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
+    >
+      <Plus size={18} className="shrink-0" />
+      <span>Add Product</span>
+    </Link>
+
+    <Link
+      href="/admin/articles?action=new"
+      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-blue-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-blue-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
+    >
+      <Plus size={18} className="shrink-0" />
+      <span>Add Resource</span>
+    </Link>
+
+    <Link
+      href="/admin/orders?status=pending"
+      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-orange-500 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-orange-600 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
+    >
+      <ShoppingCart size={18} className="shrink-0" />
+      <span>Process Orders</span>
+    </Link>
+
+    <Link
+      href="/admin/chat"
+      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-green-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-green-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
+    >
+      <MessageCircle size={18} className="shrink-0" />
+      <span>Edit Chat</span>
+    </Link>
+  </div>
+</section>
 
         {error && <div role="alert" className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>}
         <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
@@ -100,51 +170,24 @@ export default function AdminDashboard() {
           <StatCard title="Customers" value={stats.customers} icon={Users} color="blue" />
         </div>
 
-        <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center justify-between gap-4">
-           <Link href="/admin/articles" className="text-sm font-medium text-blue-600">Manage resources</Link>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {articleCategoryStats.map((category) => (
-              <Link key={category.id} href={`/admin/articles?category=${encodeURIComponent(category.id)}`} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50">
-                <span className="text-sm font-medium text-gray-700">{category.name}</span>
-                <span className="rounded-full bg-blue-100 px-2.5 py-1 text-sm font-bold text-blue-700">{category.count}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-bold text-gray-900">Quick Actions</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href="/admin/products?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700"><Plus size={18} /> Add Product</Link>
-            <Link href="/admin/articles?action=new" className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700"><Plus size={18} /> Add Resource</Link>
-            <Link href="/admin/orders?status=pending" className="flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 font-semibold text-white hover:bg-orange-600"><ShoppingCart size={18} /> Process Orders</Link>
-            <Link href="/admin/chat" className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> Edit Chat</Link>
-          </div>
-        </section>
-
         <div className="grid gap-8 lg:grid-cols-3">
-          <section className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm lg:col-span-2">
-            <div className="flex items-center justify-between border-b border-gray-100 p-5"><h2 className="text-xl font-bold text-gray-900">Featured Products</h2><Link href="/admin/products" className="text-sm font-medium text-emerald-600">View all</Link></div>
-            <div className="divide-y divide-gray-100">
-              {products.filter((item) => item.featured).slice(0, 5).map((product) => <div key={product.id} className="flex items-center gap-4 p-4"><img src={product.images?.[0] || "/logo.png"} alt="" className="h-12 w-12 rounded-lg object-cover" /><div className="min-w-0 flex-1"><p className="truncate font-semibold text-gray-900">{product.name}</p><p className="text-sm text-gray-500">{formatMoney(product.price)} · {product.stockQuantity} in stock</p></div></div>)}
-              {!loading && products.every((item) => !item.featured) && <p className="p-6 text-center text-gray-500">No featured products yet.</p>}
-            </div>
-          </section>
-          <section className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          
+          <section className="self-start rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
             <div className="mb-5 flex items-center gap-3"><div className="rounded-lg bg-emerald-100 p-2 text-emerald-700"><TrendingUp /></div><div><p className="text-sm text-gray-500">Order payment rate</p><p className="text-2xl font-bold text-gray-900">{stats.paymentRate}%</p></div></div>
             <div className="mb-2 flex justify-between text-sm text-gray-600"><span>Paid orders</span><span>{orders.filter((order) => order.paymentStatus === "paid").length} / {orders.length}</span></div>
             <div className="h-2 overflow-hidden rounded-full bg-gray-100"><motion.div initial={{ width: 0 }} animate={{ width: `${stats.paymentRate}%` }} transition={{ duration: .8 }} className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" /></div>
             <p className="mt-5 border-t border-gray-100 pt-4 text-sm text-gray-500">Calculated from Firestore-backed order and payment states.</p>
           </section>
+          <section aria-labelledby="email-activity-heading" className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm lg:col-span-2">
+            <div className="flex items-center justify-between gap-4 border-b border-gray-100 p-5">
+              <div><h2 id="email-activity-heading" className="text-xl font-bold text-gray-900">Latest Email Activity</h2><p className="mt-1 text-sm text-gray-500">The most recent email deliveries</p></div>
+              <Link href="/admin/mailing" className="shrink-0 text-sm font-medium text-emerald-600 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">View all</Link>
+            </div>
+            {emailLoading ? <p role="status" className="p-6 text-sm text-gray-500">Loading email activity...</p> : emailError ? <div role="alert" className="p-6 text-sm text-red-700">{emailError} <button onClick={() => void loadEmailActivity()} className="ml-2 font-medium underline">Try again</button></div> : emailActivity.length === 0 ? <p className="p-6 text-sm text-gray-500">No email activity yet.</p> : <ul className="max-h-96 divide-y divide-gray-100 overflow-y-auto">{emailActivity.map((item) => <li key={item.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3"><div className="min-w-0"><p className="break-words font-medium text-gray-900">{item.subject || "Untitled email"}</p><p className="text-sm text-gray-500">{item.kind === "meeting" ? "Meeting" : "Newsletter"} · {emailDate(item.sentAt)}</p></div><p className="text-sm text-gray-600">{item.sent ?? 0} sent{(item.failed ?? 0) > 0 && <span className="text-red-700"> · {item.failed} failed</span>}</p></li>)}</ul>}
+          </section>
         </div>
 
-        <section className="mt-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-gray-100 p-5"><h2 className="text-xl font-bold text-gray-900">Recent Products</h2><Link href="/admin/products" className="text-sm font-medium text-emerald-600">Manage products</Link></div>
-          <div className="overflow-x-auto"><table className="w-full min-w-[650px] text-left"><thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Category</th><th className="px-5 py-3">Price</th><th className="px-5 py-3">Stock</th><th className="px-5 py-3">Added</th></tr></thead><tbody className="divide-y divide-gray-100">{products.slice(0, 6).map((product) => <tr key={product.id}><td className="px-5 py-4"><div className="flex items-center gap-3"><img src={product.images?.[0] || "/logo.png"} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="font-semibold text-gray-900">{product.name}</span></div></td><td className="px-5 py-4 capitalize text-gray-600">{product.category}</td><td className="px-5 py-4">{formatMoney(product.price)}</td><td className="px-5 py-4">{product.stockQuantity}</td><td className="px-5 py-4 text-sm text-gray-500">{formatDate(product.createdAt)}</td></tr>)}</tbody></table></div>
-          {!loading && products.length === 0 && <p className="p-6 text-center text-gray-500">No products yet.</p>}
-        </section>
+        
 
         <section className="mt-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 p-5"><h2 className="text-xl font-bold text-gray-900">Recent Orders</h2><Link href="/admin/orders" className="text-sm font-medium text-emerald-600">View all</Link></div>

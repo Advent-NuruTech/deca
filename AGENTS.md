@@ -30,3 +30,7 @@ the admin layout's `robots` metadata, the `/admin/` exclusion in `robots.ts`, an
 the `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet` response header. New
 admin routes must remain beneath the shared `/admin` layout and must never override
 these directives with indexable metadata.
+
+## Content editing
+
+Reuse `components/admin/rich-text-editor.tsx` and its existing interface for rich-text content wherever writing is needed. Keep the experience consistent with the email editor.
