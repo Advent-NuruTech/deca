@@ -67,14 +67,30 @@ export async function PUT(
     }
     const syncD1 = await beginD1ReadModelUpdate("products");
     let updated;
+    let applied = false;
     try {
-      await reference.update(withUpdateTimestamp(data));
+      await firestore().runTransaction(async (transaction) => {
+        const current = await transaction.get(reference);
+        if (!current.exists) throw new HttpError(404, "Product not found");
+        const expected = input.expectedInventory as { stockQuantity?: number; variants?: Array<{ id: string; stockQuantity: number }> } | undefined;
+        if (expected) {
+          const currentData = current.data() ?? {};
+          const stock = (currentData.variants ?? []).map((v: { id: string; stockQuantity: number }) => ({ id: v.id, stockQuantity: v.stockQuantity }));
+          if (currentData.stockQuantity !== expected.stockQuantity || JSON.stringify(stock) !== JSON.stringify(expected.variants ?? [])) throw new HttpError(409, "Stock changed while you were editing. Reopen the product to see the latest stock.");
+        }
+        transaction.update(reference, withUpdateTimestamp(data));
+      });
+      applied = true;
       updated = await reference.get();
       if (syncD1) {
         await syncD1ProductDocument(updated);
         await markD1ReadModelReady("products");
       }
     } catch (error) {
+      if (!applied) {
+        if (syncD1) await markD1ReadModelReady("products").catch(() => undefined);
+        throw error;
+      }
       try {
         await reference.set(existing.data() ?? {});
         if (syncD1) {

@@ -25,34 +25,34 @@ export async function POST(request: NextRequest) {
     const input = validateOrderBody(body);
     const database = firestore();
     const orderReference = database.collection("orders").doc();
-    const productReferences = input.items.map((item) => database.collection("products").doc(item.product));
+    const productReferences = [...new Set(input.items.map((item) => item.product))].map((id) => database.collection("products").doc(id));
 
     await database.runTransaction(async (transaction) => {
-      const products = await Promise.all(productReferences.map((reference) => transaction.get(reference)));
-      const items = products.map((product, index) => {
-        const requested = input.items[index];
-        if (!product.exists) throw new HttpError(400, "A product in your cart was not found");
+      const products = await Promise.all(productReferences.map ( (reference) => transaction.get(reference)));
+      const byId = new Map(products.map((product) => [product.id, product]));
+      const updates = new Map<string, { variants?: Array<{ id: string; name: string; price: number; stockQuantity: number; image?: string }>; stockQuantity: number }>();
+      const items = input.items.map((requested) => {
+        const product = byId.get(requested.product);
+        if (!product?.exists) throw new HttpError(400, "A product in your cart was not found");
         const data = product.data() ?? {};
-        const quantity = requested.quantity;
-        const stockQuantity = Number(data.stockQuantity ?? 0);
-        if (data.status !== "active" || data.inStock !== true || !Number.isFinite(stockQuantity) || stockQuantity < quantity) {
-          throw new HttpError(400, `Insufficient stock for ${String(data.name ?? "a cart item")}`);
-        }
-        const price = Number(data.price);
-        if (!Number.isFinite(price) || price < 0) throw new Error("A product has an invalid price");
-        transaction.update(product.ref, {
-          stockQuantity: FieldValue.increment(-quantity),
-          inStock: stockQuantity - quantity > 0,
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-        return {
-          product: product.id,
-          name: String(data.name ?? "Product"),
-          price,
-          quantity,
-          image: Array.isArray(data.images) && typeof data.images[0] === "string" ? data.images[0] : "",
-        };
+        const variants = Array.isArray(data.variants) ? data.variants : [];
+        const update = updates.get(product.id) ?? { variants: variants.length ? variants.map((v) => ({ ...v })) : undefined, stockQuantity: Number(data.stockQuantity ?? 0) };
+        if (data.status !== "active") throw new HttpError(400, `Product ${String(data.name)} is unavailable`);
+        const variant = update.variants?.find((v) => v.id === requested.variantId);
+        if ((update.variants && !variant) || (!update.variants && requested.variantId)) throw new HttpError(400, `Please select an available option for ${String(data.name)}`);
+        const stock = variant ? variant.stockQuantity : update.stockQuantity;
+        if ((!variant && data.inStock !== true) || !Number.isFinite(stock) || stock < requested.quantity) throw new HttpError(400, `Insufficient stock for ${String(data.name)}${variant ? ` (${variant.name})` : ""}`);
+        const price = Number(variant ? variant.price : data.price);
+        if (!Number.isFinite(price) || price <= 0) throw new Error("A product has an invalid price");
+        if (variant) variant.stockQuantity -= requested.quantity;
+        else update.stockQuantity -= requested.quantity;
+        updates.set(product.id, update);
+        return { product: product.id, ...(variant ? { variantId: variant.id, variantName: variant.name } : {}), name: String(data.name ?? "Product"), price, quantity: requested.quantity, image: variant?.image || (Array.isArray(data.images) && typeof data.images[0] === "string" ? data.images[0] : "") };
       });
+      for (const [id, update] of updates) {
+        const stockQuantity = update.variants ? update.variants.reduce((sum, v) => sum + v.stockQuantity, 0) : update.stockQuantity;
+        transaction.update(byId.get(id)!.ref, { ...(update.variants ? { variants: update.variants } : {}), stockQuantity, inStock: stockQuantity > 0, updatedAt: FieldValue.serverTimestamp() });
+      }
       const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const shipping = SHIPPING_RATES[input.shippingMethod];
       transaction.set(orderReference, {

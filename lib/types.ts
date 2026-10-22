@@ -11,12 +11,21 @@ export interface ProductSpecifications {
   [key: string]: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string;
+  price: number;
+  stockQuantity: number;
+  image?: string;
+}
+
 export interface Product {
   id?: string;
   name: string;
   slug: string;
   description: string;
   features?: string;
+  variants?: ProductVariant[];
   category: string;
   price: number;
   originalPrice?: number;
@@ -53,6 +62,8 @@ export type PublicProduct = Product & {
 
 export type CartItem = PublicProduct & {
   quantity: number;
+  variantId?: string;
+  variantName?: string;
 };
 
 export interface ArticleAuthor {
@@ -148,6 +159,8 @@ export type PublicArticle = Article & {
 
 export interface OrderItem {
   product: string;
+  variantId?: string;
+  variantName?: string;
   name: string;
   price: number;
   quantity: number;

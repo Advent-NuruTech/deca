@@ -70,7 +70,7 @@ export default function CheckoutPage() {
     try {
       const order = await api.post<PublicOrder>("/api/orders", {
         customer: { name: formData.name, email: formData.email, phone: formData.phone, address: { ...formData.address, country: "Kenya" } },
-        items: items.map((item) => ({ product: item._id, quantity: item.quantity })),
+        items: items.map((item) => ({ product: item._id, variantId: item.variantId, quantity: item.quantity })),
         paymentMethod: formData.paymentMethod,
         shippingMethod: formData.shippingMethod,
         notes: formData.notes,

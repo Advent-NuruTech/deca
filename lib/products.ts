@@ -120,6 +120,23 @@ function keywordsField(input: Record<string, unknown>): string[] | undefined {
   return value.map((item) => (item as string).trim()).filter(Boolean);
 }
 
+function variantsField(input: Record<string, unknown>) {
+  if (input.variants === undefined) return undefined;
+  if (!Array.isArray(input.variants) || input.variants.length > 50) throw new HttpError(400, "At most 50 variants are allowed");
+  const variants = input.variants.map((value, index) => {
+    if (!isRecord(value)) throw new HttpError(400, `Variant ${index + 1} is invalid`);
+    const id = stringField(value, "id", { required: true, max: 100 })!;
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new HttpError(400, "Invalid variant ID");
+    const name = stringField(value, "name", { required: true, max: 100 })!;
+    const price = numberField(value, "price", { required: true, min: 0.01 })!;
+    const stockQuantity = numberField(value, "stockQuantity", { required: true, integer: true, min: 0 })!;
+    const image = optionalString(value, "image", 2000);
+    return { id, name, price, stockQuantity, ...(image ? { image } : {}) };
+  });
+  if (new Set(variants.map((v) => v.id)).size !== variants.length || new Set(variants.map((v) => v.name.toLowerCase())).size !== variants.length) throw new HttpError(400, "Variant names and IDs must be unique");
+  return variants;
+}
+
 export function validateProductBody(value: unknown, partial = false): Record<string, unknown> {
   if (!isRecord(value)) throw new HttpError(400, "A JSON product body is required");
 
@@ -139,11 +156,13 @@ export function validateProductBody(value: unknown, partial = false): Record<str
     if (next !== undefined) result[key] = next;
   };
 
+  const variants = variantsField(value);
+  assign("variants", variants);
   assign("name", name);
   assign("description", description);
   assign("features", richTextField(value, "features", { max: 10000 }));
   assign("category", typeof category === "string" ? category.trim() : category);
-  assign("price", numberField(value, "price", { required: !partial, min: 0.01 }));
+  assign("price", numberField(value, "price", { required: !partial && !variants?.length, min: 0.01 }));
   assign("originalPrice", numberField(value, "originalPrice", { min: 0 }));
   assign("images", imagesField(value));
   assign("inStock", booleanField(value, "inStock"));
@@ -169,6 +188,11 @@ export function validateProductBody(value: unknown, partial = false): Record<str
     result.harvestDate = value.harvestDate;
   }
 
+  if (variants?.length) {
+    result.price = Math.min(...variants.map((v) => v.price));
+    result.stockQuantity = variants.reduce((sum, v) => sum + v.stockQuantity, 0);
+    result.inStock = variants.some((v) => v.stockQuantity > 0);
+  }
   if (partial && Object.keys(result).length === 0) {
     throw new HttpError(400, "No supported product fields were provided");
   }

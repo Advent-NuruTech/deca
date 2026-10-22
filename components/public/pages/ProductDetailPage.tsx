@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
-import type { PublicProduct } from "@/lib/types";
+import type { PublicProduct, ProductVariant } from "@/lib/types";
 import { useCart } from "@/components/providers/CartProvider";
 import SEO from "@/components/public/SEO";
 import ProductGallery from "@/components/public/product/ProductGallery";
@@ -17,12 +17,14 @@ import { richTextToPlainText } from "@/lib/rich-text";
 export default function ProductDetailPage({ slug }: { slug: string }) {
   const [product, setProduct] = useState<PublicProduct | null>(null);
   const [loading, setLoading] = useState(true);
+  const [variantImage, setVariantImage] = useState("");
   const { addItem } = useCart();
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setProduct(null);
+    setVariantImage("");
     api
       .get<PublicProduct>(`/api/products/${encodeURIComponent(slug)}`)
       .then((response) => {
@@ -71,8 +73,8 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
     );
   }
 
-  const handleAddToCart = (quantity: number) => {
-    addItem(product, quantity);
+  const handleAddToCart = (quantity: number, variant?: ProductVariant) => {
+    addItem(product, quantity, variant);
     toast.success("Added to cart");
   };
 
@@ -97,15 +99,15 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
 
           <div className="grid lg:grid-cols-2 gap-12">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-              <ProductGallery images={product.images} name={product.name} />
+              <ProductGallery key={variantImage} images={variantImage ? [variantImage, ...product.images.filter((image) => image !== variantImage)] : product.images} name={product.name} />
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-              <ProductInfo product={product} onAddToCart={handleAddToCart} />
+              <ProductInfo product={product} onAddToCart={handleAddToCart} onVariantChange={(variant) => setVariantImage(variant.image ?? "")} />
             </motion.div>
           </div>
 
           <div className="mt-12">
-            <ProductSpecs specifications={product.specifications} brand={product.brand} model={product.model} />
+            <ProductSpecs specifications={product.specifications} model={product.model} />
           </div>
           <RelatedProducts category={product.category} currentProductId={product._id} />
         </div>

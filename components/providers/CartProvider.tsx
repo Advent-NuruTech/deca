@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CartItem, PublicProduct } from "@/lib/types";
+import type { CartItem, PublicProduct, ProductVariant } from "@/lib/types";
 
 const CART_STORAGE_KEY = "cart";
 
@@ -17,11 +17,13 @@ type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   total: number;
-  addItem: (product: PublicProduct, quantity?: number) => void;
+  addItem: (product: PublicProduct, quantity?: number, variant?: ProductVariant) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
 };
+
+export function cartItemKey(item: Pick<CartItem, "_id" | "variantId">) { return JSON.stringify([item._id, item.variantId ?? null]); }
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -66,13 +68,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (hydrated) window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [hydrated, items]);
 
-  const addItem = useCallback((product: PublicProduct, quantity = 1) => {
+  const addItem = useCallback((product: PublicProduct, quantity = 1, variant?: ProductVariant) => {
+    if (product.variants?.length && !variant) return;
     const safeQuantity = Math.max(1, Math.floor(quantity));
     setItems((current) => {
-      const existing = current.find((item) => item._id === product._id);
-      if (!existing) return [...current, { ...product, quantity: safeQuantity }];
+      const existing = current.find((item) => item._id === product._id && item.variantId === variant?.id);
+      if (!existing) return [...current, { ...product, ...(variant ? { variantId: variant.id, variantName: variant.name, price: variant.price, stockQuantity: variant.stockQuantity, images: variant.image ? [variant.image] : product.images } : {}), quantity: safeQuantity }];
       return current.map((item) =>
-        item._id === product._id
+        item._id === product._id && item.variantId === variant?.id
           ? { ...item, quantity: item.quantity + safeQuantity }
           : item,
       );
@@ -80,14 +83,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeItem = useCallback((productId: string) => {
-    setItems((current) => current.filter((item) => item._id !== productId));
+    setItems((current) => current.filter((item) => cartItemKey(item) !== productId));
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     const safeQuantity = Math.max(1, Math.floor(quantity));
     setItems((current) =>
       current.map((item) =>
-        item._id === productId ? { ...item, quantity: safeQuantity } : item,
+        cartItemKey(item) === productId ? { ...item, quantity: safeQuantity } : item,
       ),
     );
   }, []);

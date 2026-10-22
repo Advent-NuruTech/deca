@@ -30,7 +30,7 @@ export default function CartSummary({
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-gray-600">
             <span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</span>
-            <span className="text-gray-800 font-medium">$ {subtotal.toLocaleString()}</span>
+            <span className="text-gray-800 font-medium">KES {subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-gray-600">
             <span>Shipping</span>
@@ -39,7 +39,7 @@ export default function CartSummary({
           <div className="border-t border-gray-100 pt-4">
             <div className="flex justify-between text-lg">
               <span className="text-gray-800 font-semibold">Total</span>
-              <span className="text-2xl font-bold text-emerald-700">$ {subtotal.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-emerald-700">KES {subtotal.toLocaleString()}</span>
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ type ShippingMethod = keyof typeof SHIPPING_RATES;
 
 export type ValidatedOrderInput = {
   customer: OrderCustomer;
-  items: Array<{ product: string; quantity: number }>;
+  items: Array<{ product: string; quantity: number; variantId?: string }>;
   paymentMethod: (typeof PAYMENT_METHODS)[number];
   shippingMethod: ShippingMethod;
   notes?: string;
@@ -80,10 +80,11 @@ export function validateOrderBody(value: unknown): ValidatedOrderInput {
     if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > 999) {
       throw new HttpError(400, `items[${index}].quantity is invalid`);
     }
-    return { product, quantity };
+    const variantId = optionalString(item, "variantId", 100);
+    return { product, quantity, ...(variantId ? { variantId } : {}) };
   });
-  if (new Set(items.map((item) => item.product)).size !== items.length) {
-    throw new HttpError(400, "Each product may appear only once");
+  if (new Set(items.map((item) => JSON.stringify([item.product, item.variantId ?? null]))).size !== items.length) {
+    throw new HttpError(400, "Each product option may appear only once");
   }
 
   const paymentMethod = value.paymentMethod ?? "mpesa";

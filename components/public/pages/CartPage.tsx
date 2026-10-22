@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { useCart } from "@/components/providers/CartProvider";
+import { cartItemKey, useCart } from "@/components/providers/CartProvider";
 import SEO from "@/components/public/SEO";
 import CartItem from "@/components/public/cart/CartItem";
 import CartSummary from "@/components/public/cart/CartSummary";
@@ -52,7 +52,7 @@ export default function CartPage() {
                 <AnimatePresence mode="popLayout">
                   {items.map((item, index) => (
                     <CartItem
-                      key={item._id}
+                      key={cartItemKey(item)}
                       item={item}
                       index={index}
                       onRemove={handleRemoveItem}

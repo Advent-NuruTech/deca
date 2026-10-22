@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { cartItemKey } from "@/components/providers/CartProvider";
 import type { CartItem as CartItemType } from "@/lib/types";
 
 export default function CartItem({
@@ -46,7 +47,7 @@ export default function CartItem({
             >
               {item.name}
             </Link>
-            <p className="text-gray-500 text-sm mb-4 line-clamp-2">{item.description}</p>
+            {item.variantName && <p className="text-gray-600 text-sm mb-4">{item.variantName}</p>}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-500">Quantity:</span>
@@ -54,7 +55,7 @@ export default function CartItem({
                   <motion.button
                     type="button"
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => onQuantityChange(item._id, item.quantity - 1)}
+                    onClick={() => onQuantityChange(cartItemKey(item), item.quantity - 1)}
                     disabled={item.quantity <= 1}
                     aria-label={`Decrease ${item.name} quantity`}
                     className={`px-3 py-2 rounded-l-lg transition-colors ${
@@ -68,13 +69,13 @@ export default function CartItem({
                     min="1"
                     value={item.quantity}
                     aria-label={`${item.name} quantity`}
-                    onChange={(event) => onQuantityChange(item._id, Number.parseInt(event.target.value, 10) || 1)}
+                    onChange={(event) => onQuantityChange(cartItemKey(item), Number.parseInt(event.target.value, 10) || 1)}
                     className="w-16 text-center bg-transparent border-0 text-gray-800 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <motion.button
                     type="button"
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => onQuantityChange(item._id, item.quantity + 1)}
+                    onClick={() => onQuantityChange(cartItemKey(item), item.quantity + 1)}
                     aria-label={`Increase ${item.name} quantity`}
                     className="px-3 py-2 rounded-r-lg text-gray-600 hover:bg-gray-100 transition-colors"
                   >
@@ -83,8 +84,8 @@ export default function CartItem({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-emerald-700">$ {(item.price * item.quantity).toLocaleString()}</p>
-                {item.quantity > 1 && <p className="text-sm text-gray-500">$ {item.price.toLocaleString()} each</p>}
+                <p className="text-2xl font-bold text-emerald-700">KES {(item.price * item.quantity).toLocaleString()}</p>
+                {item.quantity > 1 && <p className="text-sm text-gray-500">KES {item.price.toLocaleString()} each</p>}
               </div>
             </div>
           </div>
@@ -93,7 +94,7 @@ export default function CartItem({
             type="button"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => onRemove(item._id, item.name)}
+            onClick={() => onRemove(cartItemKey(item), item.name)}
             className="absolute top-4 right-4 md:relative md:top-auto md:right-auto text-red-500 hover:text-red-600 transition-colors"
             title="Remove from cart"
           >

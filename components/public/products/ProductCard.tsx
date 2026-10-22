@@ -52,19 +52,19 @@ const ProductCard = ({ product, index }: { product: PublicProduct; index: number
             </h3>
           </Link>
           <p className="text-emerald-700 font-bold text-lg mt-1">
-            ${product.price}
+            {product.variants?.length ? "From " : ""}KES {product.price}
           </p>
           <p className="text-gray-500 text-sm line-clamp-2 mt-2">
             {richTextToPlainText(product.description)}
           </p>
           <div className="flex gap-2 mt-4">
-            <button
+            {product.variants?.length ? <Link href={`/products/${product.slug}`} className="flex-1 rounded-lg bg-emerald-600 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700">Choose an option</Link> : <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
               className="flex-1 inline-flex items-center justify-center gap-1 bg-emerald-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingCart size={14} /> Add to Cart
-            </button>
+            </button>}
             <Link
               href={`/products/${product.slug}`}
               className="inline-flex items-center justify-center p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition"
