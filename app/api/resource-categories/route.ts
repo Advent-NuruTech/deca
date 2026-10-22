@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
     const taxonomy = adminView
-      ? await getResourceTaxonomy({ initialize: true, includeDrafts: true })
+      ? await getResourceTaxonomy(request.nextUrl.searchParams.get("light") === "true"
+        ? { includeDrafts: true, includeCounts: false }
+        : { initialize: true, includeDrafts: true })
       : await getCachedNavigationTaxonomy();
     return NextResponse.json(
       taxonomy,

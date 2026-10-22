@@ -1,3 +1,4 @@
+import { FieldPath } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
@@ -26,6 +27,39 @@ export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
+    if (adminView && request.nextUrl.searchParams.get("paged") === "true") {
+      const taxonomy = await getResourceTaxonomy({ includeDrafts: true, includeCounts: false });
+      const categoryId = request.nextUrl.searchParams.get("categoryId") ?? "";
+      const publication = request.nextUrl.searchParams.get("publication") ?? "";
+      const search = (request.nextUrl.searchParams.get("search") ?? "").trim().toLowerCase();
+      const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 20));
+      let cursor = request.nextUrl.searchParams.get("cursor") ?? "";
+      const found: PublicArticle[] = [];
+      let exhausted = false;
+      while (found.length <= limit && !exhausted) {
+        let query = firestore().collection("articles").orderBy(FieldPath.documentId()).limit(50);
+        if (cursor) query = query.startAfter(cursor);
+        const snapshot = await query.get();
+        exhausted = snapshot.size < 50;
+        for (const document of snapshot.docs) {
+          cursor = document.id;
+          const article = { ...serializeArticle(document), ...resolveArticleAssignment(document.data(), taxonomy) };
+          if (categoryId && article.majorCategoryId !== categoryId && article.subcategoryId !== categoryId) continue;
+          if (publication && article.published !== (publication === "published")) continue;
+          if (search && !`${article.title ?? ""} ${article.excerpt ?? ""} ${(article.tags ?? []).join(" ")}`.toLowerCase().includes(search)) continue;
+          found.push(article);
+          if (found.length > limit) break;
+        }
+      }
+      const articles = found.slice(0, limit);
+      const collection = firestore().collection("articles");
+      const [totalCount, publishedCount, documentCount] = await Promise.all([
+        collection.count().get(), collection.where("published", "==", true).count().get(),
+        collection.where("isDownloadable", "==", true).count().get(),
+      ]);
+      const total = totalCount.data().count;
+      return NextResponse.json({ articles, hasMore: found.length > limit, nextCursor: articles.at(-1)?.id ?? "", stats: { total, published: publishedCount.data().count, drafts: total - publishedCount.data().count, documents: documentCount.data().count } });
+    }
     const category = request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ?? "";
     const requestedMajor = request.nextUrl.searchParams.get("majorCategoryId")?.trim() ?? request.nextUrl.searchParams.get("major")?.trim() ?? "";
     const requestedSubcategory = request.nextUrl.searchParams.get("subcategoryId")?.trim() ?? "";

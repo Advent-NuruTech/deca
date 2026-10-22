@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, Download, Edit3, Eye, FileText, FolderPlus, ImagePlus, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { AlertCircle, Download, Edit3, Eye, FileText, FolderPlus, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import type { PublicArticle, ResourceMajorCategory, ResourceSubcategory, ResourceTaxonomy } from "@/lib/types";
@@ -29,7 +29,12 @@ export default function ArticleManager() {
   const searchParams = useSearchParams();
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
+  const [cursors, setCursors] = useState<string[]>([""]);
+  const [hasMore, setHasMore] = useState(false);
+  const [stats, setStats] = useState<{ total: number; published: number; drafts: number; documents: number } | null>(null);
+  const [reloadVersion, setReloadVersion] = useState(0);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -37,6 +42,7 @@ export default function ArticleManager() {
   const [resourcePage, setResourcePage] = useState(1);
   const [editing, setEditing] = useState<PublicArticle | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState<{ kind: "major" | "subcategory"; parentId?: string } | null>(null);
   const [form, setForm] = useState<ArticleForm>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -45,25 +51,37 @@ export default function ArticleManager() {
   const [newDocumentKey, setNewDocumentKey] = useState("");
 
   const load = useCallback(async () => {
-    setLoading(true); setError("");
     try {
-      const response = await api.get<{ articles: PublicArticle[]; resourceCategories: ResourceTaxonomy }>("/api/articles?scope=admin&all=true");
-      setArticles(response.articles ?? []); setTaxonomy(response.resourceCategories ?? { majors: [], subcategories: [] });
-    } catch (nextError) { setError(errorMessage(nextError, "Resources could not be loaded")); }
-    finally { setLoading(false); }
+      const response = await api.get<ResourceTaxonomy>("/api/resource-categories?scope=admin&light=true");
+      setTaxonomy(response);
+      setError("");
+      setReloadVersion((value) => value + 1);
+    } catch (nextError) { setError(errorMessage(nextError, "Categories could not be loaded")); }
   }, []);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { setCategory(searchParams.get("category") ?? ""); if (searchParams.get("action") === "new") openNew(); }, [searchParams]);
-
-  const filtered = useMemo(() => articles.filter((article) => {
-    const text = `${article.title} ${article.excerpt} ${(article.tags ?? []).join(" ")}`.toLowerCase();
-    return (!query || text.includes(query.toLowerCase())) && (!category || article.majorCategoryId === category || article.subcategoryId === category) && (!publication || (publication === "published") === article.published);
-  }), [articles, category, publication, query]);
-  const resourcePages = Math.max(1, Math.ceil(filtered.length / 20));
-  const currentResourcePage = Math.min(resourcePage, resourcePages);
-  const visibleArticles = filtered.slice((currentResourcePage - 1) * 20, currentResourcePage * 20);
-  useEffect(() => { setResourcePage(1); }, [query, category, publication]);
-  useEffect(() => { setResourcePage((page) => Math.min(page, resourcePages)); }, [resourcePages]);
+  useEffect(() => { setResourcePage(1); setCursors([""]); }, [query, category, publication]);
+  useEffect(() => {
+    if (!listOpen) return;
+    let active = true;
+    setLoading(true);
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({ scope: "admin", paged: "true", limit: "20", cursor: cursors[resourcePage - 1] ?? "", categoryId: category, publication, search: query });
+      api.get<{ articles: PublicArticle[]; hasMore: boolean; nextCursor: string; stats: { total: number; published: number; drafts: number; documents: number } }>(`/api/articles?${params}`)
+        .then((response) => {
+          if (!active) return;
+          setArticles(response.articles);
+          setHasMore(response.hasMore);
+          setStats(response.stats);
+          setCursors((current) => [...current.slice(0, resourcePage), response.nextCursor]);
+          setError("");
+        })
+        .catch((nextError) => { if (active) setError(errorMessage(nextError, "Resources could not be loaded")); })
+        .finally(() => { if (active) setLoading(false); });
+    }, query ? 350 : 0);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [listOpen, resourcePage, cursors[resourcePage - 1], category, publication, query, reloadVersion]);
+  const visibleArticles = loading ? [] : articles;
   const setField = <K extends keyof ArticleForm>(key: K, value: ArticleForm[K]) => setForm((current) => ({ ...current, [key]: value }));
   const categoryName = (article: PublicArticle) => {
     const major = taxonomy.majors.find((item) => item.id === article.majorCategoryId)?.name ?? "Uncategorized";
@@ -115,12 +133,16 @@ export default function ArticleManager() {
     catch (nextError) { toast.error(errorMessage(nextError, "Resource could not be deleted")); }
   }
 
-  async function addCategory(kind: "major" | "subcategory", parentId?: string) { const name = window.prompt(kind === "major" ? "Name the new major resource category" : "Name the new subcategory")?.trim(); if (!name) return; try { await api.post("/api/resource-categories", { kind, name, parentId }); toast.success("Category added"); await load(); } catch (nextError) { toast.error(errorMessage(nextError, "Category could not be added")); } }
+  async function addCategory(kind: "major" | "subcategory", parentId?: string) { setNewCategory({ kind, parentId }); }
   async function renameCategory(item: CategoryItem) { const name = window.prompt("Edit category name", item.name)?.trim(); if (!name || name === item.name) return; try { await api.put(`/api/resource-categories/${item.id}`, { name }); toast.success("Category renamed"); await load(); } catch (nextError) { toast.error(errorMessage(nextError, "Category could not be renamed")); } }
   async function moveSubcategory(item: ResourceSubcategory, parentId: string) { if (parentId === item.parentId) return; try { await api.put(`/api/resource-categories/${item.id}`, { parentId }); toast.success("Subcategory and its resources moved"); await load(); } catch (nextError) { toast.error(errorMessage(nextError, "Subcategory could not be moved")); } }
   async function deleteCategory(item: CategoryItem) {
     const candidates = item.kind === "major" ? taxonomy.majors.filter((candidate) => candidate.id !== item.id) : taxonomy.subcategories.filter((candidate) => candidate.id !== item.id);
-    const inUse = item.count > 0 || (item.kind === "major" && taxonomy.subcategories.some((sub) => sub.parentId === item.id)); let replacementId = "";
+    let currentTaxonomy: ResourceTaxonomy;
+    try { currentTaxonomy = await api.get<ResourceTaxonomy>("/api/resource-categories?scope=admin"); }
+    catch (nextError) { toast.error(errorMessage(nextError, "Category usage could not be checked")); return; }
+    const currentItem = [...currentTaxonomy.majors, ...currentTaxonomy.subcategories].find((candidate) => candidate.id === item.id);
+    const inUse = (currentItem?.count ?? 0) > 0 || (item.kind === "major" && currentTaxonomy.subcategories.some((sub) => sub.parentId === item.id)); let replacementId = "";
     if (inUse) { const name = window.prompt(`“${item.name}” is in use. Type the exact destination name to move everything before deletion:\n\n${candidates.map((candidate) => candidate.name).join(", ")}`)?.trim(); if (!name) return; replacementId = candidates.find((candidate) => candidate.name.toLowerCase() === name.toLowerCase())?.id ?? ""; if (!replacementId) return void toast.error("That destination category was not found"); }
     else if (!window.confirm(`Delete “${item.name}”?`)) return;
     try { await api.delete(`/api/resource-categories/${item.id}`, { replacementId }); toast.success("Category deleted without orphaning resources"); setCategory(""); await load(); } catch (nextError) { toast.error(errorMessage(nextError, "Category could not be deleted")); }
@@ -128,18 +150,58 @@ export default function ArticleManager() {
 
   return <main className="pb-16 pt-10"><div className="container mx-auto px-4">
     <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><h1 className="text-4xl font-bold text-emerald-700">Resource Management</h1><p className="mt-2 text-gray-600">Manage resources, documents, and the editable category structure.</p></div><button onClick={openNew} className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white shadow hover:bg-emerald-700"><Plus size={20} /> Add Resource</button></div>
-    <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4"><MiniStat label="Total resources" value={articles.length} icon={<FileText />} /><MiniStat label="Published" value={articles.filter((item) => item.published).length} icon={<Eye />} /><MiniStat label="Drafts" value={articles.filter((item) => !item.published).length} icon={<Edit3 />} /><MiniStat label="Documents" value={articles.filter((item) => item.isDownloadable).length} icon={<Download />} /></div>
     <CategoryManager taxonomy={taxonomy} selected={category} onSelect={setCategory} onAdd={addCategory} onRename={renameCategory} onMove={moveSubcategory} onDelete={deleteCategory} />
     {error && <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"><AlertCircle className="mr-2 inline" size={18} />{error} <button onClick={() => void load()} className="ml-2 font-semibold underline">Retry</button></div>}
-    <section className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"><div className="flex flex-col gap-3 border-b border-gray-100 p-5 lg:flex-row"><label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search resources…" className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><CategorySelect taxonomy={taxonomy} value={category} onChange={setCategory} /><select value={publication} onChange={(event) => setPublication(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All publication states</option><option value="published">Published</option><option value="draft">Draft</option></select></div>
-      <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left"><thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500"><tr><th className="px-5 py-3">Resource</th><th className="px-5 py-3">Category</th><th className="px-5 py-3">State</th><th className="px-5 py-3">Views</th><th className="px-5 py-3">Updated</th><th className="px-5 py-3 text-right">Actions</th></tr></thead><tbody className="divide-y divide-gray-100">{visibleArticles.map((article) => <tr key={article.id} className="hover:bg-gray-50"><td className="px-5 py-4"><div className="flex items-center gap-3">{article.featuredImage ? <img src={article.featuredImage} alt="" className="h-12 w-16 rounded-lg object-cover" /> : <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-gray-100 text-gray-400"><FileText /></div>}<div className="min-w-0"><p className="max-w-md truncate font-semibold text-gray-900">{article.title}</p><p className="max-w-md truncate text-sm text-gray-500">{article.excerpt}</p></div></div></td><td className="px-5 py-4 text-gray-600">{categoryName(article)}</td><td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${article.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{article.published ? "Published" : "Draft"}</span>{article.isDownloadable && <span className="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-700">File</span>}</td><td className="px-5 py-4">{article.views ?? 0}</td><td className="px-5 py-4 text-sm text-gray-500">{formatDate(article.updatedAt)}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button onClick={() => void openEdit(article)} className="rounded-lg p-2 text-blue-600 hover:bg-blue-50" aria-label={`Edit ${article.title}`}><Edit3 size={18} /></button><button onClick={() => void remove(article)} className="rounded-lg p-2 text-red-600 hover:bg-red-50" aria-label={`Delete ${article.title}`}><Trash2 size={18} /></button></div></td></tr>)}</tbody></table></div>{loading && <p className="p-10 text-center text-gray-500">Loading resources…</p>}{!loading && !filtered.length && <p className="p-10 text-center text-gray-500">No resources match your filters.</p>}{!loading && filtered.length > 0 && <Pagination label="resources" page={currentResourcePage} pages={resourcePages} total={filtered.length} pageSize={20} onPage={setResourcePage} />}
+    <section className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3 p-5"><div><h2 className="text-lg font-bold">Resources</h2><p className="mt-1 text-sm text-gray-500">View and manage resources in pages.</p></div><button type="button" aria-expanded={listOpen} aria-controls="resource-list" onClick={() => setListOpen((open) => !open)} className="rounded-lg border border-emerald-600 px-4 py-2 font-semibold text-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">{listOpen ? "Hide resources" : "View resources"}</button></div>{listOpen && <div id="resource-list">{stats && <div className="grid grid-cols-2 gap-3 border-t border-gray-100 p-5 lg:grid-cols-4"><MiniStat label="Total resources" value={stats.total} icon={<FileText />} /><MiniStat label="Published" value={stats.published} icon={<Eye />} /><MiniStat label="Drafts" value={stats.drafts} icon={<Edit3 />} /><MiniStat label="Documents" value={stats.documents} icon={<Download />} /></div>}<div className="flex flex-col gap-3 border-t border-b border-gray-100 p-5 lg:flex-row"><label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input aria-label="Search resources" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search resources…" className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><CategorySelect taxonomy={taxonomy} value={category} onChange={setCategory} /><select aria-label="Publication state" value={publication} onChange={(event) => setPublication(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All publication states</option><option value="published">Published</option><option value="draft">Draft</option></select></div>
+      <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left"><thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500"><tr><th className="px-5 py-3">Resource</th><th className="px-5 py-3">Category</th><th className="px-5 py-3">State</th><th className="px-5 py-3">Views</th><th className="px-5 py-3">Updated</th><th className="px-5 py-3 text-right">Actions</th></tr></thead><tbody className="divide-y divide-gray-100">{visibleArticles.map((article) => <tr key={article.id} className="hover:bg-gray-50"><td className="px-5 py-4"><div className="flex items-center gap-3">{article.featuredImage ? <img src={article.featuredImage} alt="" className="h-12 w-16 rounded-lg object-cover" /> : <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-gray-100 text-gray-400"><FileText /></div>}<div className="min-w-0"><p className="max-w-md truncate font-semibold text-gray-900">{article.title}</p><p className="max-w-md truncate text-sm text-gray-500">{article.excerpt}</p></div></div></td><td className="px-5 py-4 text-gray-600">{categoryName(article)}</td><td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${article.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{article.published ? "Published" : "Draft"}</span>{article.isDownloadable && <span className="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-700">File</span>}</td><td className="px-5 py-4">{article.views ?? 0}</td><td className="px-5 py-4 text-sm text-gray-500">{formatDate(article.updatedAt)}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button onClick={() => void openEdit(article)} className="rounded-lg p-2 text-blue-600 hover:bg-blue-50" aria-label={`Edit ${article.title}`}><Edit3 size={18} /></button><button onClick={() => void remove(article)} className="rounded-lg p-2 text-red-600 hover:bg-red-50" aria-label={`Delete ${article.title}`}><Trash2 size={18} /></button></div></td></tr>)}</tbody></table></div>{loading && <p className="p-10 text-center text-gray-500">Loading resources…</p>}{!loading && !error && !visibleArticles.length && <p className="p-10 text-center text-gray-500">No resources match your filters.</p>}{!loading && (visibleArticles.length > 0 || resourcePage > 1) && <nav aria-label="Resource pages" className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-4 text-sm text-gray-600"><span aria-live="polite">Page {resourcePage}</span><div className="flex gap-2"><button type="button" disabled={resourcePage <= 1} onClick={() => setResourcePage((page) => page - 1)} className="rounded-lg border px-3 py-2 font-medium disabled:opacity-40">Previous</button><button type="button" disabled={!hasMore} onClick={() => setResourcePage((page) => page + 1)} className="rounded-lg border px-3 py-2 font-medium disabled:opacity-40">Next</button></div></nav>}</div>}
     </section>
   </div>
+  {newCategory && <CategoryDialog category={newCategory} parentName={taxonomy.majors.find((item) => item.id === newCategory.parentId)?.name} onClose={() => setNewCategory(null)} onCreated={load} />}
   <AnimatePresence>{modalOpen && <ResourceModal form={form} taxonomy={taxonomy} editing={Boolean(editing)} saving={saving} uploadingImage={uploadingImage} uploadingDocument={uploadingDocument} setField={setField} setForm={setForm} onSubmit={submit} onClose={closeModal} onUploadImage={uploadImage} onUploadDocument={uploadDocument} onClearImage={clearImage} onClearDocument={clearDocument} />}</AnimatePresence>
   </main>;
 }
 
-function CategorySelect({ taxonomy, value, onChange }: { taxonomy: ResourceTaxonomy; value: string; onChange: (value: string) => void }) { return <select value={value} onChange={(event) => onChange(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All categories</option>{taxonomy.majors.map((major) => <optgroup key={major.id} label={major.name}><option value={major.id}>All in {major.name} ({major.count})</option>{taxonomy.subcategories.filter((item) => item.parentId === major.id).map((item) => <option key={item.id} value={item.id}>{item.name} ({item.count})</option>)}</optgroup>)}</select>; }
+function CategoryDialog({ category, parentName, onClose, onCreated }: { category: { kind: "major" | "subcategory"; parentId?: string }; parentName?: string; onClose: () => void; onCreated: () => Promise<void> }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const isSubcategory = category.kind === "subcategory";
+
+  useEffect(() => {
+    const element = dialog.current;
+    if (element && !element.open) element.showModal();
+  }, []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = name.trim();
+    if (!trimmed) { setError("Enter a category name."); return; }
+    setSaving(true);
+    setError("");
+    try {
+      await api.post("/api/resource-categories", { kind: category.kind, parentId: category.parentId, name: trimmed });
+      toast.success(isSubcategory ? "Subcategory added" : "Category added");
+      dialog.current?.close();
+      await onCreated();
+    } catch (reason) {
+      setError(errorMessage(reason, "Category could not be added"));
+    } finally { setSaving(false); }
+  }
+
+  return <dialog ref={dialog} aria-labelledby="category-dialog-title" aria-describedby="category-dialog-description" onCancel={(event) => { if (saving) event.preventDefault(); }} onClose={onClose} className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-2xl backdrop:bg-gray-950/60">
+    <form onSubmit={submit}>
+      <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-5 sm:p-6">
+        <div><div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><FolderPlus size={20} aria-hidden="true" /></div><h2 id="category-dialog-title" className="text-xl font-bold">{isSubcategory ? "Add subcategory" : "Add major category"}</h2><p id="category-dialog-description" className="mt-1 text-sm text-gray-600">{isSubcategory ? <>Add a subcategory under <strong>{parentName ?? "the selected category"}</strong>.</> : "Create a category to organize your resources."}</p></div>
+        <button type="button" disabled={saving} onClick={() => dialog.current?.close()} aria-label="Close dialog" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:opacity-50"><X size={20} /></button>
+      </div>
+      <div className="p-5 sm:p-6"><label htmlFor="new-category-name" className="mb-2 block text-sm font-semibold">{isSubcategory ? "Subcategory name" : "Category name"}</label><input id="new-category-name" autoFocus required maxLength={100} value={name} onChange={(event) => { setName(event.target.value); setError(""); }} placeholder={isSubcategory ? "e.g. Family devotionals" : "e.g. Articles and blogs"} aria-invalid={Boolean(error)} aria-describedby={error ? "category-dialog-error" : undefined} disabled={saving} className="input-field" />{error && <p id="category-dialog-error" role="alert" className="mt-2 text-sm text-red-700">{error}</p>}</div>
+      <div className="flex flex-col-reverse gap-3 border-t border-gray-100 p-5 sm:flex-row sm:justify-end sm:px-6"><button type="button" disabled={saving} onClick={() => dialog.current?.close()} className="rounded-lg border border-gray-300 px-4 py-2.5 font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:opacity-50">Cancel</button><button type="submit" disabled={saving} className="rounded-lg bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:opacity-50">{saving ? "Adding?" : isSubcategory ? "Add subcategory" : "Add category"}</button></div>
+    </form>
+  </dialog>;
+}
+
+function CategorySelect({ taxonomy, value, onChange }: { taxonomy: ResourceTaxonomy; value: string; onChange: (value: string) => void }) { return <select aria-label="Resource category" value={value} onChange={(event) => onChange(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All categories</option>{taxonomy.majors.map((major) => <optgroup key={major.id} label={major.name}><option value={major.id}>All in {major.name}</option>{taxonomy.subcategories.filter((item) => item.parentId === major.id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</optgroup>)}</select>; }
 
 function CategoryManager({ taxonomy, selected, onSelect, onAdd, onRename, onMove, onDelete }: { taxonomy: ResourceTaxonomy; selected: string; onSelect: (id: string) => void; onAdd: (kind: "major" | "subcategory", parentId?: string) => Promise<void>; onRename: (item: CategoryItem) => Promise<void>; onMove: (item: ResourceSubcategory, parentId: string) => Promise<void>; onDelete: (item: CategoryItem) => Promise<void> }) {
   const [query, setQuery] = useState("");
@@ -164,8 +226,8 @@ function CategoryGroup({ major, subcategories, taxonomy, term, selected, onSelec
   useEffect(() => { setPage(1); }, [term]);
   useEffect(() => { setPage((current) => Math.min(current, pages)); }, [pages]);
   return <div className={`min-w-0 rounded-xl border p-4 ${selected === major.id ? "border-emerald-400 bg-emerald-50" : "border-gray-200"}`}>
-    <div className="flex items-center gap-2"><button onClick={() => onSelect(selected === major.id ? "" : major.id)} className="min-w-0 flex-1 text-left font-bold">{major.name} <span className="text-sm font-normal text-gray-500">({major.count})</span></button><IconButton label={`Rename ${major.name}`} onClick={() => void onRename(major)} icon={<Edit3 size={16} />} /><IconButton danger label={`Delete ${major.name}`} onClick={() => void onDelete(major)} icon={<Trash2 size={16} />} /></div>
-    <div className="mt-3 space-y-2">{subcategories.slice((currentPage - 1) * 10, currentPage * 10).map((sub) => <div key={sub.id} className={`flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ${selected === sub.id ? "bg-emerald-50 ring-1 ring-emerald-300" : "bg-gray-50"}`}><button onClick={() => onSelect(selected === sub.id ? "" : sub.id)} className="min-w-[110px] flex-1 text-left text-sm font-medium">{sub.name} <span className="font-normal text-gray-500">({sub.count})</span></button><select aria-label={`Move ${sub.name}`} value={sub.parentId} onChange={(event) => void onMove(sub, event.target.value)} className="max-w-40 rounded border bg-white px-2 py-1 text-xs">{taxonomy.majors.map((destination) => <option key={destination.id} value={destination.id}>{destination.name}</option>)}</select><IconButton label={`Rename ${sub.name}`} onClick={() => void onRename(sub)} icon={<Edit3 size={15} />} /><IconButton danger label={`Delete ${sub.name}`} onClick={() => void onDelete(sub)} icon={<Trash2 size={15} />} /></div>)}</div>
+    <div className="flex items-center gap-2"><button onClick={() => onSelect(selected === major.id ? "" : major.id)} className="min-w-0 flex-1 text-left font-bold">{major.name}</button><IconButton label={`Rename ${major.name}`} onClick={() => void onRename(major)} icon={<Edit3 size={16} />} /><IconButton danger label={`Delete ${major.name}`} onClick={() => void onDelete(major)} icon={<Trash2 size={16} />} /></div>
+    <div className="mt-3 space-y-2">{subcategories.slice((currentPage - 1) * 10, currentPage * 10).map((sub) => <div key={sub.id} className={`flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ${selected === sub.id ? "bg-emerald-50 ring-1 ring-emerald-300" : "bg-gray-50"}`}><button onClick={() => onSelect(selected === sub.id ? "" : sub.id)} className="min-w-[110px] flex-1 text-left text-sm font-medium">{sub.name}</button><select aria-label={`Move ${sub.name}`} value={sub.parentId} onChange={(event) => void onMove(sub, event.target.value)} className="max-w-40 rounded border bg-white px-2 py-1 text-xs">{taxonomy.majors.map((destination) => <option key={destination.id} value={destination.id}>{destination.name}</option>)}</select><IconButton label={`Rename ${sub.name}`} onClick={() => void onRename(sub)} icon={<Edit3 size={15} />} /><IconButton danger label={`Delete ${sub.name}`} onClick={() => void onDelete(sub)} icon={<Trash2 size={15} />} /></div>)}</div>
     {!subcategories.length && <p className="mt-3 text-sm text-gray-500">{term ? "No matching subcategories." : "No subcategories yet."}</p>}
     {subcategories.length > 0 && <Pagination label={`subcategories in ${major.name}`} page={currentPage} pages={pages} total={subcategories.length} pageSize={10} onPage={setPage} />}
     <button onClick={() => void onAdd("subcategory", major.id)} className="mt-3 flex items-center gap-1 rounded text-sm font-semibold text-emerald-700"><Plus size={15} /> Add subcategory</button>
@@ -182,7 +244,7 @@ function ResourceModal({ form, taxonomy, editing, saving, uploadingImage, upload
 
 function UploadSection({ title, busy, accept, label, onChange, children }: { title: string; busy: boolean; accept: string; label: string; onChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>; children: ReactNode }) { return <Section title={title}><label className="flex cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed p-6"><Upload className="text-gray-400" /><span>{busy ? "Uploading…" : label}</span><input type="file" accept={accept} onChange={onChange} disabled={busy} className="hidden" /></label>{children}</Section>; }
 function IconButton({ label, onClick, icon, danger }: { label: string; onClick: () => void; icon: ReactNode; danger?: boolean }) { return <button onClick={onClick} aria-label={label} className={`rounded p-1.5 ${danger ? "text-red-600 hover:bg-red-50" : "text-blue-600 hover:bg-blue-50"}`}>{icon}</button>; }
-function MiniStat({ label, value, icon }: { label: string; value: number; icon: ReactNode }) { return <div className="flex items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white p-3 shadow-sm sm:p-5"><div className="min-w-0"><p className="text-sm text-gray-500">{label}</p><p className="mt-1 break-words text-xl font-bold sm:text-2xl">{value}</p></div><div className="shrink-0 rounded-lg bg-blue-100 p-2 text-blue-700 sm:p-3">{icon}</div></div>; }
+function MiniStat({ label, value, icon }: { label: string; value: number; icon: ReactNode }) { return <div className="flex items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white p-3"><div><p className="text-sm text-gray-500">{label}</p><p className="mt-1 text-xl font-bold">{value}</p></div><div className="rounded-lg bg-blue-100 p-2 text-blue-700">{icon}</div></div>; }
 function Section({ title, children }: { title: string; children: ReactNode }) { return <section><h3 className="mb-4 border-b pb-2 text-lg font-bold">{title}</h3>{children}</section>; }
 function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) { return <label className={wide ? "md:col-span-2" : ""}><span className="mb-1.5 block text-sm font-medium">{label}</span>{children}</label>; }
 function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) { return <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />{label}</label>; }
