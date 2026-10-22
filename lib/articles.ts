@@ -72,6 +72,7 @@ export function validateArticleBody(value: unknown, partial = false): ValidatedA
   };
 
   assign("title", title);
+  assign("authorId", stringField(value, "authorId", { max: 128, allowEmpty: true }));
   assign("excerpt", excerpt);
   assign("featuredImage", optionalString(value, "featuredImage", 2000));
   assign("category", typeof category === "string" ? category.trim().toLowerCase() : undefined);

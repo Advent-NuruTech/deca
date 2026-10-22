@@ -50,7 +50,15 @@ export type CartItem = PublicProduct & {
 export interface ArticleAuthor {
   uid: string;
   name: string;
-  email: string;
+  email?: string;
+  bio?: string;
+  managed?: boolean;
+}
+
+export interface AuthorProfile {
+  id: string;
+  name: string;
+  bio: string;
 }
 
 export interface StudyCategoryOption {

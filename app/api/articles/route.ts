@@ -12,6 +12,7 @@ import {
   validateArticleBody,
 } from "@/lib/articles";
 import { firestore } from "@/lib/firestore";
+import { selectedAuthor } from "@/lib/authors";
 import { PUBLIC_ARTICLES_TAG, PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
 import {
   beginD1ReadModelUpdate,
@@ -148,13 +149,17 @@ export async function POST(request: NextRequest) {
     await validateResourceAssignment(metadata);
     const slug = articleSlug(metadata.title as string);
     await assertUniqueArticleSlug(slug);
+    const author = await selectedAuthor(metadata.authorId, admin);
+    delete metadata.authorId;
     const syncD1 = await beginD1ReadModelUpdate("articles");
 
     const reference = firestore().collection("articles").doc();
-    const author = { uid: admin.uid, name: admin.name, email: admin.email };
 
     try {
-      await reference.set(createArticleMetadata({ ...metadata, slug, author }));
+      await firestore().runTransaction(async (transaction) => {
+        if (author.managed && !(await transaction.get(firestore().collection("authors").doc(author.uid))).exists) throw new HttpError(400, "The selected author no longer exists. Choose another author.");
+        transaction.set(reference, createArticleMetadata({ ...metadata, slug, author }));
+      });
       await saveArticleContent(reference.id, content ?? "");
       const created = await reference.get();
       if (syncD1) {

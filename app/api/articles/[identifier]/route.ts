@@ -19,6 +19,7 @@ import {
   syncD1ArticleDocument,
 } from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
+import { selectedAuthor } from "@/lib/authors";
 import { getCachedPublishedArticleBySlug } from "@/lib/public-content";
 import { deleteImage, publicIdFromManagedUrl } from "@/lib/cloudinary";
 import { deleteFromR2 } from "@/lib/r2";
@@ -73,7 +74,7 @@ export async function PUT(
   { params }: { params: Promise<{ identifier: string }> },
 ) {
   try {
-    await requireAdmin(request);
+    const admin = await requireAdmin(request);
     const { identifier } = await params;
     const reference = firestore().collection("articles").doc(identifier);
     const existing = await reference.get();
@@ -87,6 +88,7 @@ export async function PUT(
     }
     const { content, metadata } = validateArticleBody(body, true);
     const input = body as Record<string, unknown>;
+    if ("authorId" in metadata) { metadata.author = await selectedAuthor(metadata.authorId, admin); delete metadata.authorId; }
     for (const key of ["featuredImage", "studyCategory", "seoTitle", "seoDescription"] as const) {
       if (key in input && (input[key] === "" || input[key] === null)) metadata[key] = FieldValue.delete();
     }
@@ -115,7 +117,11 @@ export async function PUT(
 
     try {
       if (content !== undefined) await saveArticleContent(identifier, content);
-      await reference.update(updateArticleMetadata(metadata, existingData.published === true));
+      await firestore().runTransaction(async (transaction) => {
+        const author = metadata.author as { uid: string; managed?: boolean } | undefined;
+        if (author?.managed && !(await transaction.get(firestore().collection("authors").doc(author.uid))).exists) throw new HttpError(400, "The selected author no longer exists. Choose another author.");
+        transaction.update(reference, updateArticleMetadata(metadata, existingData.published === true));
+      });
       const updated = await reference.get();
       if (syncD1) {
         await syncD1ArticleDocument(updated);

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { unstable_cache } from "next/cache";
+import { listAuthors, resolveAuthors } from "@/lib/authors";
 import { serializeArticle } from "@/lib/articles";
 import { PUBLIC_ARTICLES_TAG, PUBLIC_PRODUCTS_TAG, RESOURCE_TAXONOMY_TAG } from "@/lib/cache-tags";
 import {
@@ -51,14 +52,24 @@ async function readPublishedArticlesFromFirestore(): Promise<PublicArticleDatase
   return { articles, resourceCategories };
 }
 
+async function hydrateAuthors(articles: PublicArticle[]): Promise<PublicArticle[]> {
+  if (!articles.some((article) => article.author?.managed)) return articles;
+  try { return resolveAuthors(articles, await listAuthors()); }
+  catch (error) {
+    console.warn("Using saved author details because profiles are unavailable.", error);
+    return articles;
+  }
+}
+
 async function readPublishedArticles(): Promise<PublicArticleDataset> {
   try {
     if (!(await isD1ReadModelReady("articles"))) throw new Error("D1 article read model is not ready");
     const [articles, taxonomy] = await Promise.all([readD1Articles(), getCachedNavigationTaxonomy()]);
-    return taxonomyWithCounts(taxonomy, articles);
+    return taxonomyWithCounts(taxonomy, await hydrateAuthors(articles));
   } catch (error) {
     console.warn("Using cached Firestore article fallback because D1 is unavailable or not ready.", error);
-    return readPublishedArticlesFromFirestore();
+    const dataset = await readPublishedArticlesFromFirestore();
+    return { ...dataset, articles: await hydrateAuthors(dataset.articles) };
   }
 }
 
@@ -107,14 +118,14 @@ export const getCachedPublishedArticleBySlug = unstable_cache(
       if (!(await isD1ReadModelReady("articles"))) throw new Error("D1 article read model is not ready");
       const [article, taxonomy] = await Promise.all([readD1ArticleBySlug(slug), getCachedNavigationTaxonomy()]);
       if (!article) return null;
-      return taxonomyWithCounts(taxonomy, [article]).articles[0];
+      return (await hydrateAuthors(taxonomyWithCounts(taxonomy, [article]).articles))[0];
     } catch (error) {
       console.warn("Using Firestore article-detail fallback because D1 is unavailable or not ready.", error);
       const snapshot = await firestore().collection("articles").where("slug", "==", slug).limit(1).get();
       const document = snapshot.docs[0];
       if (!document || document.data().published !== true) return null;
       const taxonomy = await getCachedNavigationTaxonomy();
-      return { ...serializeArticle(document), ...resolveArticleAssignment(document.data(), taxonomy) };
+      return (await hydrateAuthors([{ ...serializeArticle(document), ...resolveArticleAssignment(document.data(), taxonomy) }]))[0];
     }
   },
   ["published-article-by-slug-v1"],

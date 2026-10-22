@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
+import { sanitizeRichText } from "@/lib/rich-text";
 import { getPublicTaxonomy } from "@/lib/public-settings-client";
 
 export default function ArticleSidebar({ article }: { article: PublicArticle }) {
@@ -24,12 +25,10 @@ export default function ArticleSidebar({ article }: { article: PublicArticle }) 
           </div>
           <div>
             <p className="font-medium text-gray-900">{article.author?.name || "Admin"}</p>
-            <p className="text-sm text-gray-500">Ministry Contributor</p>
+
           </div>
         </div>
-        <p className="text-gray-600 text-sm">
-          Sharing faith, family, and farming insights to encourage and equip others.
-        </p>
+        {article.author?.bio && <div className="prose prose-sm max-w-none break-words text-gray-600" dangerouslySetInnerHTML={{ __html: sanitizeRichText(article.author.bio) }} />}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-6">
