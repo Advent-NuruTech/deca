@@ -12,6 +12,7 @@ import ProductGallery from "@/components/public/product/ProductGallery";
 import ProductInfo from "@/components/public/product/ProductInfo";
 import ProductSpecs from "@/components/public/product/ProductSpecs";
 import RelatedProducts from "@/components/public/product/RelatedProducts";
+import { richTextToPlainText } from "@/lib/rich-text";
 
 export default function ProductDetailPage({ slug }: { slug: string }) {
   const [product, setProduct] = useState<PublicProduct | null>(null);
@@ -79,7 +80,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
     <>
       <SEO
         title={product.seoTitle || product.name}
-        description={product.seoDescription || product.description}
+        description={product.seoDescription || richTextToPlainText(product.description)}
         keywords={product.seoKeywords || []}
         image={product.images?.[0]}
         type="product"

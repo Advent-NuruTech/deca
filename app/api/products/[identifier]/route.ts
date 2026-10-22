@@ -18,6 +18,7 @@ import {
   validateProductBody,
   withUpdateTimestamp,
 } from "@/lib/products";
+import { validateProductCategory } from "@/lib/product-categories";
 
 export async function GET(
   _request: NextRequest,
@@ -53,6 +54,7 @@ export async function PUT(
       throw new HttpError(400, "A valid JSON product body is required");
     }
     const data = validateProductBody(body, true);
+    await validateProductCategory(data, existing.data());
     const input = body as Record<string, unknown>;
     for (const key of ["features", "brand", "model", "seoTitle", "seoDescription", "seedType"] as const) {
       if (key in input && (input[key] === "" || input[key] === null)) data[key] = FieldValue.delete();

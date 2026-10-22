@@ -4,7 +4,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
-import type { PublicProduct } from "@/lib/types";
+import type { ProductCategory, PublicProduct } from "@/lib/types";
 import SEO from "../SEO";
 import ProductsHero from "../products/ProductsHero";
 import ProductsFilter from "../products/ProductsFilter";
@@ -19,6 +19,7 @@ type ProductsResponse = {
   currentPage: number;
   total: number;
 };
+type CategoriesResponse = { categories: ProductCategory[] };
 
 const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) => {
   const router = useRouter();
@@ -29,6 +30,15 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
   const [currentPage, setCurrentPage] = useState(1);
   const [category, setCategory] = useState(initialCategory || searchParams.get("category") || "");
   const [search, setSearch] = useState("");
+  const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.get<CategoriesResponse>("/api/product-categories")
+      .then((response) => { if (!cancelled) setProductCategories(response.categories ?? []); })
+      .catch(() => { if (!cancelled) setProductCategories([]); });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -82,9 +92,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
 
   const categories = [
     { value: "", label: "All Products" },
-    { value: "seeds", label: "Organic Seeds" },
-    { value: "produce", label: "Fresh Produce" },
-    { value: "other", label: "Other Products" },
+    ...productCategories.map((item) => ({ value: item.id, label: item.name })),
   ];
 
   return (
@@ -110,7 +118,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
           </AnimatedSection>
           {products?.length > 0 && (
             <AnimatedSection delay={0.2} direction="up">
-              <CategoryStats products={products} />
+              <CategoryStats products={products} categories={productCategories} />
             </AnimatedSection>
           )}
           <AnimatedSection delay={0.3} direction="up">

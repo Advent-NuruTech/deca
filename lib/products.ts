@@ -4,9 +4,9 @@ import slugify from "slugify";
 import { FieldValue, type DocumentData, type DocumentSnapshot } from "firebase-admin/firestore";
 import { HttpError } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
+import { richTextToPlainText, sanitizeRichText } from "@/lib/rich-text";
 import type { PublicProduct } from "@/lib/types";
 
-const CATEGORIES = ["seeds", "produce", "other"] as const;
 const STATUSES = ["active", "inactive", "draft"] as const;
 const MAX_IMAGES = 10;
 
@@ -38,6 +38,27 @@ function optionalString(input: Record<string, unknown>, key: string, max = 500):
   const value = input[key];
   if (value === undefined || value === null || value === "") return undefined;
   return stringField(input, key, { max });
+}
+
+function richTextField(
+  input: Record<string, unknown>,
+  key: string,
+  options: { required?: boolean; max?: number } = {},
+): string | undefined {
+  const value = input[key];
+  if (value === undefined || value === null || value === "") {
+    if (options.required) throw new HttpError(400, `${key} is required`);
+    return undefined;
+  }
+  if (typeof value !== "string") throw new HttpError(400, `${key} must be a string`);
+  const safe = sanitizeRichText(value);
+  const text = richTextToPlainText(safe);
+  if (!text.trim()) {
+    if (options.required) throw new HttpError(400, `${key} is required`);
+    return undefined;
+  }
+  if (text.length > (options.max ?? 10000)) throw new HttpError(400, `${key} is too long`);
+  return safe;
 }
 
 function numberField(
@@ -103,10 +124,10 @@ export function validateProductBody(value: unknown, partial = false): Record<str
   if (!isRecord(value)) throw new HttpError(400, "A JSON product body is required");
 
   const name = stringField(value, "name", { required: !partial, max: 160 });
-  const description = stringField(value, "description", { required: !partial, max: 10000 });
+  const description = richTextField(value, "description", { required: !partial, max: 10000 });
   const category = value.category;
-  if (category !== undefined && !CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
-    throw new HttpError(400, "category must be seeds, produce or other");
+  if (category !== undefined && (typeof category !== "string" || !category.trim())) {
+    throw new HttpError(400, "category must be a non-empty string");
   }
   const status = value.status;
   if (status !== undefined && !STATUSES.includes(status as (typeof STATUSES)[number])) {
@@ -120,8 +141,8 @@ export function validateProductBody(value: unknown, partial = false): Record<str
 
   assign("name", name);
   assign("description", description);
-  assign("features", optionalString(value, "features", 10000));
-  assign("category", category);
+  assign("features", richTextField(value, "features", { max: 10000 }));
+  assign("category", typeof category === "string" ? category.trim() : category);
   assign("price", numberField(value, "price", { required: !partial, min: 0.01 }));
   assign("originalPrice", numberField(value, "originalPrice", { min: 0 }));
   assign("images", imagesField(value));
@@ -163,7 +184,7 @@ export function validateProductBody(value: unknown, partial = false): Record<str
     result.organicCertified ??= false;
     result.seoKeywords ??= [];
     result.seoTitle ??= name;
-    result.seoDescription ??= description?.slice(0, 160);
+    result.seoDescription ??= description ? richTextToPlainText(description).slice(0, 160) : undefined;
   }
 
   return result;

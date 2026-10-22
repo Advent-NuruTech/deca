@@ -1,9 +1,10 @@
 "use client";
 
-import type { ChatSettings, ResourceTaxonomy } from "@/lib/types";
+import type { ChatSettings, ProductCategory, ResourceTaxonomy } from "@/lib/types";
 
 let taxonomyRequest: Promise<ResourceTaxonomy> | undefined;
 let chatSettingsRequest: Promise<ChatSettings> | undefined;
+let productCategoriesRequest: Promise<ProductCategory[]> | undefined;
 
 function fetchJson<T>(path: string): Promise<T> {
   return fetch(path).then((response) => {
@@ -28,4 +29,14 @@ export function getPublicChatSettings() {
       throw error;
     });
   return chatSettingsRequest;
+}
+
+export function getPublicProductCategories() {
+  productCategoriesRequest ??= fetchJson<{ categories: ProductCategory[] }>("/api/product-categories")
+    .then((response) => response.categories)
+    .catch((error) => {
+      productCategoriesRequest = undefined;
+      throw error;
+    });
+  return productCategoriesRequest;
 }

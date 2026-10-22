@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import type { PublicProduct } from "@/lib/types";
+import { sanitizeRichText } from "@/lib/rich-text";
 
 export default function ProductInfo({
   product,
@@ -38,11 +39,11 @@ export default function ProductInfo({
           {product.inStock ? "In Stock" : "Out of Stock"}
         </span>
       </div>
-      <p className="text-gray-600 mb-6">{product.description}</p>
+      <div className="prose prose-emerald mb-6 max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: sanitizeRichText(product.description) }} />
       {product.features && (
         <div className="mb-6">
           <h3 className="font-semibold text-gray-800 mb-2">Key Features</h3>
-          <p className="text-gray-600 text-sm whitespace-pre-line">{product.features}</p>
+          <div className="prose prose-sm prose-emerald max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: sanitizeRichText(product.features) }} />
         </div>
       )}
       {product.inStock && (

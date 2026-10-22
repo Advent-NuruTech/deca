@@ -1,5 +1,6 @@
 export const PUBLIC_ARTICLES_TAG = "public-articles";
 export const PUBLIC_PRODUCTS_TAG = "public-products";
+export const PRODUCT_CATEGORIES_TAG = "product-categories";
 export const RESOURCE_TAXONOMY_TAG = "resource-taxonomy";
 export const CHAT_SETTINGS_TAG = "chat-settings";
 

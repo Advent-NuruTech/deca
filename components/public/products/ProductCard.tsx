@@ -8,6 +8,7 @@ import type { MouseEvent } from "react";
 import toast from "react-hot-toast";
 import { useCart } from "@/components/providers/CartProvider";
 import type { PublicProduct } from "@/lib/types";
+import { richTextToPlainText } from "@/lib/rich-text";
 
 const ProductCard = ({ product, index }: { product: PublicProduct; index: number }) => {
   const { addItem } = useCart();
@@ -54,7 +55,7 @@ const ProductCard = ({ product, index }: { product: PublicProduct; index: number
             ${product.price}
           </p>
           <p className="text-gray-500 text-sm line-clamp-2 mt-2">
-            {product.description}
+            {richTextToPlainText(product.description)}
           </p>
           <div className="flex gap-2 mt-4">
             <button

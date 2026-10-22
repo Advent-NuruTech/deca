@@ -17,7 +17,7 @@ export interface Product {
   slug: string;
   description: string;
   features?: string;
-  category: "seeds" | "produce" | "other";
+  category: string;
   price: number;
   originalPrice?: number;
   images: string[];
@@ -36,6 +36,14 @@ export interface Product {
   seedType?: string;
   createdAt?: unknown;
   updatedAt?: unknown;
+}
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+  slug: string;
+  order: number;
+  count: number;
 }
 
 export type PublicProduct = Product & {

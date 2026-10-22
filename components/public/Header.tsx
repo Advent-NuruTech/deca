@@ -9,8 +9,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart } from "@/components/providers/CartProvider";
-import type { ResourceTaxonomy } from "@/lib/types";
-import { getPublicTaxonomy } from "@/lib/public-settings-client";
+import type { ProductCategory, ResourceTaxonomy } from "@/lib/types";
+import { getPublicProductCategories, getPublicTaxonomy } from "@/lib/public-settings-client";
 import {
   Menu,
   X,
@@ -44,6 +44,7 @@ const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<"resources" | "shop" | null>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
   const [resourceTaxonomy, setResourceTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
+  const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
@@ -61,9 +62,8 @@ const Header = () => {
 
   useEffect(() => {
     let cancelled = false;
-    getPublicTaxonomy()
-      .then((data) => { if (!cancelled) setResourceTaxonomy(data); })
-      .catch(() => undefined);
+    getPublicTaxonomy().then((taxonomy) => { if (!cancelled) setResourceTaxonomy(taxonomy); }).catch(() => undefined);
+    getPublicProductCategories().then((categories) => { if (!cancelled) setProductCategories(categories); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, []);
 
@@ -151,10 +151,9 @@ const Header = () => {
     ]),
     { name: "Videos", path: "/videos", major: true },
   ];
-  const shopItems = [
-    { name: "Seeds Shop", path: "/products?category=seeds" },
-    { name: "Fresh Produce", path: "/products?category=produce" },
-  ];
+  const shopItems = productCategories.length
+    ? productCategories.map((item) => ({ name: item.name, path: `/products?category=${encodeURIComponent(item.id)}` }))
+    : [{ name: "All Products", path: "/products" }];
 
   const navItems = [
     { name: "Home", path: "/" },

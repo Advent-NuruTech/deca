@@ -18,6 +18,8 @@ import {
   validateProductBody,
   withCreateTimestamps,
 } from "@/lib/products";
+import { validateProductCategory } from "@/lib/product-categories";
+import { richTextToPlainText } from "@/lib/rich-text";
 
 type StoredRecord = Record<string, unknown>;
 
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
       .filter((product) => featured === null || Boolean(product.featured) === (featured === "true"))
       .filter((product) => {
         if (!search) return true;
-        return `${product.name ?? ""} ${product.description ?? ""}`.toLowerCase().includes(search);
+        return `${product.name ?? ""} ${richTextToPlainText(String(product.description ?? ""))}`.toLowerCase().includes(search);
       })
       .sort((left, right) => timestamp(right.createdAt) - timestamp(left.createdAt));
 
@@ -77,6 +79,7 @@ export async function POST(request: NextRequest) {
       throw new HttpError(400, "A valid JSON product body is required");
     }
     const data = validateProductBody(body);
+    await validateProductCategory(data);
     const slug = productSlug(data.name as string);
     await assertUniqueProductSlug(slug);
     const syncD1 = await beginD1ReadModelUpdate("products");

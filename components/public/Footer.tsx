@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import type { ResourceTaxonomy } from "@/lib/types";
-import { getPublicTaxonomy } from "@/lib/public-settings-client";
+import type { ProductCategory, ResourceTaxonomy } from "@/lib/types";
+import { getPublicProductCategories, getPublicTaxonomy } from "@/lib/public-settings-client";
 import {
   Mail,
   Phone,
@@ -56,9 +56,11 @@ function PoweredByAnts() {
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [taxonomy, setTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
+  const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
 
   useEffect(() => {
     getPublicTaxonomy().then(setTaxonomy).catch(() => undefined);
+    getPublicProductCategories().then(setProductCategories).catch(() => undefined);
   }, []);
 
   const quickLinks = [
@@ -71,11 +73,11 @@ const Footer = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  const productLinks = [
-    { name: "Organic Seeds", path: "/products?category=seeds", icon: "🌱" },
-    { name: "Fresh Produce", path: "/products?category=produce", icon: "🍅" },
-    { name: "Other Products", path: "/products?category=other", icon: "🌿" },
-  ];
+  const productLinks = productCategories.map((item) => ({
+    name: item.name,
+    path: `/products?category=${encodeURIComponent(item.id)}`,
+    icon: "🌿",
+  }));
 
   const socialLinks = [
     {
