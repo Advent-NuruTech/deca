@@ -1,4 +1,7 @@
+﻿import type { Metadata } from "next";
 import OrderConfirmationPage from "@/components/public/pages/OrderConfirmationPage";
+
+export const metadata: Metadata = { title: "Order details", robots: { index: false, follow: false } };
 
 export default async function Page({ params }: { params: Promise<{ orderNumber: string }> }) {
   const { orderNumber } = await params;

@@ -32,6 +32,7 @@ export default function AccountPage() {
   const [orderError, setOrderError] = useState("");
   const [stages, setStages] = useState<string[]>([]);
   const [tab, setTab] = useState<"orders" | "settings">("orders");
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("section") === "settings") setTab("settings"); }, []);
   const passwordAccount = firebaseUser?.providerData.some((provider) => provider.providerId === "password") ?? false;
 
   useEffect(() => { if (!loading && !firebaseUser) router.replace("/sign-in?returnTo=%2Faccount"); }, [loading, firebaseUser, router]);
@@ -41,9 +42,15 @@ export default function AccountPage() {
     let active = true;
     setOrders(null);
     setOrderError("");
-    api.get<{ statuses: string[] }>("/api/order-statuses").then((result) => { if (active) setStages(result.statuses); }).catch(() => { if (active) setStages([]); });
-    api.get<{ orders: PublicOrder[] }>("/api/account/orders").then((result) => { if (active) setOrders(result.orders); }).catch((err) => { if (active) setOrderError(friendly(err)); });
-    return () => { active = false; };
+    const refresh = () => {
+      api.get<{ statuses: string[] }>("/api/order-statuses").then((result) => { if (active) setStages(result.statuses); }).catch(() => { if (active) setStages([]); });
+      api.get<{ orders: PublicOrder[] }>("/api/account/orders").then((result) => { if (active) { setOrders(result.orders); setOrderError(""); } }).catch((err) => { if (active) setOrderError(friendly(err)); });
+    };
+    const onVisibility = () => { if (document.visibilityState === "visible") refresh(); };
+    refresh();
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { active = false; window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", onVisibility); };
   }, [user?.uid]);
 
   async function run(action: () => Promise<void>) {

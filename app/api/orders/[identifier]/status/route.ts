@@ -12,18 +12,21 @@ export async function PUT(
     await requireAdmin(request);
     const { identifier } = await params;
     const reference = firestore().collection("orders").doc(identifier);
-    if (!(await reference.get()).exists) throw new HttpError(404, "Order not found");
     const body: unknown = await request.json().catch(() => null);
     const statuses = validateStatusBody(body);
-    if (statuses.orderStatus) {
-      const config = await firestore().collection("settings").doc("orderStatuses").get();
-      const options = config.data()?.statuses ?? ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
-      if (!options.includes(statuses.orderStatus)) throw new HttpError(400, "Unknown order status");
-    }
-    await reference.update({
-      ...(statuses.orderStatus ? { orderStatus: statuses.orderStatus } : {}),
-      ...(statuses.paymentStatus ? { paymentStatus: statuses.paymentStatus } : {}),
-      updatedAt: FieldValue.serverTimestamp(),
+    await firestore().runTransaction(async (transaction) => {
+      const document = await transaction.get(reference);
+      if (!document.exists) throw new HttpError(404, "Order not found");
+      if (statuses.orderStatus) {
+        const config = await transaction.get(firestore().collection("settings").doc("orderStatuses"));
+        const options = config.data()?.statuses ?? ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+        if (!options.includes(statuses.orderStatus)) throw new HttpError(400, "Unknown order status");
+      }
+      transaction.update(reference, {
+        ...(statuses.orderStatus ? { orderStatus: statuses.orderStatus } : {}),
+        ...(statuses.paymentStatus ? { paymentStatus: statuses.paymentStatus } : {}),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
     });
     return NextResponse.json(serializeOrder(await reference.get()));
   } catch (error) {

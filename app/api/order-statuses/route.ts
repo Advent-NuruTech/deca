@@ -17,10 +17,15 @@ export async function PUT(request: NextRequest) {
     if (!Array.isArray(body.statuses) || !body.statuses.length || body.statuses.some((s: unknown) => typeof s !== "string" || !s.trim() || s.length > 100)) throw new HttpError(400, "Enter valid status names");
     const statuses = body.statuses.map((s: string) => s.trim().toLowerCase());
     if (new Set(statuses).size !== statuses.length || !statuses.includes("pending")) throw new HttpError(400, "Statuses must be unique and include pending");
-    const orders = await firestore().collection("orders").get();
-    const used = new Set(orders.docs.map((doc) => doc.data().orderStatus));
-    if ([...used].some((status) => !statuses.includes(status))) throw new HttpError(400, "A status used by an existing order cannot be removed. Move those orders first.");
-    await firestore().collection("settings").doc("orderStatuses").set({ statuses });
+    const database = firestore();
+    await database.runTransaction(async (transaction) => {
+      const config = database.collection("settings").doc("orderStatuses");
+      await transaction.get(config);
+      const orders = await transaction.get(database.collection("orders"));
+      const used = new Set(orders.docs.map ( (doc) => doc.data().orderStatus));
+      if ([...used].some((status) => !statuses.includes(status))) throw new HttpError(400, "A status used by an existing order cannot be removed. Move those orders first.");
+      transaction.set(config, { statuses });
+    });
     return NextResponse.json({ statuses });
   } catch (error) { return errorResponse(error); }
 }

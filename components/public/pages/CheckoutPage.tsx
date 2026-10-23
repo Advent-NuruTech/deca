@@ -91,13 +91,14 @@ export default function CheckoutPage() {
         setSelectedAddress(saved.id);
         setAddresses((current) => [...current.filter((item) => item.id !== saved.id), saved]);
       }
-      const order = await api.post<PublicOrder>("/api/orders", {
+      const order = await api.post<PublicOrder & { confirmationEmailSent: boolean }>("/api/orders", {
         customer: { name: formData.name, email: formData.email, phone: formData.phone, address: { ...formData.address, country: "Kenya" } },
         items: items.map((item) => ({ product: item._id, variantId: item.variantId, quantity: item.quantity })),
         notes: formData.notes,
       });
       clearCart();
-      toast.success("Order placed successfully!");
+      if (order.confirmationEmailSent) toast.success("Order placed! Check your email for confirmation.");
+      else toast("Order placed. We could not send a confirmation email; view the details in your account.", { duration: 7000 });
       router.push(`/order-confirmation/${encodeURIComponent(order.orderNumber)}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to place order. Please try again.");

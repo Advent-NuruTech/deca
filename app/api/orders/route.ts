@@ -9,6 +9,7 @@ import {
   syncD1ProductDocument,
 } from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
+import { sendOrderConfirmation } from "@/lib/order-confirmation-email";
 import {
   createOrderNumber,
   orderTimestamps,
@@ -84,7 +85,15 @@ export async function POST(request: NextRequest) {
     }
 
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
-    return NextResponse.json(serializeOrder(await orderReference.get()), { status: 201 });
+    const order = serializeOrder(await orderReference.get());
+    let confirmationEmailSent = false;
+    try {
+      await sendOrderConfirmation(order);
+      confirmationEmailSent = true;
+    } catch (error) {
+      console.error("Order created but confirmation email failed", order.id, error);
+    }
+    return NextResponse.json({ ...order, confirmationEmailSent }, { status: 201 });
   } catch (error) {
     return errorResponse(error);
   }

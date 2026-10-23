@@ -16,7 +16,7 @@ export async function GET(
     if (user.role !== "admin" && document.data().userId !== user.uid) {
       throw new HttpError(404, "Order not found");
     }
-    return NextResponse.json(serializeOrder(document));
+    return NextResponse.json(serializeOrder(document), { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     return errorResponse(error);
   }
