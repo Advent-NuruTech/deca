@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
     const profile = await api.get<AppUser>("/api/auth/me");
-    if (firebaseAuth().currentUser?.uid === current.uid) setUser(profile);
+    if (firebaseAuth().currentUser?.uid === current.uid) { setUser(profile); setError(null); }
     return profile;
   }, []);
 
@@ -100,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const credential = await signInWithPopup(firebaseAuth(), new GoogleAuthProvider());
     const profile = await api.post<AppUser>("/api/auth/register", { name: credential.user.displayName || credential.user.email?.split("@")[0] || "Customer" });
     setUser(profile);
+    setError(null);
     return profile;
   }, []);
 
@@ -108,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await createUserWithEmailAndPassword(firebaseAuth(), email, password);
     const profile = await api.post<AppUser>("/api/auth/register", { name });
     setUser(profile);
+    setError(null);
     return profile;
   }, []);
 

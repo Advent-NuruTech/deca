@@ -18,7 +18,7 @@ not re-upload files, and deletion must not leave article bodies or managed media
 
 ## Production UI and UX standard
 
-All interface work must be production-ready, not prototype-grade. Use coherent visual
+All features and implementations must be production-ready, not prototypes or placeholders. All interface work must be production-ready, not prototype-grade. Use coherent visual
 hierarchy, responsive layouts, accessible semantics and keyboard states, clear loading,
 empty, error, and success feedback, and polished interaction details. Preserve established
 design tokens and patterns, and verify user flows on both mobile and desktop before handoff.
