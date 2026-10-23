@@ -212,6 +212,8 @@ const Header = () => {
 
   const hideForStudyScroll = (pathname === "/study-materials" || articleListing) && isScrolled;
 
+  if (pathname === "/products") return null;
+
   return (
     <motion.header
       initial={{ y: -100 }}

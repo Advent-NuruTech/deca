@@ -106,7 +106,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
             <span className="text-gray-800 font-medium">{product.name}</span>
           </nav>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,450px)_minmax(0,1fr)] lg:gap-8">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
               <ProductGallery images={images} name={product.name} selectedIndex={imageIndex} onSelect={selectImage} />
             </motion.div>

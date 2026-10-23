@@ -69,10 +69,20 @@ export async function getProductCategories(options: {
 
   if (options.includeCounts !== false) {
     const products = options.productDocuments ?? (await db.collection("products").get()).docs;
+    const latest = new Map<string, number>();
     for (const product of products) {
       if (!options.includeInactive && product.data().status !== "active") continue;
       const category = categories.find((item) => item.id === product.data().category);
-      if (category) category.count += 1;
+      if (category) {
+        category.count += 1;
+        const data = product.data();
+        const createdAt = data.createdAt;
+        const time = createdAt && typeof createdAt.toMillis === "function" ? createdAt.toMillis() : Date.parse(String(createdAt ?? "")) || 0;
+        if (!latest.has(category.id) || time > latest.get(category.id)!) {
+          latest.set(category.id, time);
+          category.image = Array.isArray(data.images) && typeof data.images[0] === "string" ? data.images[0] : undefined;
+        }
+      }
     }
   }
 

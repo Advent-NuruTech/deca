@@ -53,6 +53,7 @@ export interface ProductCategory {
   slug: string;
   order: number;
   count: number;
+  image?: string;
 }
 
 export type PublicProduct = Product & {
