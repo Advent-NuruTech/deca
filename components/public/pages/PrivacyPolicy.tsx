@@ -1,158 +1,17 @@
-"use client";
+﻿import Link from "next/link";
+import LegalPage from "@/components/public/legal/LegalPage";
 
-// src/pages/PrivacyPolicy.jsx
-import React from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowLeft, Shield, Lock, Eye, Database, Cookie } from "lucide-react";
-
-const PrivacyPolicy = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Back button */}
-        <Link href="/">
-          <motion.div
-            whileHover={{ x: -5 }}
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-emerald-600 transition-colors mb-8"
-          >
-            <ArrowLeft size={16} />
-            Back to Home
-          </motion.div>
-        </Link>
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <div className="inline-flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full mb-4">
-            <Shield className="w-4 h-4 text-emerald-700" />
-            <span className="text-sm font-medium text-emerald-700">Legal</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Privacy Policy
-          </h1>
-          <p className="text-xl text-gray-500">
-            Last updated: {new Date().toLocaleDateString()}
-          </p>
-        </motion.div>
-
-        {/* Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100 space-y-8"
-        >
-          {/* Introduction */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-emerald-600" />
-              Introduction
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              At RemSam Homestead, we respect your privacy. This Privacy Policy
-              explains how we collect, use, and protect your information when
-              you visit our website, subscribe to our content, make donations,
-              or purchase products. Please read this policy carefully.
-            </p>
-          </section>
-
-          {/* Information Collection */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Database className="w-5 h-5 text-emerald-600" />
-              Information We Collect
-            </h2>
-            <div className="space-y-4 text-gray-600">
-              <p>
-                We may collect personal information that you voluntarily
-                provide:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>When you subscribe to our newsletter</li>
-                <li>When you download study materials</li>
-                <li>When you make a donation or purchase a product</li>
-                <li>When you contact us via email, phone, or contact forms</li>
-              </ul>
-              <p className="mt-4">This information may include:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Name and email address</li>
-                <li>Mailing address (for product delivery)</li>
-                <li>Phone number</li>
-                <li>
-                  Payment information (processed securely via third‑party
-                  gateways)
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          {/* How We Use Information */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Eye className="w-5 h-5 text-emerald-600" />
-              How We Use Your Information
-            </h2>
-            <div className="space-y-4 text-gray-600">
-              <p>We use your information to:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Send you requested resources and newsletters</li>
-                <li>Process donations and product orders</li>
-                <li>Respond to your inquiries</li>
-                <li>Improve our website and content</li>
-                <li>Comply with legal obligations (e.g., tax receipts)</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Cookies */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Cookie className="w-5 h-5 text-emerald-600" />
-              Cookies and Tracking Technologies
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              We use cookies to enhance your browsing experience, analyse site
-              traffic, and remember your preferences. You may disable cookies in
-              your browser settings, but some features may not function
-              properly.
-            </p>
-          </section>
-
-          {/* Third-Party Disclosure */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Third-Party Disclosure
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              We do not sell, trade, or otherwise transfer your personally
-              identifiable information to outside parties except as necessary to
-              process payments, deliver products, or comply with the law. We may
-              share aggregated, non‑identifying information with analytics
-              partners.
-            </p>
-          </section>
-
-          {/* Contact Information */}
-          <section className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-            <h2 className="text-xl font-bold text-gray-800 mb-3">Contact Us</h2>
-            <p className="text-gray-600 mb-2">
-              If you have questions about this Privacy Policy, please contact
-              us:
-            </p>
-            <ul className="text-gray-600 space-y-1">
-              <li>📧 Email: hello@remSamhomestead.org</li>
-              <li>📞 Phone: +254 721 627 977</li>
-              <li>💬 WhatsApp: +254 721 627 977</li>
-            </ul>
-          </section>
-        </motion.div>
-      </div>
-    </div>
-  );
-};
-
-export default PrivacyPolicy;
+export default function PrivacyPolicy() {
+  return <LegalPage title="Privacy Policy" intro="How RemSam Homestead collects, uses, and protects information when you use our website and services.">
+    <section><h2>Who we are</h2><p>RemSam Homestead operates this website from Butere, Kenya. This policy applies to our website, customer accounts, shop, resources, contact forms, newsletter and donation requests. To ask about your information, use our <Link href="/contact">contact form</Link>.</p></section>
+    <section><h2>Information we collect</h2><ul><li><strong>Account details:</strong> your name, email address, account identifier and sign-in information managed by Firebase Authentication. Passwords are handled by Firebase Authentication; our application does not store your password in its customer profile.</li><li><strong>Orders:</strong> your name, email, phone number, delivery address, items, order and payment status, chosen payment and delivery methods, and any order notes.</li><li><strong>Messages and subscriptions:</strong> details you submit in contact forms or when subscribing to our emails, including your email address and any message you provide.</li><li><strong>Donations:</strong> the amount and status of a donation request and, when signed in, your account identifier, name and email.</li><li><strong>Technical information:</strong> information such as IP address, browser and request details may be processed by our hosting and security providers when you use the site.</li></ul></section>
+    <section><h2>Google sign-in</h2><p>If you choose Continue with Google, Google and Firebase Authentication provide us with an account identifier, email address and, where available, your name and basic profile information. We use these details to create or access your account, identify you when you sign in and associate your orders with your account. We store the account identifier, name and email in our customer profile database. We do not receive your Google password.</p><p>We share information with the service providers described below only as needed to operate the service or as otherwise described in this policy. Google processes sign-in information under its own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</p></section>
+    <section><h2>How we use information</h2><p>We use information to create and secure accounts; process and manage orders and donation requests; arrange delivery and communicate about transactions; respond to inquiries; send newsletters you request; maintain and improve the website; prevent misuse; and meet applicable legal obligations. Depending on the purpose, we rely on your consent, the need to provide a service you request, our legitimate operational interests, or a legal obligation.</p></section>
+    <section><h2>Service providers and sharing</h2><p>We use service providers to operate the website. These include Google Firebase for authentication and data storage, Vercel for hosting, Cloudflare for storage and site services, and Resend for email delivery. We may also use delivery or payment providers as needed to fulfill a transaction. They receive information relevant to the services they provide. Information may also be disclosed when required by law or to protect rights and security.</p><p>The contact page contains a Google Maps embed, and our site may link to YouTube and other external services. Those services may collect information under their own policies when you interact with them.</p></section>
+    <section><h2>Cookies and browser storage</h2><p>We use browser storage to maintain sign-in and remember the shopping cart. Google and other service providers may use cookies or similar technologies when their services are used. For details and browser controls, see our <Link href="/cookie-policy">Cookie Policy</Link>.</p></section>
+    <section><h2>Retention, security and transfers</h2><p>We keep information for as long as needed for the purposes described above, including maintaining accounts and order records, resolving disputes and meeting legal obligations. Retention can vary by record and legal requirements. We use access controls and service-provider security measures, but no system can guarantee absolute security.</p><p>Our service providers may process or store information outside Kenya. Where applicable, we seek to use appropriate safeguards or another lawful basis for international transfers.</p></section>
+    <section><h2>Your choices and rights</h2><p>You can update your name and sign-in details in <Link href="/account">account settings</Link>, and unsubscribe from marketing emails using the link in an email. You may also contact us to request access, correction or deletion, or to object to processing, subject to applicable law and any records we must retain. We may need to verify your identity before responding.</p><p>You may contact Kenya’s <a href="https://www.odpc.go.ke/" target="_blank" rel="noopener noreferrer">Office of the Data Protection Commissioner</a> about your data protection rights or a complaint.</p></section>
+    <section><h2>Children</h2><p>If a parent or guardian believes a child has provided personal information without appropriate permission, please contact us so we can review the request.</p></section>
+    <section><h2>Changes and contact</h2><p>We may update this policy as our services or practices change. The date above identifies the latest revision. For privacy questions or requests, reach us through our <Link href="/contact">contact page</Link>.</p></section>
+  </LegalPage>;
+}

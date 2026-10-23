@@ -183,6 +183,7 @@ const Header = () => {
     "/admin/analytics",
     "/terms",
     "/privacy",
+    "/cookie-policy",
     "/donate",
     "/faith",
   ];

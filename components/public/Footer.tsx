@@ -306,19 +306,20 @@ const Footer = () => {
             <p className="text-center text-gray-500 md:text-left">
               © {currentYear} RemSam Homestead. All rights reserved.
             </p>
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center justify-center gap-5">
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="text-gray-500 hover:text-emerald-600 transition"
               >
                 Privacy
               </Link>
               <Link
-                href="/terms"
+                href="/terms-of-service"
                 className="text-gray-500 hover:text-emerald-600 transition"
               >
                 Terms
               </Link>
+              <Link href="/cookie-policy" className="text-gray-500 hover:text-emerald-600 transition">Cookies</Link>
               <Link
                 href="/contact"
                 className="text-gray-500 hover:text-emerald-600 transition"

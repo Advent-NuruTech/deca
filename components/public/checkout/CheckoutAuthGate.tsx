@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { LockKeyhole } from "lucide-react";
 import toast from "react-hot-toast";
@@ -60,6 +61,7 @@ export default function CheckoutAuthGate({ children }: { children: ReactNode }) 
           </button>
         </form>
         <button type="button" disabled={submitting} onClick={async () => { setSubmitting(true); try { await signInWithGoogle(); } catch { toast.error("Google sign-in could not be completed. Please try again."); } finally { setSubmitting(false); } }} className="mt-4 w-full rounded-xl border border-gray-300 bg-white py-3 font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-50">Continue with Google</button>
+        <p className="mt-4 text-sm text-gray-500">By continuing, you agree to our <Link href="/terms-of-service" className="text-emerald-700 underline">Terms of Service</Link> and acknowledge our <Link href="/privacy-policy" className="text-emerald-700 underline">Privacy Policy</Link>.</p>
         <button type="button" onClick={() => setCreating((value) => !value)} className="w-full mt-4 text-sm text-emerald-700 hover:text-emerald-800">
           {creating ? "Already have an account? Sign in" : "New customer? Create an account"}
         </button>
