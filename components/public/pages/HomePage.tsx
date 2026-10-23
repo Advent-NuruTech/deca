@@ -18,7 +18,9 @@ import {
   Play,
 } from "lucide-react";
 import api from "@/lib/public-api";
-import type { Article, Product, ResourceTaxonomy } from "@/lib/types";
+import type { Article, PublicProduct, ResourceTaxonomy } from "@/lib/types";
+import ProductsGrid from "@/components/public/products/ProductsGrid";
+import { api as productsApi } from "@/lib/api";
 import StudyMaterialCard, { type StudyMaterial } from "@/components/public/StudyMaterialCard";
 import SEO from "../SEO";
 import YouTubeVideos from "../YouTubeVideos";
@@ -90,7 +92,9 @@ const HomePage = () => {
   const [featuredHomeschool, setFeaturedHomeschool] = useState<Article | null>(null);
   const [latestStudies, setLatestStudies] = useState<StudyMaterial[]>([]);
   const [resourceTaxonomy, setResourceTaxonomy] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
-  const [featuredSeeds, setFeaturedSeeds] = useState<(Product & { _id?: string })[]>([]);
+  const [latestProducts, setLatestProducts] = useState<PublicProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(false);
   const [loading, setLoading] = useState(true);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -111,7 +115,6 @@ const HomePage = () => {
           featuredHomeschool: Article | null;
           latestStudies: StudyMaterial[];
           resourceTaxonomy: ResourceTaxonomy;
-          featuredSeeds: (Product & { _id?: string })[];
         }>("/home");
         setFeaturedFaith(response.data.featuredFaith);
         setFeaturedRecipe(response.data.featuredRecipe);
@@ -119,7 +122,6 @@ const HomePage = () => {
         setFeaturedHomeschool(response.data.featuredHomeschool);
         setLatestStudies(response.data.latestStudies || []);
         setResourceTaxonomy(response.data.resourceTaxonomy || { majors: [], subcategories: [] });
-        setFeaturedSeeds(response.data.featuredSeeds || []);
       } catch (error) {
         console.error("Error fetching home data:", error);
       } finally {
@@ -127,6 +129,15 @@ const HomePage = () => {
       }
     };
     fetchHomeData();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    productsApi.get<{ products: PublicProduct[] }>("/api/products?limit=8")
+      .then((response) => { if (!cancelled) setLatestProducts(response.products ?? []); })
+      .catch(() => { if (!cancelled) setProductsError(true); })
+      .finally(() => { if (!cancelled) setProductsLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   const fadeUp: Variants = {
@@ -429,50 +440,17 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ========== 7. FROM OUR FARM ========== */}
-        {featuredSeeds.length > 0 && <section className="bg-white py-16">
+        {/* ========== FROM OUR FARM ========== */}
+        <section className="bg-white py-16">
           <div className="container mx-auto px-4">
-            <div className="mx-auto max-w-5xl">
-              <div className="mb-8 flex items-center justify-center gap-2">
-                <ShoppingBag className="h-7 w-7 text-amber-600" />
-                <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">From Our Farm</h2>
-              </div>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    {featuredSeeds.slice(0, 2).map((product) => (
-                      <Link
-                        key={product._id}
-                        href={`/products/${product.slug}`}
-                        className="group"
-                      >
-                        <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-                          {product.images?.[0] && (
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="w-full h-36 object-cover group-hover:scale-105 transition duration-300"
-                            />
-                          )}
-                          <div className="p-3">
-                            <h3 className="font-semibold text-gray-800 text-sm line-clamp-1">
-                              {product.name}
-                            </h3>
-                            <p className="text-emerald-700 font-bold text-sm mt-1">
-                              ${product.price}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                    <Link
-                      href="/products?category=seeds"
-                      className="text-center text-emerald-600 font-medium mt-2 inline-block sm:col-span-2"
-                    >
-                      Shop all seeds →
-                    </Link>
-                  </div>
+            <div className="mb-8 flex items-center justify-center gap-2">
+              <ShoppingBag className="h-7 w-7 text-amber-600" aria-hidden="true" />
+              <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">From Our Farm</h2>
             </div>
+            {productsError ? <p role="alert" className="py-8 text-center text-gray-600">Products could not be loaded. Please visit the shop to try again.</p> : <ProductsGrid products={latestProducts} loading={productsLoading} fourColumns />}
+            <div className="mt-8 text-center"><Link href="/products" className="inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700">Shop all products <ArrowRight size={16} aria-hidden="true" /></Link></div>
           </div>
-        </section>}
+        </section>
 
         {/* ========== 7. YOUTUBE VIDEOS ========== */}
         <section className="py-16 bg-white">

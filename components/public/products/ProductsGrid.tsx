@@ -4,7 +4,7 @@
 import ProductCard from "./ProductCard";
 import type { PublicProduct } from "@/lib/types";
 
-const ProductsGrid = ({ products, loading }: { products: PublicProduct[]; loading: boolean }) => {
+const ProductsGrid = ({ products, loading, fourColumns = false }: { products: PublicProduct[]; loading: boolean; fourColumns?: boolean }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -20,7 +20,7 @@ const ProductsGrid = ({ products, loading }: { products: PublicProduct[]; loadin
     );
   }
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+    <div className={`grid grid-cols-2 gap-2 sm:gap-4 ${fourColumns ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-4"}`}>
       {products.map((product, index) => (
         <ProductCard key={product._id} product={product} index={index} />
       ))}

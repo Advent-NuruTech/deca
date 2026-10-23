@@ -36,8 +36,8 @@ export default function CartPage() {
       />
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-5xl font-bold">
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">Shopping Cart</span>
             </h1>
             {items.length > 0 && (
@@ -47,7 +47,7 @@ export default function CartPage() {
           {items.length === 0 ? (
             <EmptyCart />
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8">
               <div className="lg:col-span-2 space-y-4">
                 <AnimatePresence mode="popLayout">
                   {items.map((item, index) => (

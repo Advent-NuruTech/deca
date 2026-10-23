@@ -87,7 +87,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 pt-24 pb-32">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-44 sm:pb-32">
         <div className="container mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>

@@ -27,12 +27,12 @@ export default function CartItem({
       className="group relative"
     >
       <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
-      <div className="relative bg-white rounded-xl shadow-sm p-6 border border-gray-100 group-hover:border-transparent transition-all duration-500">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="relative w-full md:w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+      <div className="relative bg-white rounded-xl shadow-sm p-4 md:p-6 border border-gray-100 group-hover:border-transparent transition-all duration-500">
+        <div className="flex flex-row gap-4 md:gap-6">
+          <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
             {item.images?.[0] ? (
               <>
-                <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover" />
+                <img src={item.images[0]} alt={item.name} className="w-full h-full object-contain md:object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-100 via-transparent to-transparent opacity-60" />
               </>
             ) : (
@@ -40,17 +40,17 @@ export default function CartItem({
             )}
           </div>
 
-          <div className="flex-grow">
+          <div className="min-w-0 flex-grow pr-8 md:pr-0">
             <Link
               href={`/products/${item.slug}`}
-              className="text-xl font-semibold text-gray-800 hover:text-emerald-600 transition-colors mb-2 inline-block"
+              className="text-base md:text-xl font-semibold text-gray-800 hover:text-emerald-600 transition-colors mb-2 inline-block"
             >
               {item.name}
             </Link>
-            {item.variantName && <p className="text-gray-600 text-sm mb-4">{item.variantName}</p>}
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            {item.variantName && <p className="text-gray-600 text-sm mb-2 md:mb-4">{item.variantName}</p>}
+            <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">Quantity:</span>
+                <span className="sr-only md:not-sr-only md:text-sm md:text-gray-500">Quantity:</span>
                 <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg">
                   <motion.button
                     type="button"
@@ -70,7 +70,7 @@ export default function CartItem({
                     value={item.quantity}
                     aria-label={`${item.name} quantity`}
                     onChange={(event) => onQuantityChange(cartItemKey(item), Number.parseInt(event.target.value, 10) || 1)}
-                    className="w-16 text-center bg-transparent border-0 text-gray-800 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-9 md:w-16 text-center bg-transparent border-0 text-gray-800 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <motion.button
                     type="button"
@@ -84,7 +84,7 @@ export default function CartItem({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-emerald-700">KES {(item.price * item.quantity).toLocaleString()}</p>
+                <p className="text-base md:text-2xl font-bold text-emerald-700">KES {(item.price * item.quantity).toLocaleString()}</p>
                 {item.quantity > 1 && <p className="text-sm text-gray-500">KES {item.price.toLocaleString()} each</p>}
               </div>
             </div>
@@ -95,7 +95,8 @@ export default function CartItem({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => onRemove(cartItemKey(item), item.name)}
-            className="absolute top-4 right-4 md:relative md:top-auto md:right-auto text-red-500 hover:text-red-600 transition-colors"
+            aria-label={`Remove ${item.name} from cart`}
+            className="absolute top-2 right-2 min-h-11 min-w-11 flex items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-red-600 md:min-h-0 md:min-w-0 md:relative md:top-auto md:right-auto text-red-500 hover:text-red-600 transition-colors"
             title="Remove from cart"
           >
             <Trash2 size={20} />
