@@ -1,17 +1,15 @@
 "use client";
 
 // src/pages/ProductsPage.jsx
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import type { ProductCategory, PublicProduct } from "@/lib/types";
 import SEO from "../SEO";
 import ProductsHero from "../products/ProductsHero";
-import ProductsFilter from "../products/ProductsFilter";
+import { Check, ChevronDown, Search, X } from "lucide-react";
 import ProductsGrid from "../products/ProductsGrid";
 import ProductsPagination from "../products/ProductsPagination";
-import CategoryStats from "../products/CategoryStats";
-import AnimatedSection from "../AnimatedSection";
 
 type ProductsResponse = {
   products: PublicProduct[];
@@ -29,7 +27,24 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [category, setCategory] = useState(initialCategory || searchParams.get("category") || "");
-  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState(searchParams.get("search") || "");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [total, setTotal] = useState(0);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(false);
+  const drawer = useRef<HTMLDivElement>(null);
+  const categoryButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => { const timer = window.setTimeout(() => { setSearch(query.trim()); }, 300); return () => window.clearTimeout(timer); }, [query]);
+  useEffect(() => { const media = window.matchMedia("(min-width: 1024px)"); const reset = () => { setDrawerOpen(false); setDesktopOpen(false); }; media.addEventListener("change", reset); return () => media.removeEventListener("change", reset); }, []);
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const previous = document.body.style.overflow; document.body.style.overflow = "hidden"; drawer.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setDrawerOpen(false); if (event.key === "Tab" && drawer.current) { const buttons = drawer.current.querySelectorAll<HTMLButtonElement>("button:not([disabled])"); const first = buttons[0], last = buttons[buttons.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } } };
+    document.addEventListener("keydown", onKey); return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", onKey); categoryButton.current?.focus(); };
+  }, [drawerOpen]);
   const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
 
   useEffect(() => {
@@ -47,16 +62,18 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
     if (search) params.set("search", search);
     params.set("page", searchParams.get("page") || "1");
     setLoading(true);
+    setError(false);
     api
       .get<ProductsResponse>(`/api/products?${params.toString()}`)
       .then((response) => {
         if (cancelled) return;
         setProducts(response.products ?? []);
+        setTotal(response.total ?? 0);
         setTotalPages(response.totalPages ?? 1);
         setCurrentPage(response.currentPage ?? 1);
       })
       .catch(() => {
-        if (!cancelled) setProducts([]);
+        if (!cancelled) { setProducts([]); setError(true); }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -64,27 +81,21 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
     return () => {
       cancelled = true;
     };
-  }, [category, search, searchParams]);
+  }, [category, search, searchParams, retry]);
 
   const handleCategoryChange = (cat: string) => {
     setCategory(cat);
     const params = new URLSearchParams(searchParams.toString());
+    if (query.trim()) params.set("search", query.trim()); else params.delete("search");
     if (cat) params.set("category", cat);
     else params.delete("category");
     params.delete("page");
     router.replace(`/products${params.size ? `?${params}` : ""}`);
   };
 
-  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (category) params.set("category", category);
-    if (search) params.set("search", search);
-    router.replace(`/products${params.size ? `?${params}` : ""}`);
-  };
-
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
+    if (search) params.set("search", search); else params.delete("search");
     params.set("page", String(page));
     router.replace(`/products?${params}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -95,6 +106,9 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
     ...productCategories.map((item) => ({ value: item.id, label: item.name })),
   ];
 
+  const categoryName = categories.find((item) => item.value === category)?.label || "All Products";
+  const categoryList = (close: boolean) => categories.map((item) => <button key={item.value} onClick={() => { handleCategoryChange(item.value); if (close) setDrawerOpen(false); }} aria-pressed={category === item.value} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm ${category === item.value ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-700 hover:bg-gray-100"}`}><span className="flex-1">{item.label}</span>{category === item.value && <Check size={17} />}</button>);
+
   return (
     <>
       <SEO
@@ -102,39 +116,24 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
         description="Buy organic seeds, fresh produce, and other agricultural products from our farm."
         keywords={["Organic Seeds", "Fresh Produce", "Farm Products"]}
       />
-      <ProductsHero />
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <AnimatedSection delay={0.1} direction="up">
-            <ProductsFilter
-              search={search}
-              setSearch={setSearch}
-              category={category}
-              setCategory={handleCategoryChange}
-              categories={categories}
-              onSearch={handleSearch}
-              totalProducts={products?.length || 0}
-            />
-          </AnimatedSection>
-          {products?.length > 0 && (
-            <AnimatedSection delay={0.2} direction="up">
-              <CategoryStats products={products} categories={productCategories} />
-            </AnimatedSection>
-          )}
-          <AnimatedSection delay={0.3} direction="up">
-            <ProductsGrid products={products || []} loading={loading} />
-          </AnimatedSection>
-          {!loading && products?.length > 0 && (
-            <AnimatedSection delay={0.4} direction="up">
-              <ProductsPagination
-                currentPage={currentPage || 1}
-                totalPages={totalPages || 1}
-                onPageChange={handlePageChange}
-              />
-            </AnimatedSection>
-          )}
+      {!query ? <ProductsHero /> : <div className="h-20 bg-emerald-950" aria-hidden="true" />}
+      <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
+        <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
+          <label className="flex min-w-0 flex-1 items-center gap-2 px-2 text-gray-500 sm:px-3"><Search size={20} aria-hidden="true" /><span className="sr-only">Search products</span><input type="search" value={query} onChange={(event) => { if (!query && event.target.value) window.scrollTo({ top: 0, behavior: "smooth" }); setQuery(event.target.value); if (searchParams.get("page")) { const params = new URLSearchParams(searchParams.toString()); params.delete("page"); router.replace(`/products${params.size ? `?${params}` : ""}`, { scroll: false }); } }} placeholder="Search products..." className="min-w-0 w-full py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 sm:text-base" /></label>
+          <button ref={categoryButton} onClick={() => { if (window.matchMedia("(min-width: 1024px)").matches) setDesktopOpen((open) => !open); else setDrawerOpen(true); }} aria-expanded={drawerOpen || desktopOpen} aria-controls="product-categories" className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 sm:px-5"><span className="max-w-[100px] truncate sm:max-w-[220px]">{category ? categoryName : "Categories"}</span><ChevronDown size={18} /></button>
+        </div>
+      </div>
+      <section className="bg-gray-50 py-10 sm:py-14" aria-label="Product results">
+        <div className="mx-auto flex max-w-7xl items-start gap-8 px-4 sm:px-6">
+          {desktopOpen && <aside id="product-categories" aria-label="Product categories" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] w-60 shrink-0 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 lg:block"><h2 className="px-4 py-3 font-bold">Categories</h2>{categoryList(false)}</aside>}
+          <div className="min-w-0 flex-1">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-2"><div><h2 className="text-2xl font-bold text-gray-900">{search ? "Search results" : category ? categoryName : "Explore products"}</h2><p className="mt-1 text-sm text-gray-500" aria-live="polite">{loading ? "Finding products..." : `${total} ${total === 1 ? "product" : "products"}${search ? ` for ?${search}?` : ""}`}</p></div>{category && <button onClick={() => handleCategoryChange("")} className="text-sm font-semibold text-emerald-700 hover:underline">Clear category</button>}</div>
+            {error ? <div role="alert" className="rounded-xl bg-white p-8 text-center text-gray-600">Could not load products. <button onClick={() => setRetry((value) => value + 1)} className="font-semibold text-emerald-700 underline">Try again</button></div> : <ProductsGrid products={products} loading={loading} />}
+            {!loading && !error && products.length > 0 && <ProductsPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />}
+          </div>
         </div>
       </section>
+      {drawerOpen && <div className="fixed inset-0 z-[100]" role="presentation"><div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOpen(false)} /><div ref={drawer} role="dialog" aria-modal="true" aria-labelledby="product-categories-heading" className="absolute inset-y-0 left-0 flex w-[min(85vw,340px)] flex-col bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-gray-100 p-5"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Browse the shop</p><h2 id="product-categories-heading" className="mt-1 text-xl font-bold text-gray-900">Categories</h2></div><button onClick={() => setDrawerOpen(false)} aria-label="Close categories" className="rounded-full p-2 text-gray-600 hover:bg-gray-100"><X size={22} /></button></div><div id="product-categories" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">{categoryList(true)}</div></div></div>}
     </>
   );
 };

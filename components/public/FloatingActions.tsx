@@ -2,6 +2,7 @@
 
 // components/FloatingActions.jsx
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, ChevronUp, X } from "lucide-react";
 import type { ChatSettings } from "@/lib/types";
@@ -22,6 +23,8 @@ const fallbackSettings: ChatSettings = {
 };
 
 const FloatingActions = () => {
+  const pathname = usePathname();
+  const productDetail = /^\/products\/[^/]+\/?$/.test(pathname);
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -61,7 +64,7 @@ const FloatingActions = () => {
   return (
     <>
       {/* WhatsApp Button with Quick Replies */}
-      <div className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8">
+      <div className={`fixed right-6 z-50 md:right-8 ${productDetail ? "bottom-24 md:bottom-28" : "bottom-6 md:bottom-8"}`}>
         {/* Quick reply menu */}
         <AnimatePresence>
           {isWhatsAppOpen && (
@@ -176,7 +179,7 @@ const FloatingActions = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 100 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="fixed bottom-6 left-6 z-50 md:bottom-8 md:left-8"
+            className={`fixed left-6 z-50 md:left-8 ${productDetail ? "bottom-24 md:bottom-28" : "bottom-6 md:bottom-8"}`}
           >
             <motion.button
               onClick={scrollToTop}

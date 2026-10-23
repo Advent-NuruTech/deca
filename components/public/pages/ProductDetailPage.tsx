@@ -10,21 +10,22 @@ import { useCart } from "@/components/providers/CartProvider";
 import SEO from "@/components/public/SEO";
 import ProductGallery from "@/components/public/product/ProductGallery";
 import ProductInfo from "@/components/public/product/ProductInfo";
-import ProductSpecs from "@/components/public/product/ProductSpecs";
 import RelatedProducts from "@/components/public/product/RelatedProducts";
 import { richTextToPlainText } from "@/lib/rich-text";
 
 export default function ProductDetailPage({ slug }: { slug: string }) {
   const [product, setProduct] = useState<PublicProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [variantImage, setVariantImage] = useState("");
+  const [variantId, setVariantId] = useState("");
+  const [imageIndex, setImageIndex] = useState(0);
   const { addItem } = useCart();
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setProduct(null);
-    setVariantImage("");
+    setVariantId("");
+    setImageIndex(0);
     api
       .get<PublicProduct>(`/api/products/${encodeURIComponent(slug)}`)
       .then((response) => {
@@ -73,6 +74,14 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
     );
   }
 
+  const images = [...new Set([...(product.images ?? []), ...(product.variants ?? []).map((item) => item.image || "")].filter(Boolean))];
+  const variant = product.variants?.find((item) => item.id === variantId);
+  const selectImage = (index: number) => {
+    setImageIndex(index);
+    const matching = product.variants?.find((item) => item.image && item.image === images[index]);
+    setVariantId(matching?.id ?? "");
+  };
+
   const handleAddToCart = (quantity: number, variant?: ProductVariant) => {
     addItem(product, quantity, variant);
     toast.success("Added to cart");
@@ -87,7 +96,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
         image={product.images?.[0]}
         type="product"
       />
-      <div className="min-h-screen bg-gray-50 pt-24 pb-16">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-32">
         <div className="container mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
@@ -99,16 +108,13 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
 
           <div className="grid lg:grid-cols-2 gap-12">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-              <ProductGallery key={variantImage} images={variantImage ? [variantImage, ...product.images.filter((image) => image !== variantImage)] : product.images} name={product.name} />
+              <ProductGallery images={images} name={product.name} selectedIndex={imageIndex} onSelect={selectImage} />
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-              <ProductInfo product={product} onAddToCart={handleAddToCart} onVariantChange={(variant) => setVariantImage(variant.image ?? "")} />
+              <ProductInfo product={product} variant={variant} onAddToCart={handleAddToCart} onVariantChange={(option) => { setVariantId(option.id); if (option.image) setImageIndex(images.indexOf(option.image)); }} />
             </motion.div>
           </div>
 
-          <div className="mt-12">
-            <ProductSpecs specifications={product.specifications} model={product.model} />
-          </div>
           <RelatedProducts category={product.category} currentProductId={product._id} />
         </div>
       </div>

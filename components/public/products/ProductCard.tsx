@@ -10,7 +10,7 @@ import { useCart } from "@/components/providers/CartProvider";
 import type { PublicProduct } from "@/lib/types";
 import { richTextToPlainText } from "@/lib/rich-text";
 
-const ProductCard = ({ product, index }: { product: PublicProduct; index: number }) => {
+const ProductCard = ({ product, index, compact = false }: { product: PublicProduct; index: number; compact?: boolean }) => {
   const { addItem } = useCart();
 
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
@@ -29,7 +29,7 @@ const ProductCard = ({ product, index }: { product: PublicProduct; index: number
       className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden"
     >
       <div className="block">
-        <div className="relative h-48 overflow-hidden bg-gray-100">
+        <Link href={`/products/${product.slug}`} aria-label={`View ${product.name}`} className="relative block aspect-square overflow-hidden bg-gray-100">
           {product.images?.[0] && (
             <img
               src={product.images[0]}
@@ -44,20 +44,20 @@ const ProductCard = ({ product, index }: { product: PublicProduct; index: number
               </span>
             </div>
           )}
-        </div>
-        <div className="p-4">
+        </Link>
+        <div className={compact ? "p-2 sm:p-4" : "p-3 sm:p-4"}>
           <Link href={`/products/${product.slug}`}>
             <h3 className="font-semibold text-gray-800 line-clamp-1">
               {product.name}
             </h3>
           </Link>
           <p className="text-emerald-700 font-bold text-lg mt-1">
-            {product.variants?.length ? "From " : ""}KES {product.price}
+            {product.variants?.length ? "From " : ""}KES {product.price.toLocaleString()}
           </p>
-          <p className="text-gray-500 text-sm line-clamp-2 mt-2">
+          <p className={compact ? "hidden sm:line-clamp-2 text-gray-500 text-sm mt-2" : "text-gray-500 text-sm line-clamp-2 mt-2"}>
             {richTextToPlainText(product.description)}
           </p>
-          <div className="flex gap-2 mt-4">
+          <div className={compact ? "hidden sm:flex gap-2 mt-4" : "flex gap-2 mt-4"}>
             {product.variants?.length ? <Link href={`/products/${product.slug}`} className="flex-1 rounded-lg bg-emerald-600 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700">Choose an option</Link> : <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
@@ -67,6 +67,7 @@ const ProductCard = ({ product, index }: { product: PublicProduct; index: number
             </button>}
             <Link
               href={`/products/${product.slug}`}
+              aria-label={`View ${product.name}`}
               className="inline-flex items-center justify-center p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition"
             >
               <Eye size={16} />
