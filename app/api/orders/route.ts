@@ -13,7 +13,6 @@ import {
   createOrderNumber,
   orderTimestamps,
   serializeOrder,
-  SHIPPING_RATES,
   timestamp,
   validateOrderBody,
 } from "@/lib/orders";
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
         transaction.update(byId.get(id)!.ref, { ...(update.variants ? { variants: update.variants } : {}), stockQuantity, inStock: stockQuantity > 0, updatedAt: FieldValue.serverTimestamp() });
       }
       const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const shipping = SHIPPING_RATES[input.shippingMethod];
+      const shipping = 0;
       transaction.set(orderReference, {
         userId: user.uid,
         orderNumber: createOrderNumber(),
@@ -62,11 +61,12 @@ export async function POST(request: NextRequest) {
         items,
         subtotal,
         shipping,
-        total: subtotal + shipping,
-        paymentMethod: input.paymentMethod,
+        total: subtotal,
+        deliveryFeePending: true,
+        paymentMethod: "pending",
         paymentStatus: "pending",
         orderStatus: "pending",
-        shippingMethod: input.shippingMethod,
+        shippingMethod: "to_be_confirmed",
         ...(input.notes ? { notes: input.notes } : {}),
         ...orderTimestamps(),
       });

@@ -191,11 +191,12 @@ export interface Order {
   subtotal: number;
   shipping: number;
   total: number;
-  paymentMethod: "mpesa" | "bank_transfer" | "cash_on_delivery" | "card";
+  deliveryFeePending?: boolean;
+  paymentMethod: "mpesa" | "bank_transfer" | "cash_on_delivery" | "card" | "pending";
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  orderStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  orderStatus: string;
   notes?: string;
-  shippingMethod: "standard" | "express" | "pickup";
+  shippingMethod: "standard" | "express" | "pickup" | "to_be_confirmed";
   createdAt?: unknown;
   updatedAt?: unknown;
 }

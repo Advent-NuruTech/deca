@@ -8,24 +8,28 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart } from "@/components/providers/CartProvider";
 import SEO from "@/components/public/SEO";
 import CheckoutAuthGate from "@/components/public/checkout/CheckoutAuthGate";
-import CheckoutForm, { type CheckoutFormData } from "@/components/public/checkout/CheckoutForm";
+import CheckoutForm, { type CheckoutFormData, type SavedAddress } from "@/components/public/checkout/CheckoutForm";
 import EmptyCheckout from "@/components/public/checkout/EmptyCheckout";
 import OrderSummary from "@/components/public/checkout/OrderSummary";
 import { api } from "@/lib/api";
 import type { PublicOrder } from "@/lib/types";
 
-const shippingRates = { standard: 500, express: 1500, pickup: 0 } as const;
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { items, total: cartTotal, clearCart } = useCart();
   const [submitting, setSubmitting] = useState(false);
+  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [saveAddress, setSaveAddress] = useState(true);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [addressError, setAddressError] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<CheckoutFormData>({
     name: "", email: "", phone: "",
     address: { street: "", city: "", county: "", postalCode: "" },
-    paymentMethod: "mpesa", shippingMethod: "standard", notes: "",
+    notes: "",
   });
 
   useEffect(() => {
@@ -37,8 +41,22 @@ export default function CheckoutPage() {
     }));
   }, [user]);
 
-  const shipping = shippingRates[formData.shippingMethod];
-  const total = cartTotal + shipping;
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    setAddressesLoading(true);
+    api.get<{ addresses: SavedAddress[] }>("/api/account/addresses").then(({ addresses }) => {
+      if (!active) return;
+      setAddresses(addresses);
+      if (addresses[0]) { const a = addresses[0]; setFormData((current) => { if (current.phone || current.address.street || current.address.city || current.address.county) return current; return { ...current, phone: a.phone, address: { street: a.street, city: a.city, county: a.county, postalCode: a.postalCode } }; }); setSelectedAddress(a.id); }
+    }).catch(() => { if (active) setAddressError("Saved addresses could not be loaded. You can still enter an address."); }).finally(() => { if (active) setAddressesLoading(false); });
+    return () => { active = false; };
+  }, [user]);
+  const selectAddress = (id: string) => {
+    setSelectedAddress(id);
+    const a = addresses.find((item) => item.id === id);
+    setFormData((current) => ({ ...current, phone: a?.phone ?? current.phone, address: a ? { street: a.street, city: a.city, county: a.county, postalCode: a.postalCode } : { street: "", city: "", county: "", postalCode: "" } }));
+  };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -68,11 +86,14 @@ export default function CheckoutPage() {
     if (!items.length) return router.push("/cart");
     setSubmitting(true);
     try {
+      if (saveAddress) {
+        const saved = await api.put<SavedAddress>("/api/account/addresses", { ...(selectedAddress ? { id: selectedAddress } : {}), ...formData.address, phone: formData.phone });
+        setSelectedAddress(saved.id);
+        setAddresses((current) => [...current.filter((item) => item.id !== saved.id), saved]);
+      }
       const order = await api.post<PublicOrder>("/api/orders", {
         customer: { name: formData.name, email: formData.email, phone: formData.phone, address: { ...formData.address, country: "Kenya" } },
         items: items.map((item) => ({ product: item._id, variantId: item.variantId, quantity: item.quantity })),
-        paymentMethod: formData.paymentMethod,
-        shippingMethod: formData.shippingMethod,
         notes: formData.notes,
       });
       clearCart();
@@ -87,5 +108,5 @@ export default function CheckoutPage() {
 
   if (!items.length) return <div className="min-h-screen bg-gray-50 pt-24 pb-16"><div className="container mx-auto px-4"><EmptyCheckout /></div></div>;
 
-  return <><SEO title="Checkout | RemSam Homestead" description="Complete your order at RemSam Homestead. Secure checkout for organic seeds, fresh produce, and other farm products." keywords={["Checkout", "Order", "Payment", "Organic Seeds", "Kenya"]} /><div className="min-h-screen bg-gray-50 pt-24 pb-16"><div className="container mx-auto px-4"><motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8"><h1 className="text-4xl md:text-5xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">Checkout</span></h1><p className="text-gray-500 mt-2">Complete your order by providing your details below</p></motion.div><CheckoutAuthGate><div className="grid grid-cols-1 lg:grid-cols-3 gap-8"><div className="lg:col-span-2"><CheckoutForm formData={formData} errors={errors} onChange={handleChange} onSubmit={handleSubmit} loading={submitting} /></div><div className="lg:col-span-1"><OrderSummary cartItems={items} subtotal={cartTotal} shipping={shipping} total={total} /></div></div></CheckoutAuthGate></div></div></>;
+  return <><SEO title="Checkout | RemSam Homestead" description="Complete your order at RemSam Homestead. Secure checkout for organic seeds, fresh produce, and other farm products." keywords={["Checkout", "Order", "Payment", "Organic Seeds", "Kenya"]} /><div className="min-h-screen bg-gray-50 pt-24 pb-16"><div className="container mx-auto px-4"><motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8"><h1 className="text-4xl md:text-5xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">Checkout</span></h1><p className="text-gray-500 mt-2">Complete your order by providing your details below</p></motion.div><CheckoutAuthGate><div className="grid grid-cols-1 lg:grid-cols-3 gap-8"><div className="lg:col-span-2">{addressesLoading ? <p role="status" className="rounded-xl bg-white p-6 text-slate-600">Loading your saved details?</p> : <>{addressError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-4 text-amber-900">{addressError}</p>}<CheckoutForm addresses={addresses} selectedAddress={selectedAddress} onSelectAddress={selectAddress} saveAddress={saveAddress} onSaveAddressChange={setSaveAddress} formData={formData} errors={errors} onChange={handleChange} onSubmit={handleSubmit} loading={submitting} /></>}</div><div className="lg:col-span-1"><OrderSummary cartItems={items} subtotal={cartTotal} shipping={0} total={cartTotal} /></div></div></CheckoutAuthGate></div></div></>;
 }

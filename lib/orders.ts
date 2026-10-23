@@ -5,23 +5,11 @@ import { HttpError } from "@/lib/auth";
 import { serializeValue } from "@/lib/products";
 import type { OrderCustomer, PublicOrder } from "@/lib/types";
 
-export const SHIPPING_RATES = {
-  standard: 500,
-  express: 1500,
-  pickup: 0,
-} as const;
-
-const PAYMENT_METHODS = ["mpesa", "bank_transfer", "cash_on_delivery", "card"] as const;
-const ORDER_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"] as const;
-
-type ShippingMethod = keyof typeof SHIPPING_RATES;
 
 export type ValidatedOrderInput = {
   customer: OrderCustomer;
   items: Array<{ product: string; quantity: number; variantId?: string }>;
-  paymentMethod: (typeof PAYMENT_METHODS)[number];
-  shippingMethod: ShippingMethod;
   notes?: string;
 };
 
@@ -87,29 +75,14 @@ export function validateOrderBody(value: unknown): ValidatedOrderInput {
     throw new HttpError(400, "Each product option may appear only once");
   }
 
-  const paymentMethod = value.paymentMethod ?? "mpesa";
-  if (!PAYMENT_METHODS.includes(paymentMethod as (typeof PAYMENT_METHODS)[number])) {
-    throw new HttpError(400, "Invalid payment method");
-  }
-  const shippingMethod = value.shippingMethod ?? "standard";
-  if (typeof shippingMethod !== "string" || !(shippingMethod in SHIPPING_RATES)) {
-    throw new HttpError(400, "Invalid shipping method");
-  }
-
-  return {
-    customer,
-    items,
-    paymentMethod: paymentMethod as ValidatedOrderInput["paymentMethod"],
-    shippingMethod: shippingMethod as ShippingMethod,
-    notes: optionalString(value, "notes", 2000),
-  };
+  return { customer, items, notes: optionalString(value, "notes", 2000) };
 }
 
 export function validateStatusBody(value: unknown) {
   if (!isRecord(value)) throw new HttpError(400, "A JSON status body is required");
   const orderStatus = value.orderStatus;
   const paymentStatus = value.paymentStatus;
-  if (orderStatus !== undefined && !ORDER_STATUSES.includes(orderStatus as (typeof ORDER_STATUSES)[number])) {
+  if (orderStatus !== undefined && (typeof orderStatus !== "string" || !orderStatus.trim() || orderStatus.length > 100)) {
     throw new HttpError(400, "Invalid order status");
   }
   if (paymentStatus !== undefined && !PAYMENT_STATUSES.includes(paymentStatus as (typeof PAYMENT_STATUSES)[number])) {

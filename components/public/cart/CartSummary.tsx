@@ -14,7 +14,7 @@ export default function CartSummary({
   onClearCart: () => void;
 }) {
   const features = [
-    { icon: Truck, text: "Free shipping on orders over $50" },
+    { icon: Truck, text: "Delivery fee confirmed after your details are reviewed" },
     { icon: Shield, text: "Secure checkout guaranteed" },
   ];
 
@@ -34,11 +34,11 @@ export default function CartSummary({
           </div>
           <div className="flex justify-between text-gray-600">
             <span>Shipping</span>
-            <span className="text-emerald-600">Free</span>
+            <span className="text-slate-700">To be confirmed</span>
           </div>
           <div className="border-t border-gray-100 pt-4">
             <div className="flex justify-between text-lg">
-              <span className="text-gray-800 font-semibold">Total</span>
+              <span className="text-gray-800 font-semibold">Products total</span>
               <span className="text-2xl font-bold text-emerald-700">KES {subtotal.toLocaleString()}</span>
             </div>
           </div>
