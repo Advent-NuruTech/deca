@@ -3,17 +3,16 @@
 import { managedImageIdFromUrl } from "@/lib/managed-images";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, Edit3, FolderPlus, ImagePlus, Package, Plus, Search, Sparkles, Star, Trash2, X } from "lucide-react";
+import { Edit3, FolderPlus, ImagePlus, Plus, Search, Sparkles, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
-import { richTextToPlainText } from "@/lib/rich-text";
 import type { Product, ProductCategory, PublicProduct } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 import RichTextEditor from "@/components/admin/rich-text-editor";
 
-type ProductsResponse = { products: PublicProduct[] };
+type ProductsResponse = { products: PublicProduct[]; hasMore: boolean; nextCursor: string };
 type CategoriesResponse = { categories: ProductCategory[] };
 type UploadResponse = { url: string; public_id: string };
 type ProductForm = {
@@ -44,9 +43,15 @@ function formFromProduct(product?: PublicProduct | null, fallbackCategory = ""):
 
 export default function ProductManager() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [products, setProducts] = useState<PublicProduct[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState<string[]>([""]);
+  const [hasMore, setHasMore] = useState(false);
+  const [reloadVersion, setReloadVersion] = useState(0);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
@@ -60,32 +65,34 @@ export default function ProductManager() {
   const [newUploads, setNewUploads] = useState<string[]>([]);
 
   const load = useCallback(async () => {
-    setLoading(true); setError("");
     try {
-      const [productResponse, categoryResponse] = await Promise.all([
-        api.get<ProductsResponse>("/api/products?scope=admin&limit=100"),
-        api.get<CategoriesResponse>("/api/product-categories?scope=admin"),
-      ]);
-      setProducts(productResponse.products ?? []);
-      setCategories(categoryResponse.categories ?? []);
-    } catch (nextError) { setError(errorMessage(nextError, "Products and categories could not be loaded")); }
-    finally { setLoading(false); }
+      const response = await api.get<CategoriesResponse>("/api/product-categories?scope=admin&light=true");
+      setCategories(response.categories ?? []); setError("");
+      setReloadVersion((version) => version + 1);
+    } catch (nextError) { setError(errorMessage(nextError, "Categories could not be loaded")); }
   }, []);
-
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {
-    if (searchParams.get("action") === "new" && categories.length) openEditor();
-  // Open the URL action after its category choices have loaded.
+    if (searchParams.get("action") === "new" && categories.length) { openEditor(); router.replace("/admin/products", { scroll: false }); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, categories.length]);
-
+  useEffect(() => { setPage(1); setCursors([""]); }, [query, status, categoryFilter]);
+  useEffect(() => {
+    if (!listOpen) return;
+    let active = true; setLoading(true);
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({ scope: "admin", paged: "true", limit: "20", cursor: cursors[page - 1] ?? "", category: categoryFilter, status, search: query });
+      api.get<ProductsResponse>(`/api/products?${params}`).then((response) => {
+        if (!active) return;
+        setProducts(response.products); setHasMore(response.hasMore);
+        setCursors((current) => [...current.slice(0, page), response.nextCursor]); setError("");
+      }).catch((nextError) => { if (active) setError(errorMessage(nextError, "Products could not be loaded")); })
+        .finally(() => { if (active) setLoading(false); });
+    }, query ? 350 : 0);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [listOpen, page, cursors[page - 1], categoryFilter, status, query, reloadVersion]);
   const categoryNames = useMemo(() => new Map(categories.map((item) => [item.id, item.name])), [categories]);
-  const filtered = useMemo(() => products.filter((product) => {
-    const searchable = `${product.name} ${richTextToPlainText(product.description)}`.toLowerCase();
-    return (!query || searchable.includes(query.toLowerCase()))
-      && (!status || product.status === status)
-      && (!categoryFilter || product.category === categoryFilter);
-  }), [categoryFilter, products, query, status]);
+  const filtered = loading ? [] : products;
 
   function openEditor(product?: PublicProduct) {
     setEditing(product ?? null); setForm(formFromProduct(product, categories[0]?.id ?? ""));
@@ -169,7 +176,7 @@ export default function ProductManager() {
       const removed = new Set([...previousImages.map(managedImageIdFromUrl).filter((id): id is string => Boolean(id)), ...newUploads].filter((id) => !retainedIds.has(id)));
       await Promise.allSettled([...removed].map((publicId) => api.delete("/api/upload", { publicId })));
       setNewUploads([]); setEditorOpen(false); setEditing(null);
-      toast.success(editing ? "Product updated" : "Product created"); await load();
+      toast.success(editing ? "Product updated" : "Product created"); setReloadVersion((version) => version + 1);
     } catch (nextError) { toast.error(errorMessage(nextError, "Product could not be saved")); }
     finally { setSaving(false); }
   }
@@ -179,7 +186,7 @@ export default function ProductManager() {
     try {
       await api.delete(`/api/products/${product.id}`);
       setProducts((current) => current.filter((item) => item.id !== product.id));
-      setCategories((current) => current.map((item) => item.id === product.category ? { ...item, count: Math.max(0, item.count - 1) } : item));
+      setReloadVersion((version) => version + 1);
       toast.success("Product deleted");
     } catch (nextError) { toast.error(errorMessage(nextError, "Product could not be deleted")); }
   }
@@ -194,9 +201,12 @@ export default function ProductManager() {
   async function deleteCategory(category: ProductCategory) {
     const candidates = categories.filter((item) => item.id !== category.id);
     let replacementId = "";
-    if (category.count > 0) {
+    let count: number;
+    try { count = (await api.get<{ count: number }>(`/api/product-categories?scope=admin&countFor=${encodeURIComponent(category.id)}`)).count; }
+    catch (nextError) { toast.error(errorMessage(nextError, "Category usage could not be checked")); return; }
+    if (count > 0) {
       if (!candidates.length) return void toast.error("Add another category before deleting this one");
-      const name = window.prompt(`“${category.name}” contains ${category.count} product${category.count === 1 ? "" : "s"}. Type the exact destination category name to move them before deletion:\n\n${candidates.map((item) => item.name).join(", ")}`)?.trim();
+      const name = window.prompt(`“${category.name}” contains ${count} product${count === 1 ? "" : "s"}. Type the exact destination category name to move them before deletion:\n\n${candidates.map((item) => item.name).join(", ")}`)?.trim();
       if (!name) return;
       replacementId = candidates.find((item) => item.name.toLowerCase() === name.toLowerCase())?.id ?? "";
       if (!replacementId) return void toast.error("That destination category was not found");
@@ -204,23 +214,20 @@ export default function ProductManager() {
     try {
       await api.delete(`/api/product-categories/${category.id}`, { replacementId });
       if (categoryFilter === category.id) setCategoryFilter("");
-      toast.success(category.count ? "Category deleted and products moved" : "Category deleted"); await load();
+      toast.success(count ? "Category deleted and products moved" : "Category deleted"); await load();
     } catch (nextError) { toast.error(errorMessage(nextError, "Category could not be deleted")); }
   }
 
-  const active = products.filter((product) => product.status === "active").length;
-  const featured = products.filter((product) => product.featured).length;
-  const lowStock = products.filter((product) => product.variants?.length ? product.variants.some((v) => v.stockQuantity <= 5) : product.stockQuantity <= 5).length;
-
   return <main className="pb-16 pt-10"><div className="container mx-auto px-4">
     <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><h1 className="text-4xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Product Management</span></h1><p className="mt-2 text-gray-600">Manage products, inventory, rich content, media, and categories.</p></div><div className="flex items-center gap-4"><motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="hidden md:block"><Sparkles size={30} className="text-emerald-400/50" /></motion.div><button onClick={() => openEditor()} disabled={!categories.length} className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white shadow hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Plus size={20} /> Add New Product</button></div></div>
-    <CategoryManager categories={categories} selected={categoryFilter} onSelect={setCategoryFilter} onAdd={() => setCategoryDialogOpen(true)} onRename={renameCategory} onDelete={deleteCategory} />
-    <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4"><MiniStat label="Total products" value={products.length} icon={<Package />} /><MiniStat label="Active" value={active} icon={<Package />} /><MiniStat label="Featured" value={featured} icon={<Star />} /><MiniStat label="Low stock" value={lowStock} icon={<AlertCircle />} /></div>
+    <CategoryManager categories={categories} selected={categoryFilter} onSelect={(id) => { setCategoryFilter(id); if (id) setListOpen(true); }} onAdd={() => setCategoryDialogOpen(true)} onRename={renameCategory} onDelete={deleteCategory} />
     {error && <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error} <button onClick={() => void load()} className="ml-2 font-semibold underline">Retry</button></div>}
     <section className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-      <div className="flex flex-col gap-3 border-b border-gray-100 p-5 lg:flex-row"><label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input aria-label="Search products" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search products…" className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><select aria-label="Product category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} className="rounded-lg border border-gray-200 px-3 py-2.5"><option value="">All categories</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><select aria-label="Product status" value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-lg border border-gray-200 px-3 py-2.5"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-5"><div><h2 className="text-lg font-bold">Products</h2><p className="mt-1 text-sm text-gray-500">View and manage products in pages.</p></div><button type="button" aria-expanded={listOpen} aria-controls="product-list" onClick={() => setListOpen((open) => !open)} className="rounded-lg border border-emerald-600 px-4 py-2 font-semibold text-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">{listOpen ? "Hide products" : "View products"}</button></div>
+      {listOpen && <div id="product-list"><div className="flex flex-col gap-3 border-b border-gray-100 p-5 lg:flex-row"><label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input aria-label="Search products" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search products…" className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><select aria-label="Product category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} className="rounded-lg border border-gray-200 px-3 py-2.5"><option value="">All categories</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><select aria-label="Product status" value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-lg border border-gray-200 px-3 py-2.5"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
       <div className="overflow-x-auto"><table className="w-full min-w-[800px] text-left"><thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Category</th><th className="px-5 py-3">Price</th><th className="px-5 py-3">Stock</th><th className="px-5 py-3">Status</th><th className="px-5 py-3">Created</th><th className="px-5 py-3 text-right">Actions</th></tr></thead><tbody className="divide-y divide-gray-100">{filtered.map((product) => <tr key={product.id} className="hover:bg-gray-50"><td className="px-5 py-4"><div className="flex items-center gap-3"><img src={product.images?.[0] || "/logo.png"} alt="" className="h-12 w-12 rounded-lg object-cover" /><div><p className="font-semibold text-gray-900">{product.name}</p>{product.featured && <span className="text-xs text-amber-600">Featured</span>}</div></div></td><td className="px-5 py-4 text-gray-600">{categoryNames.get(product.category) ?? "Unassigned"}</td><td className="px-5 py-4 font-medium">{formatMoney(product.price)}</td><td className="px-5 py-4"><span className={product.stockQuantity <= 5 ? "font-semibold text-red-600" : "text-gray-600"}>{product.stockQuantity}</span>{Boolean(product.variants?.length) && <div className="mt-1 text-xs text-gray-500">{product.variants!.map((v) => `${v.name}: ${v.stockQuantity}`).join(", ")}</div>}</td><td className="px-5 py-4"><StatusBadge value={product.status} /></td><td className="px-5 py-4 text-sm text-gray-500">{formatDate(product.createdAt)}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button onClick={() => openEditor(product)} aria-label={`Edit ${product.name}`} className="rounded-lg p-2 text-blue-600 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-600"><Edit3 size={18} /></button><button onClick={() => void remove(product)} aria-label={`Delete ${product.name}`} className="rounded-lg p-2 text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600"><Trash2 size={18} /></button></div></td></tr>)}</tbody></table></div>
-      {!loading && filtered.length === 0 && <p className="p-10 text-center text-gray-500">No products match your filters.</p>}{loading && <p className="p-10 text-center text-gray-500">Loading products…</p>}
+      {!loading && !error && filtered.length === 0 && <p className="p-10 text-center text-gray-500">No products match your filters.</p>}{loading && <p role="status" className="p-10 text-center text-gray-500">Loading products?</p>}
+      {!loading && (filtered.length > 0 || page > 1) && <nav aria-label="Product pages" className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 px-5 py-4 text-sm text-gray-600"><span aria-live="polite">Page {page}</span><div className="flex gap-2"><button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)} className="rounded-lg border px-3 py-2 font-medium disabled:opacity-40">Previous</button><button type="button" disabled={!hasMore} onClick={() => setPage((value) => value + 1)} className="rounded-lg border px-3 py-2 font-medium disabled:opacity-40">Next</button></div></nav>}</div>}
     </section>
   </div>
   <AnimatePresence>{editorOpen && <ProductEditor editing={editing} form={form} categories={categories} saving={saving} uploading={uploading} setField={setField} onUploadImages={uploadImages} onUploadVariantImage={uploadVariantImage} onRemoveImage={removeImage} onClose={closeEditor} onSubmit={submit} />}</AnimatePresence>
@@ -249,7 +256,12 @@ function CategoryManager({ categories, selected, onSelect, onAdd, onRename, onDe
   categories: ProductCategory[]; selected: string; onSelect: (id: string) => void; onAdd: () => void;
   onRename: (category: ProductCategory) => Promise<void>; onDelete: (category: ProductCategory) => Promise<void>;
 }) {
-  return <section className="mb-8 rounded-xl border border-gray-100 bg-white p-5 shadow-sm"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-bold">Product categories</h2><p className="mt-1 text-sm text-gray-500">Choose a category to filter products, or manage it below.</p></div><button type="button" onClick={onAdd} className="flex items-center gap-2 rounded-lg border border-emerald-600 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"><FolderPlus size={17} /> Add category</button></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{categories.map((category) => <div key={category.id} className={`rounded-xl border p-4 ${selected === category.id ? "border-emerald-500 bg-emerald-50" : "border-gray-200"}`}><button type="button" onClick={() => onSelect(selected === category.id ? "" : category.id)} className="w-full text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"><span className="font-semibold text-gray-900">{category.name}</span><span className="mt-1 block text-sm text-gray-500">{category.count} product{category.count === 1 ? "" : "s"}</span></button><div className="mt-3 flex gap-3 border-t border-gray-100 pt-3 text-sm"><button type="button" onClick={() => void onRename(category)} className="font-semibold text-blue-700 hover:underline">Rename</button><button type="button" onClick={() => void onDelete(category)} className="font-semibold text-red-700 hover:underline">Delete</button></div></div>)}{!categories.length && <p className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800 sm:col-span-2 xl:col-span-3">No product categories are available. Add one before creating a product.</p>}</div></section>;
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const matching = categories.filter((category) => category.name.toLowerCase().includes(query.trim().toLowerCase()));
+  const pages = Math.max(1, Math.ceil(matching.length / 10));
+  const currentPage = Math.min(page, pages);
+  return <section className="mb-8 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-bold">Product categories</h2><p className="mt-1 text-sm text-gray-500">Choose a category to view its products, or manage it below.</p></div><button type="button" onClick={onAdd} className="flex items-center gap-2 rounded-lg border border-emerald-600 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"><FolderPlus size={17} /> Add category</button></div><label className="relative mb-4 block"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input aria-label="Search product categories" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Search categories..." className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><div className="space-y-2">{matching.slice((currentPage - 1) * 10, currentPage * 10).map((category) => <div key={category.id} className={`flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 ${selected === category.id ? "border-emerald-400 bg-emerald-50" : "border-gray-200 bg-gray-50"}`}><button type="button" onClick={() => onSelect(selected === category.id ? "" : category.id)} className="min-w-[110px] flex-1 py-2 text-left font-semibold text-gray-900 focus-visible:outline-2 focus-visible:outline-emerald-700">{category.name}</button><button type="button" onClick={() => void onRename(category)} aria-label={`Rename ${category.name}`} className="rounded-lg p-2 text-blue-700 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700"><Edit3 size={17} /></button><button type="button" onClick={() => void onDelete(category)} aria-label={`Delete ${category.name}`} className="rounded-lg p-2 text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-700"><Trash2 size={17} /></button></div>)}</div>{!matching.length && <p className="py-6 text-center text-sm text-gray-500">{categories.length ? "No categories match your search." : "No product categories are available. Add one before creating a product."}</p>}{matching.length > 0 && <nav aria-label="Product category pages" className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4 text-sm text-gray-600"><span aria-live="polite">Showing {(currentPage - 1) * 10 + 1} - {Math.min(currentPage * 10, matching.length)} of {matching.length} categories</span><div className="flex items-center gap-2"><button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)} className="rounded-lg border px-3 py-2 disabled:opacity-40">Previous</button><span>Page {currentPage} of {pages}</span><button type="button" disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)} className="rounded-lg border px-3 py-2 disabled:opacity-40">Next</button></div></nav>}</section>;
 }
 
 function CategoryDialog({ onClose, onCreated }: { onClose: () => void; onCreated: () => Promise<void> }) {
@@ -267,7 +279,6 @@ function CategoryDialog({ onClose, onCreated }: { onClose: () => void; onCreated
   return <dialog ref={dialog} aria-labelledby="product-category-dialog-title" aria-describedby="product-category-dialog-description" onCancel={(event) => { if (saving) event.preventDefault(); }} onClose={onClose} className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-2xl backdrop:bg-gray-950/60"><form onSubmit={(event) => void submit(event)}><div className="border-b border-gray-100 p-5 sm:p-6"><div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><FolderPlus size={20} aria-hidden="true" /></div><h2 id="product-category-dialog-title" className="text-xl font-bold">Add product category</h2><p id="product-category-dialog-description" className="mt-1 text-sm text-gray-600">Create a category administrators can assign to products.</p></div><div className="p-5 sm:p-6"><label htmlFor="new-product-category-name" className="mb-2 block text-sm font-semibold">Category name</label><input id="new-product-category-name" autoFocus required maxLength={100} value={name} onChange={(event) => { setName(event.target.value); setError(""); }} placeholder="e.g. Farm tools" aria-invalid={Boolean(error)} aria-describedby={error ? "product-category-dialog-error" : undefined} disabled={saving} className="input-field" />{error && <p id="product-category-dialog-error" role="alert" className="mt-2 text-sm text-red-700">{error}</p>}</div><div className="flex flex-col-reverse gap-3 border-t border-gray-100 p-5 sm:flex-row sm:justify-end sm:px-6"><button type="button" disabled={saving} onClick={() => dialog.current?.close()} className="rounded-lg border border-gray-300 px-4 py-2.5 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50">Cancel</button><button type="submit" disabled={saving} className="rounded-lg bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50">{saving ? "Adding…" : "Add category"}</button></div></form></dialog>;
 }
 
-function MiniStat({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) { return <div className="flex items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white p-3 shadow-sm sm:p-5"><div className="min-w-0"><p className="text-sm text-gray-500">{label}</p><p className="mt-1 break-words text-xl font-bold sm:text-2xl">{value}</p></div><div className="shrink-0 rounded-lg bg-emerald-100 p-2 text-emerald-700 sm:p-3">{icon}</div></div>; }
 function StatusBadge({ value }: { value: string }) { const style = value === "active" ? "bg-green-100 text-green-700" : value === "draft" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"; return <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${style}`}>{value}</span>; }
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) { return <section><h3 className="mb-4 border-b border-gray-100 pb-2 text-lg font-bold text-gray-900">{title}</h3>{children}</section>; }
 function Field({ label, wide, children }: { label: string; wide?: boolean; children: React.ReactNode }) { return <label className={wide ? "md:col-span-2" : ""}><span className="mb-1.5 block text-sm font-medium text-gray-700">{label}</span>{children}</label>; }

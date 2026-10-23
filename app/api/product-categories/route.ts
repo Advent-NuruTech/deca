@@ -14,8 +14,13 @@ export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
+    const countFor = request.nextUrl.searchParams.get("countFor");
+    if (adminView && countFor) {
+      const count = await firestore().collection("products").where("category", "==", countFor).count().get();
+      return NextResponse.json({ count: count.data().count });
+    }
     const categories = await getProductCategories(adminView
-      ? { initialize: true, includeInactive: true }
+      ? { initialize: true, includeInactive: true, includeCounts: request.nextUrl.searchParams.get("light") !== "true" }
       : { includeInactive: false });
     return NextResponse.json(
       { categories },

@@ -1,3 +1,4 @@
+import { FieldPath } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
@@ -35,6 +36,39 @@ export async function GET(request: NextRequest) {
   try {
     const adminView = request.nextUrl.searchParams.get("scope") === "admin";
     if (adminView) await requireAdmin(request);
+    if (adminView && request.nextUrl.searchParams.get("stats") === "true") {
+      const collection = firestore().collection("products");
+      const [total, active] = await Promise.all([collection.count().get(), collection.where("status", "==", "active").count().get()]);
+      return NextResponse.json({ total: total.data().count, active: active.data().count });
+    }
+    if (adminView && request.nextUrl.searchParams.get("paged") === "true") {
+      const categoryId = request.nextUrl.searchParams.get("category")?.trim() ?? "";
+      const statusFilter = request.nextUrl.searchParams.get("status")?.trim() ?? "";
+      const searchTerm = (request.nextUrl.searchParams.get("search") ?? "").trim().toLowerCase();
+      const limit = Math.min(50, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 20));
+      let cursor = request.nextUrl.searchParams.get("cursor") ?? "";
+      const found: ReturnType<typeof serializeProduct>[] = [];
+      let exhausted = false;
+      while (found.length <= limit && !exhausted) {
+        let query = firestore().collection("products").orderBy(FieldPath.documentId());
+        if (categoryId) query = query.where("category", "==", categoryId);
+        else if (statusFilter) query = query.where("status", "==", statusFilter);
+        if (cursor) query = query.startAfter(cursor);
+        const batchSize = limit + 1 - found.length;
+        const snapshot = await query.limit(batchSize).get();
+        exhausted = snapshot.size < batchSize;
+        for (const document of snapshot.docs) {
+          cursor = document.id;
+          const product = serializeProduct(document);
+          if (statusFilter && product.status !== statusFilter) continue;
+          if (searchTerm && !`${product.name ?? ""} ${richTextToPlainText(String(product.description ?? ""))}`.toLowerCase().includes(searchTerm)) continue;
+          found.push(product);
+          if (found.length > limit) break;
+        }
+      }
+      const products = found.slice(0, limit);
+      return NextResponse.json({ products, hasMore: found.length > limit, nextCursor: products.at(-1)?.id ?? "" });
+    }
     const category = request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ?? "";
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
     const featured = request.nextUrl.searchParams.get("featured");

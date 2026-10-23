@@ -4,7 +4,7 @@ import { managedImageIdFromUrl } from "@/lib/managed-images";
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Download, Edit3, Eye, FileText, FolderPlus, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
@@ -30,6 +30,7 @@ function articleForm(article?: PublicArticle | null): ArticleForm {
 
 export default function ArticleManager() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [authors, setAuthors] = useState<AuthorProfile[]>([]);
   const [authorsError, setAuthorsError] = useState("");
   const [authorsLoading, setAuthorsLoading] = useState(true);
@@ -68,7 +69,7 @@ export default function ArticleManager() {
   useEffect(() => { void load(); }, [load]);
   const loadAuthors = useCallback(async () => { setAuthorsLoading(true); setAuthorsError(""); try { setAuthors(await api.get<AuthorProfile[]>("/api/authors")); } catch { setAuthorsError("Authors could not be loaded. Try refreshing the list."); } finally { setAuthorsLoading(false); } }, []);
   useEffect(() => { void loadAuthors(); }, [loadAuthors]);
-  useEffect(() => { setCategory(searchParams.get("category") ?? ""); if (searchParams.get("action") === "new") openNew(); }, [searchParams]);
+  useEffect(() => { setCategory(searchParams.get("category") ?? ""); if (searchParams.get("action") === "new") { openNew(); const params = new URLSearchParams(searchParams.toString()); params.delete("action"); router.replace(`/admin/articles${params.size ? `?${params}` : ""}`, { scroll: false }); } }, [searchParams, router]);
   useEffect(() => { setResourcePage(1); setCursors([""]); }, [query, category, publication]);
   useEffect(() => {
     if (!listOpen) return;

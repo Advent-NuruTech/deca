@@ -46,18 +46,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request);
-    const categories = await getProductCategories({ initialize: true, includeInactive: true });
+    const categories = await getProductCategories({ initialize: true, includeInactive: true, includeCounts: false });
     const { id } = await params;
     const category = categories.find((item) => item.id === id);
     if (!category) throw new HttpError(404, "Category not found");
+    const count = (await firestore().collection("products").where("category", "==", id).count().get()).data().count;
     const body = await jsonBody(request);
     const replacementId = typeof body.replacementId === "string" ? body.replacementId : "";
-    if (category.count > 0 && !categories.some((item) => item.id === replacementId && item.id !== id)) {
+    if (count > 0 && !categories.some((item) => item.id === replacementId && item.id !== id)) {
       throw new HttpError(409, "Choose another category to receive the products before deleting this one");
     }
 
-    const syncD1 = category.count > 0 ? await beginD1ReadModelUpdate("products") : false;
-    if (category.count > 0) await updateProductsForCategoryChange(id, replacementId);
+    const syncD1 = count > 0 ? await beginD1ReadModelUpdate("products") : false;
+    if (count > 0) await updateProductsForCategoryChange(id, replacementId);
     await firestore().collection("productCategories").doc(id).delete();
     if (syncD1) {
       try {

@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import QuickActions from "@/components/admin/QuickActions";
 import { motion } from "framer-motion";
-import { Clock, FileText, MessageCircle, Package, Plus, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
+import { Clock, FileText, Package, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import { api } from "@/lib/api";
-import type { PublicArticle, PublicOrder, PublicProduct, ResourceTaxonomy } from "@/lib/types";
+import type { PublicArticle, PublicOrder, ResourceTaxonomy } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 
-type ProductsResponse = { products: PublicProduct[] };
+type ProductsResponse = { total: number; active: number };
 type ArticlesResponse = { articles: PublicArticle[]; resourceCategories: ResourceTaxonomy };
 type OrdersResponse = { orders: PublicOrder[] };
 type EmailActivity = { id: string; subject: string; kind: "newsletter" | "meeting"; sent?: number; failed?: number; sentAt?: unknown };
@@ -43,7 +44,7 @@ function StatCard({ title, value, icon: Icon, color, href }: { title: string; va
 }
 
 export default function AdminDashboard() {
-  const [products, setProducts] = useState<PublicProduct[]>([]);
+  const [products, setProducts] = useState<ProductsResponse>({ total: 0, active: 0 });
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [resourceCategories, setResourceCategories] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const [orders, setOrders] = useState<PublicOrder[]>([]);
@@ -71,11 +72,11 @@ export default function AdminDashboard() {
     setError("");
     try {
       const [productData, articleData, orderData] = await Promise.all([
-        api.get<ProductsResponse>("/api/products?scope=admin&limit=100"),
+        api.get<ProductsResponse>("/api/products?scope=admin&stats=true"),
         api.get<ArticlesResponse>("/api/articles?scope=admin&limit=100"),
         api.get<OrdersResponse>("/api/orders?limit=100"),
       ]);
-      setProducts(productData.products ?? []);
+      setProducts(productData);
       setArticles(articleData.articles ?? []);
       setResourceCategories(articleData.resourceCategories ?? { majors: [], subcategories: [] });
       setOrders(orderData.orders ?? []);
@@ -89,7 +90,7 @@ export default function AdminDashboard() {
   useEffect(() => { void load(); void loadEmailActivity(); }, [load, loadEmailActivity]);
 
   const stats = useMemo(() => ({
-    activeProducts: products.filter((product) => product.status === "active").length,
+    activeProducts: products.active,
     publishedArticles: articles.filter((article) => article.published).length,
     draftArticles: articles.filter((article) => !article.published).length,
     pendingOrders: orders.filter((order) => order.orderStatus === "pending").length,
@@ -118,49 +119,11 @@ export default function AdminDashboard() {
 
         </div>
 
-<section className="mb-8 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
-  <h2 className="mb-4 text-xl font-bold text-gray-900">
-    Quick Actions
-  </h2>
-
-  <div className="grid grid-cols-4 gap-2 sm:gap-3">
-    <Link
-      href="/admin/products?action=new"
-      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-emerald-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-emerald-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
-    >
-      <Plus size={18} className="shrink-0" />
-      <span>Add Product</span>
-    </Link>
-
-    <Link
-      href="/admin/articles?action=new"
-      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-blue-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-blue-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
-    >
-      <Plus size={18} className="shrink-0" />
-      <span>Add Resource</span>
-    </Link>
-
-    <Link
-      href="/admin/orders?status=pending"
-      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-orange-500 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-orange-600 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
-    >
-      <ShoppingCart size={18} className="shrink-0" />
-      <span>Process Orders</span>
-    </Link>
-
-    <Link
-      href="/admin/chat"
-      className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-green-600 px-1 py-3 text-center text-xs font-semibold text-white hover:bg-green-700 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"
-    >
-      <MessageCircle size={18} className="shrink-0" />
-      <span>Edit Chat</span>
-    </Link>
-  </div>
-</section>
+<QuickActions />
 
         {error && <div role="alert" className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>}
         <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-          <StatCard title="Total Products" value={products.length} icon={Package} color="emerald" href="/admin/products" />
+          <StatCard title="Total Products" value={products.total} icon={Package} color="emerald" href="/admin/products" />
           <StatCard title="Active Products" value={stats.activeProducts} icon={Star} color="emerald" />
           <StatCard title="Published Resources" value={stats.publishedArticles} icon={FileText} color="blue" href="/admin/articles" />
           <StatCard title="Total Orders" value={orders.length} icon={ShoppingCart} color="orange" href="/admin/orders" />
