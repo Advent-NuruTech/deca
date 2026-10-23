@@ -90,3 +90,14 @@ node --env-file=.env.local scripts/publish-admin-update.mjs "feature-id" "Short 
 ```
 
 Run this against the intended environment only after the feature is released and verified for users. The script does not overwrite an existing ID.
+
+## Customer accounts and Google sign-in
+
+1. Add `auth.remsamhomestead.com` to the same Vercel project as the storefront. Follow Vercel's domain instructions to configure DNS and HTTPS. Do not redirect this hostname to the storefront: Firebase's `/__/auth/` helpers must be served on it. The Next.js rewrite transparently proxies these paths to the project's Firebase Hosting helper.
+2. Set `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=auth.remsamhomestead.com` and confirm `NEXT_PUBLIC_FIREBASE_PROJECT_ID` matches the Firebase project. Redeploy because public variables are compiled into the browser bundle.
+3. In Firebase Authentication, enable Email/Password and Google under Sign-in method. Under Settings > Authorized domains, add `auth.remsamhomestead.com`, `remsamhomestead.com`, and `www.remsamhomestead.com` (and only the preview or localhost domains you need for testing).
+4. In Google Cloud > Google Auth Platform > Clients, edit the web OAuth client used by Firebase Google sign-in. Add `https://auth.remsamhomestead.com/__/auth/handler` to Authorized redirect URIs. Keep existing Firebase redirect URIs in place. Add `https://auth.remsamhomestead.com`, `https://remsamhomestead.com`, and `https://www.remsamhomestead.com` to Authorized JavaScript origins. If using a different client, enter that client's ID and secret in Firebase's Google provider settings.
+5. In Google Auth Platform > Branding, use RemSam as the app name, verify ownership of `remsamhomestead.com`, provide the homepage and privacy policy, and submit branding for verification if required. Set the audience to External and publish for public access when ready. The exact text shown by Google is controlled by Google and verification status.
+6. After deploying, test email signup, password reset, Google signup and sign-in, checkout and order ownership, changing a name and password, and verifying an email change. Test on mobile and desktop. Check `https://auth.remsamhomestead.com/__/auth/handler` reaches the Firebase handler without a redirect to another host.
+
+The account page is `/account` on the storefront and is also available on the auth hostname when it points to the same deployment. Firebase browser sessions are origin-scoped: signing in on one hostname does not sign the browser in on another. Storefront links and checkout use the storefront session, while `auth.remsamhomestead.com` supplies the branded Google OAuth handler.

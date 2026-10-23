@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import QuickActions from "@/components/admin/QuickActions";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -189,7 +188,6 @@ export default function AdminNavigation({ children }: { children: ReactNode }) {
             {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />} Toggle sidebar
           </button>
         </div>
-        {pathname !== "/admin/dashboard" && <div className="container mx-auto px-4 pt-8"><QuickActions /></div>}
         <div className="min-w-0">{children}</div>
       </div>
     </div>

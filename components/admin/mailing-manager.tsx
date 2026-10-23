@@ -1,5 +1,7 @@
 "use client";
 
+import PageQuickActions from "@/components/admin/PageQuickActions";
+
 import { useEffect, useMemo, useState } from "react";
 import { CalendarClock, CheckCircle2, Clock3, History, Mail, Pause, Play, Plus, RefreshCw, Send, Trash2, Users } from "lucide-react";
 import { api } from "@/lib/api";
@@ -173,6 +175,12 @@ export default function MailingManager() {
         <button onClick={() => void load()} disabled={loading} className="flex items-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-2.5 font-semibold text-brand-dark hover:bg-brand-soft disabled:opacity-60"><RefreshCw size={17} className={loading ? "animate-spin" : ""} /> Refresh</button>
       </header>
 
+      <PageQuickActions actions={[
+        { label: "Compose email", icon: <Mail size={18} />, href: "#compose-campaign" },
+        { label: "Subscribers", icon: <Users size={18} />, href: "#newsletter-subscribers" },
+        { label: "Scheduled emails", icon: <CalendarClock size={18} />, href: "#scheduled-campaigns" },
+        { label: "Delivery history", icon: <History size={18} />, href: "#delivery-history" },
+      ]} />
       {(error || notice) && <p role={error ? "alert" : "status"} className={`mt-6 rounded-xl border px-4 py-3 text-sm font-medium ${error ? "border-red-200 bg-red-50 text-red-700" : "border-brand-border bg-brand-soft text-brand-dark"}`}>{error || notice}</p>}
 
       <section className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">

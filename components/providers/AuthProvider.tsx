@@ -14,10 +14,12 @@ import {
   deleteUser,
   onIdTokenChanged,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { firebaseAuth } from "@/lib/firebase/client";
 import type { AppUser } from "@/lib/types";
 
@@ -28,6 +30,7 @@ type AuthContextValue = {
   error: string | null;
   signIn: (email: string, password: string) => Promise<AppUser>;
   register: (name: string, email: string, password: string) => Promise<AppUser>;
+  signInWithGoogle: () => Promise<AppUser>;
   registerAdmin: (name: string, email: string, password: string, signupCode: string) => Promise<AppUser>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<AppUser | null>;
@@ -46,12 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const refreshProfile = useCallback(async () => {
-    if (!firebaseAuth().currentUser) {
+    const current = firebaseAuth().currentUser;
+    if (!current) {
       setUser(null);
       return null;
     }
     const profile = await api.get<AppUser>("/api/auth/me");
-    setUser(profile);
+    if (firebaseAuth().currentUser?.uid === current.uid) setUser(profile);
     return profile;
   }, []);
 
@@ -67,8 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await refreshProfile();
       } catch (nextError) {
-        setUser(null);
-        setError(messageFor(nextError));
+        if (firebaseAuth().currentUser?.uid === nextUser.uid) {
+          setUser((previous) => previous?.uid === nextUser.uid ? previous : null);
+          setError(messageFor(nextError));
+        }
       } finally {
         setLoading(false);
       }
@@ -77,11 +83,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null);
-    await signInWithEmailAndPassword(firebaseAuth(), email, password);
-    const profile = await refreshProfile();
+    const credential = await signInWithEmailAndPassword(firebaseAuth(), email, password);
+    let profile: AppUser | null;
+    try { profile = await refreshProfile(); }
+    catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 401) throw error;
+      profile = await api.post<AppUser>("/api/auth/register", { name: credential.user.displayName || credential.user.email?.split("@")[0] || "Customer" });
+      setUser(profile);
+    }
     if (!profile) throw new Error("User profile not found");
     return profile;
   }, [refreshProfile]);
+
+  const signInWithGoogle = useCallback(async () => {
+    setError(null);
+    const credential = await signInWithPopup(firebaseAuth(), new GoogleAuthProvider());
+    const profile = await api.post<AppUser>("/api/auth/register", { name: credential.user.displayName || credential.user.email?.split("@")[0] || "Customer" });
+    setUser(profile);
+    return profile;
+  }, []);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     setError(null);
@@ -114,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ firebaseUser, user, loading, error, signIn, register, registerAdmin, logout, refreshProfile }), [firebaseUser, user, loading, error, signIn, register, registerAdmin, logout, refreshProfile]);
+  const value = useMemo(() => ({ firebaseUser, user, loading, error, signIn, signInWithGoogle, register, registerAdmin, logout, refreshProfile }), [firebaseUser, user, loading, error, signIn, signInWithGoogle, register, registerAdmin, logout, refreshProfile]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

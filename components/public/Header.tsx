@@ -18,6 +18,7 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronDown,
+  UserRound,
 } from "lucide-react";
 const logo = "/assets/logo.png";
 
@@ -170,6 +171,7 @@ const Header = () => {
     "/products",
     "/cart",
     "/checkout",
+    "/account",
     "/order-confirmation",
     "/admin/login",
     "/admin/dashboard",
@@ -337,6 +339,7 @@ const Header = () => {
 
           {/* Right side icons - Cart and Admin (only if logged in) */}
           <div className="flex items-center gap-3">
+            <Link href="/account" aria-label={user ? "Your account" : "Sign in or create an account"} className={`rounded-lg p-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isScrolled || isLightHeroPage ? "text-gray-700 hover:text-emerald-600" : "text-white hover:text-emerald-300"}`}><UserRound className="h-5 w-5" /></Link>
             {/* Cart */}
             <Link
               href="/cart"

@@ -1,5 +1,7 @@
 "use client";
 
+import PageQuickActions from "@/components/admin/PageQuickActions";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -49,6 +51,12 @@ export default function OrdersManager() {
 
   return <main className="pb-16 pt-10"><div className="container mx-auto px-4">
     <div className="mb-8 flex items-center justify-between"><div><h1 className="text-4xl font-bold"><span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Order Management</span></h1><p className="mt-2 text-gray-600">Review customer orders and update fulfillment and payment states.</p></div><motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="hidden md:block"><Sparkles size={32} className="text-emerald-400/50" /></motion.div></div>
+    <PageQuickActions actions={[
+      { label: "All orders", icon: <ShoppingBag size={18} />, pressed: !status && !paymentStatus && !query, onClick: () => { setStatus(""); setPaymentStatus(""); setQuery(""); } },
+      { label: "Pending orders", icon: <Clock size={18} />, pressed: status === "pending" && !paymentStatus && !query, onClick: () => { setStatus("pending"); setPaymentStatus(""); setQuery(""); } },
+      { label: "Processing orders", icon: <PackageCheck size={18} />, pressed: status === "processing" && !paymentStatus && !query, onClick: () => { setStatus("processing"); setPaymentStatus(""); setQuery(""); } },
+      { label: "Shipped orders", icon: <Truck size={18} />, pressed: status === "shipped" && !paymentStatus && !query, onClick: () => { setStatus("shipped"); setPaymentStatus(""); setQuery(""); } },
+    ]} />
     <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4"><MiniStat label="Orders shown" value={String(orders.length)} icon={<ShoppingBag />} /><MiniStat label="Paid revenue" value={formatMoney(totals.revenue)} icon={<CheckCircle2 />} /><MiniStat label="Pending" value={String(totals.pending)} icon={<Clock />} /><MiniStat label="Delivered" value={String(totals.delivered)} icon={<PackageCheck />} /></div>
     {error && <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error} <button onClick={() => void load()} className="ml-2 font-semibold underline">Retry</button></div>}
     <section className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"><div className="grid gap-3 border-b border-gray-100 p-5 lg:grid-cols-[1fr_auto_auto]"><label className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search order number or customer…" className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 outline-none focus:border-emerald-500" /></label><select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All order statuses</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select><select value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value)} className="rounded-lg border border-gray-200 px-3"><option value="">All payment statuses</option><option value="pending">Pending payment</option><option value="paid">Paid</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></div>

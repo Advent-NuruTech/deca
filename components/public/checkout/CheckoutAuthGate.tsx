@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function CheckoutAuthGate({ children }: { children: ReactNode }) {
-  const { firebaseUser, loading, signIn, register } = useAuth();
+  const { firebaseUser, user, loading, signIn, signInWithGoogle, register, refreshProfile, logout } = useAuth();
   const [creating, setCreating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -15,7 +15,8 @@ export default function CheckoutAuthGate({ children }: { children: ReactNode }) 
   const [password, setPassword] = useState("");
 
   if (loading) return <div className="py-20 text-center text-gray-500">Loading checkout...</div>;
-  if (firebaseUser) return <>{children}</>;
+  if (firebaseUser && user) return <>{children}</>;
+  if (firebaseUser && !user) return <div className="rounded-xl border border-gray-200 bg-white p-6"><p role="alert">Your account profile could not be loaded.</p><button type="button" onClick={() => void refreshProfile().catch(() => toast.error("Could not load your profile."))} className="mt-4 mr-4 font-semibold text-emerald-700">Try again</button><button type="button" onClick={() => void logout()} className="mt-4 font-semibold text-emerald-700">Sign out</button></div>;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -58,6 +59,7 @@ export default function CheckoutAuthGate({ children }: { children: ReactNode }) 
             {submitting ? "Please wait..." : creating ? "Create Account & Continue" : "Sign In & Continue"}
           </button>
         </form>
+        <button type="button" disabled={submitting} onClick={async () => { setSubmitting(true); try { await signInWithGoogle(); } catch { toast.error("Google sign-in could not be completed. Please try again."); } finally { setSubmitting(false); } }} className="mt-4 w-full rounded-xl border border-gray-300 bg-white py-3 font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-50">Continue with Google</button>
         <button type="button" onClick={() => setCreating((value) => !value)} className="w-full mt-4 text-sm text-emerald-700 hover:text-emerald-800">
           {creating ? "Already have an account? Sign in" : "New customer? Create an account"}
         </button>

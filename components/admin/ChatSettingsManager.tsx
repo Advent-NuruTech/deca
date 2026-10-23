@@ -1,5 +1,7 @@
 "use client";
 
+import PageQuickActions from "@/components/admin/PageQuickActions";
+
 import { useEffect, useState } from "react";
 import { GripVertical, MessageCircle, Plus, Save, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
@@ -73,6 +75,12 @@ export default function ChatSettingsManager() {
         </div>
       </div>
 
+      <PageQuickActions actions={[
+        { label: "Add chat category", icon: <Plus size={18} />, onClick: addCategory, disabled: loading },
+        { label: "Direct number", icon: <MessageCircle size={18} />, onClick: () => document.getElementById("direct-chat-number")?.focus() },
+        { label: "View chat categories", icon: <GripVertical size={18} />, href: "#chat-categories" },
+      ]} />
+
       {error && <p role="alert" className="mt-6 rounded-lg bg-red-50 p-4 text-red-700">{error}</p>}
       {message && <p role="status" className="mt-6 rounded-lg bg-emerald-50 p-4 text-emerald-700">{message}</p>}
 
@@ -81,6 +89,7 @@ export default function ChatSettingsManager() {
           <label className="block font-semibold text-gray-900">
             Direct-message WhatsApp number
             <input
+              id="direct-chat-number"
               required
               type="tel"
               value={settings.directPhone}
@@ -92,7 +101,7 @@ export default function ChatSettingsManager() {
           <p className="mt-2 text-sm text-gray-500">Include the country code. The “send a direct message” link uses this number.</p>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section id="chat-categories" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Chat categories</h2>
