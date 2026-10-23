@@ -1,5 +1,7 @@
 "use client";
 
+import { managedImageIdFromUrl } from "@/lib/managed-images";
+
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,7 +10,7 @@ import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import { richTextToPlainText } from "@/lib/rich-text";
 import type { Product, ProductCategory, PublicProduct } from "@/lib/types";
-import { cloudinaryPublicId, errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
+import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 import RichTextEditor from "@/components/admin/rich-text-editor";
 
 type ProductsResponse = { products: PublicProduct[] };
@@ -104,11 +106,12 @@ export default function ProductManager() {
     try {
       const uploaded: UploadResponse[] = [];
       for (const file of files) {
-        const data = new FormData(); data.append("image", file);
-        uploaded.push(await api.upload<UploadResponse>("/api/upload", data));
+        const data = new FormData(); data.append("image", file); data.append("purpose", "products");
+        const item = await api.upload<UploadResponse>("/api/upload", data);
+        uploaded.push(item);
+        setNewUploads((current) => [...current, item.public_id]);
       }
       setForm((current) => ({ ...current, images: [...current.images, ...uploaded.map((item) => item.url)] }));
-      setNewUploads((current) => [...current, ...uploaded.map((item) => item.public_id)]);
       toast.success(`${uploaded.length} image${uploaded.length === 1 ? "" : "s"} uploaded`);
     } catch (nextError) { toast.error(errorMessage(nextError, "Image upload failed")); }
     finally { setUploading(false); event.target.value = ""; }
@@ -121,7 +124,7 @@ export default function ProductManager() {
     setUploading(true);
     try {
       const data = new FormData();
-      data.append("image", file);
+      data.append("image", file); data.append("purpose", "products");
       const uploaded = await api.upload<UploadResponse>("/api/upload", data);
       setNewUploads((current) => [...current, uploaded.public_id]);
       setForm((current) => ({ ...current, variants: current.variants.map((variant) => variant.id === variantId ? { ...variant, image: uploaded.url } : variant) }));
@@ -137,7 +140,7 @@ export default function ProductManager() {
   async function removeImage(index: number) {
     const image = form.images[index];
     setForm((current) => ({ ...current, images: current.images.filter((_, itemIndex) => itemIndex !== index) }));
-    const publicId = cloudinaryPublicId(image);
+    const publicId = managedImageIdFromUrl(image);
     if (publicId && newUploads.includes(publicId) && !form.variants.some((variant) => variant.image === image)) {
       try { await api.delete("/api/upload", { publicId }); } catch { /* best-effort cleanup */ }
       setNewUploads((current) => current.filter((item) => item !== publicId));
@@ -161,9 +164,9 @@ export default function ProductManager() {
       if (editing) await api.put(`/api/products/${editing.id}`, payload);
       else await api.post("/api/products", payload);
       const retainedImages = new Set([...form.images, ...form.variants.map((variant) => variant.image).filter(Boolean)]);
-      const retainedIds = new Set([...retainedImages].map(cloudinaryPublicId).filter((id): id is string => Boolean(id)));
+      const retainedIds = new Set([...retainedImages].map(managedImageIdFromUrl).filter((id): id is string => Boolean(id)));
       const previousImages = [...(editing?.images ?? []), ...(editing?.variants ?? []).map((variant) => variant.image).filter((image): image is string => Boolean(image))];
-      const removed = new Set([...previousImages.map(cloudinaryPublicId).filter((id): id is string => Boolean(id)), ...newUploads].filter((id) => !retainedIds.has(id)));
+      const removed = new Set([...previousImages.map(managedImageIdFromUrl).filter((id): id is string => Boolean(id)), ...newUploads].filter((id) => !retainedIds.has(id)));
       await Promise.allSettled([...removed].map((publicId) => api.delete("/api/upload", { publicId })));
       setNewUploads([]); setEditorOpen(false); setEditing(null);
       toast.success(editing ? "Product updated" : "Product created"); await load();

@@ -14,7 +14,7 @@ in use can only be deleted when another category is selected as its destination;
 operation reassigns dependencies first so resources never become orphaned.
 
 Deleting a resource removes all of its owned data: Firestore metadata, the D1 article
-body, its managed R2 document, and its managed Cloudinary featured image. A failed
+body, its managed R2 document, and its managed R2 or legacy Cloudinary featured image. A failed
 managed-file deletion stops the database deletion so a successful database delete
 cannot knowingly leave stored files behind.
 
@@ -63,7 +63,7 @@ remain visible. Once `_config` exists, deleted defaults are never recreated.
 
 - Preserve stable category document IDs through renames.
 - Never add a TypeScript union or server whitelist of category names.
-- Never encode category ownership in R2 keys or Cloudinary paths.
+- Never encode category ownership in R2 keys or legacy Cloudinary paths.
 - Reassignment changes metadata only; it never copies or uploads media.
 - Keep legacy fallback until all deployed data has `majorCategoryId` and the old URLs
   have been retired deliberately.

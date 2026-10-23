@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
-import { deleteImage, publicIdFromManagedUrl, uploadImage, validateManagedPublicId } from "@/lib/cloudinary";
-import { firestore } from "@/lib/firestore";
+import { randomUUID } from "node:crypto";
+import { managedImageUrl } from "@/lib/managed-images";
+import { deleteManagedImage, imageIsReferenced, validateManagedImageId } from "@/lib/managed-images-server";
+import { uploadToR2 } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -25,9 +27,18 @@ export async function POST(request: NextRequest) {
     if (image.size === 0) throw new HttpError(400, "The image file is empty");
     if (image.size > MAX_IMAGE_BYTES) throw new HttpError(413, "Images must be 5 MB or smaller");
 
+    const purpose = form.get("purpose");
+    if (purpose !== "products" && purpose !== "resources") throw new HttpError(400, "An image purpose is required");
+    const extensions: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/gif": "gif", "image/webp": "webp" };
     const bytes = Buffer.from(await image.arrayBuffer());
-    const dataUri = `data:${image.type};base64,${bytes.toString("base64")}`;
-    const uploaded = await uploadImage(dataUri);
+    const valid = image.type === "image/jpeg" ? bytes.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))
+      : image.type === "image/png" ? bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+      : image.type === "image/gif" ? ["GIF87a", "GIF89a"].includes(bytes.subarray(0, 6).toString("ascii"))
+      : bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WEBP";
+    if (!valid) throw new HttpError(415, "The image contents do not match its file type");
+    const key = `images/${purpose}/${randomUUID()}.${extensions[image.type]}`;
+    await uploadToR2(key, bytes, image.type);
+    const uploaded = { publicId: key, url: managedImageUrl(key) };
     return NextResponse.json({
       message: "File uploaded successfully",
       filename: uploaded.publicId,
@@ -56,25 +67,12 @@ export async function DELETE(request: NextRequest) {
         : undefined;
     let managedPublicId: string;
     try {
-      managedPublicId = validateManagedPublicId(publicId);
+      managedPublicId = validateManagedImageId(publicId);
     } catch (error) {
       throw new HttpError(400, error instanceof Error ? error.message : "Invalid publicId");
     }
-    const articles = await firestore().collection("articles").get();
-    if (articles.docs.some((article) => typeof article.data().featuredImage === "string" && publicIdFromManagedUrl(article.data().featuredImage) === managedPublicId)) {
-      throw new HttpError(409, "This image is still attached to a resource");
-    }
-    const products = await firestore().collection("products").get();
-    if (products.docs.some((product) => {
-      const data = product.data();
-      const images = Array.isArray(data.images) ? data.images : [];
-      const variants = Array.isArray(data.variants) ? data.variants : [];
-      return [...images, ...variants.map((variant: { image?: unknown }) => variant?.image)]
-        .some((image) => typeof image === "string" && publicIdFromManagedUrl(image) === managedPublicId);
-    })) {
-      throw new HttpError(409, "This image is still attached to a product");
-    }
-    await deleteImage(managedPublicId);
+    if (await imageIsReferenced(managedPublicId)) throw new HttpError(409, "This image is still attached to a resource or product");
+    await deleteManagedImage(managedPublicId);
     return NextResponse.json({ message: "Image deleted successfully" });
   } catch (error) {
     return errorResponse(error);

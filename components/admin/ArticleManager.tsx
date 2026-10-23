@@ -1,5 +1,7 @@
 "use client";
 
+import { managedImageIdFromUrl } from "@/lib/managed-images";
+
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -8,7 +10,7 @@ import { AlertCircle, Download, Edit3, Eye, FileText, FolderPlus, Plus, Search, 
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import type { AuthorProfile, PublicArticle, ResourceMajorCategory, ResourceSubcategory, ResourceTaxonomy } from "@/lib/types";
-import { cloudinaryPublicId, errorMessage, formatDate } from "@/components/admin/admin-utils";
+import { errorMessage, formatDate } from "@/components/admin/admin-utils";
 import RichTextEditor from "@/components/admin/rich-text-editor";
 import { automaticPreviewText, richTextToPlainText } from "@/lib/rich-text";
 
@@ -108,7 +110,7 @@ export default function ArticleManager() {
   }
   async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]; if (!file) return; setUploadingImage(true);
-    try { if (newImageId) await api.delete("/api/upload", { publicId: newImageId }); const body = new FormData(); body.append("image", file); const result = await api.upload<{ url: string; public_id: string }>("/api/upload", body); setField("featuredImage", result.url); setNewImageId(result.public_id); toast.success("Image uploaded"); }
+    try { const body = new FormData(); body.append("image", file); body.append("purpose", "resources"); const result = await api.upload<{ url: string; public_id: string }>("/api/upload", body); if (newImageId) await api.delete("/api/upload", { publicId: newImageId }).catch(() => undefined); setField("featuredImage", result.url); setNewImageId(result.public_id); toast.success("Image uploaded"); }
     catch (nextError) { toast.error(errorMessage(nextError, "Image upload failed")); }
     finally { setUploadingImage(false); event.target.value = ""; }
   }
@@ -151,7 +153,7 @@ export default function ArticleManager() {
     const payload = { ...(!editing || form.authorId || editing.author?.managed ? { authorId: form.authorId } : {}), title: form.title, ...(!editing || form.content !== editing.content ? { content: form.content, excerpt: automaticPreviewText(form.content) } : {}), majorCategoryId: form.majorCategoryId, subcategoryId: form.subcategoryId, featuredImage: form.featuredImage, published: form.published, isDownloadable: form.isDownloadable, ...(form.isDownloadable ? { fileKey: form.fileKey, fileName: form.fileName, fileType: form.fileType } : {}) };
     try {
       if (editing) await api.put(`/api/articles/${editing.id}`, payload); else await api.post("/api/articles", payload);
-      const oldImage = editing?.featuredImage ? cloudinaryPublicId(editing.featuredImage) : null;
+      const oldImage = editing?.featuredImage ? managedImageIdFromUrl(editing.featuredImage) : null;
       await Promise.allSettled([...(oldImage && editing?.featuredImage !== form.featuredImage ? [api.delete("/api/upload", { publicId: oldImage })] : []), ...(editing?.fileKey && editing.fileKey !== form.fileKey ? [api.delete("/api/study-materials", { key: editing.fileKey })] : [])]);
       setNewImageId(""); setNewDocumentKey(""); setModalOpen(false); setEditing(null); toast.success(editing ? "Resource updated" : "Resource created"); await load();
     } catch (nextError) { toast.error(errorMessage(nextError, "Resource could not be saved")); }

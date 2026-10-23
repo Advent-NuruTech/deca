@@ -8,8 +8,8 @@ project settings for deployment. Never prefix a secret with `NEXT_PUBLIC_`.
 | Firebase client | `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID` | Browser Firebase Auth |
 | Firebase Admin | `FIREBASE_SERVICE_ACCOUNT_KEY`, or `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Token verification and Firestore on the server |
 | Admin signup | `SIGN_UP_CODE` | Server-only access code required by `/admin/signup` |
-| Cloudinary | `CLOUDINARY_CLOUD_NAME` (or existing `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Product/article images |
-| Cloudflare R2 | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, optional `R2_PUBLIC_URL` | PDFs, DOC/DOCX and PPT/PPTX downloads |
+| Cloudinary | `CLOUDINARY_CLOUD_NAME` (or existing `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`), `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Legacy product/resource images and cleanup |
+| Cloudflare R2 | `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, optional `R2_PUBLIC_URL` | Product/resource images and PDFs, DOC/DOCX and PPT/PPTX downloads |
 | Cloudflare D1 | `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `D1_DATABASE_ID` | Article bodies and public article/product read models |
 | YouTube | `YOUTUBE_API_KEY` | Server-side YouTube Data API key for the channel feeds |
 

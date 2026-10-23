@@ -21,7 +21,8 @@ import {
 import { firestore } from "@/lib/firestore";
 import { selectedAuthor } from "@/lib/authors";
 import { getCachedPublishedArticleBySlug } from "@/lib/public-content";
-import { deleteImage, publicIdFromManagedUrl } from "@/lib/cloudinary";
+import { managedImageIdFromUrl } from "@/lib/managed-images";
+import { deleteManagedImage, imageIsReferenced } from "@/lib/managed-images-server";
 import { deleteFromR2 } from "@/lib/r2";
 import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
 import { validateStudyMaterialKey } from "@/lib/study-materials";
@@ -169,10 +170,11 @@ export async function DELETE(
     const oldContent = await getArticleContent(identifier);
     const existingData = existing.data() ?? {};
     const fileKey = typeof existingData.fileKey === "string" ? validateStudyMaterialKey(existingData.fileKey) : "";
-    const imagePublicId = typeof existingData.featuredImage === "string" ? publicIdFromManagedUrl(existingData.featuredImage) : null;
+    const imagePublicId = typeof existingData.featuredImage === "string" ? managedImageIdFromUrl(existingData.featuredImage) : null;
+    const deleteImage = imagePublicId && !(await imageIsReferenced(imagePublicId, identifier));
     await Promise.all([
       ...(fileKey ? [deleteFromR2(fileKey)] : []),
-      ...(imagePublicId ? [deleteImage(imagePublicId)] : []),
+      ...(deleteImage ? [deleteManagedImage(imagePublicId)] : []),
     ]);
     const syncD1 = await beginD1ReadModelUpdate("articles");
     await deleteArticleContent(identifier);

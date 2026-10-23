@@ -38,3 +38,11 @@ Reuse `components/admin/rich-text-editor.tsx` and its existing interface for ric
 ## Admin release updates
 
 Keep the admin Updates page current when a feature is fully released and verified end to end. Add a concise D1 update explaining what changed and how an administrator can use it, in simple language. Do not announce unfinished or unverified work as released. Use the admin Updates page or the parameterized `scripts/publish-admin-update.mjs` script, and avoid duplicates. Keep entries accurate when behavior changes.
+
+## Image storage convention
+
+Upload new product, product-option, and resource images to Cloudflare R2 through
+`/api/upload`. Store them under `images/products/` or `images/resources/` using
+unique, category-independent keys, and serve them through `/api/media/`. Preserve
+legacy Cloudinary links and managed cleanup. Category changes must never move media.
+Maintain reference checks and clean up managed images when they are replaced or deleted.

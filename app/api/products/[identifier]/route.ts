@@ -11,6 +11,8 @@ import {
 } from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import { getCachedActiveProductBySlug } from "@/lib/public-content";
+import { managedImageIdFromUrl } from "@/lib/managed-images";
+import { deleteManagedImage, imageIsReferenced } from "@/lib/managed-images-server";
 import {
   assertUniqueProductSlug,
   productSlug,
@@ -122,6 +124,15 @@ export async function DELETE(
     const reference = firestore().collection("products").doc(identifier);
     const existing = await reference.get();
     if (!existing.exists) throw new HttpError(404, "Product not found");
+    const existingData = existing.data() ?? {};
+    const images = Array.isArray(existingData.images) ? existingData.images : [];
+    const variants = Array.isArray(existingData.variants) ? existingData.variants : [];
+    const imageIds = new Set<string>([...images, ...variants.map((variant: { image?: unknown }) => variant?.image)]
+      .filter((image): image is string => typeof image === "string")
+      .map(managedImageIdFromUrl).filter((id): id is string => Boolean(id)));
+    for (const id of imageIds) {
+      if (!(await imageIsReferenced(id, undefined, identifier))) await deleteManagedImage(id);
+    }
     const syncD1 = await beginD1ReadModelUpdate("products");
     try {
       await reference.delete();
