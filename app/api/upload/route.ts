@@ -64,6 +64,16 @@ export async function DELETE(request: NextRequest) {
     if (articles.docs.some((article) => typeof article.data().featuredImage === "string" && publicIdFromManagedUrl(article.data().featuredImage) === managedPublicId)) {
       throw new HttpError(409, "This image is still attached to a resource");
     }
+    const products = await firestore().collection("products").get();
+    if (products.docs.some((product) => {
+      const data = product.data();
+      const images = Array.isArray(data.images) ? data.images : [];
+      const variants = Array.isArray(data.variants) ? data.variants : [];
+      return [...images, ...variants.map((variant: { image?: unknown }) => variant?.image)]
+        .some((image) => typeof image === "string" && publicIdFromManagedUrl(image) === managedPublicId);
+    })) {
+      throw new HttpError(409, "This image is still attached to a product");
+    }
     await deleteImage(managedPublicId);
     return NextResponse.json({ message: "Image deleted successfully" });
   } catch (error) {
