@@ -433,7 +433,7 @@ const HomePage = () => {
             </div>
             {loading ? <p className="text-center text-sm text-gray-500" role="status">Loading resources...</p> : latestStudies.length === 0 ? <p className="text-center text-gray-500">No downloadable resources yet.</p> : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {latestStudies.slice(0, 12).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={resourceTaxonomy.subcategories.find((item) => item.id === study.subcategoryId)?.name} />)}
+                {latestStudies.slice(0, 8).map((study) => <StudyMaterialCard key={study._id || study.slug} material={study} categoryName={resourceTaxonomy.subcategories.find((item) => item.id === study.subcategoryId)?.name} />)}
               </div>
             )}
             <div className="mt-8 text-center"><Link href="/study-materials" className="inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900">View all materials <ArrowRight size={16} /></Link></div>

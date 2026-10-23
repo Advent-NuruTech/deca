@@ -43,10 +43,14 @@ const FloatingActions = () => {
   }, []);
 
   useEffect(() => {
+    if (pathname !== "/") {
+      setIsWhatsAppOpen(false);
+      return;
+    }
     getPublicChatSettings()
       .then(setChatSettings)
       .catch(() => undefined);
-  }, []);
+  }, [pathname]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -64,7 +68,7 @@ const FloatingActions = () => {
   return (
     <>
       {/* WhatsApp Button with Quick Replies */}
-      <div className={`fixed right-6 z-50 md:right-8 ${productDetail ? "bottom-24 md:bottom-28" : "bottom-6 md:bottom-8"}`}>
+      {pathname === "/" && <div className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8">
         {/* Quick reply menu */}
         <AnimatePresence>
           {isWhatsAppOpen && (
@@ -169,7 +173,7 @@ const FloatingActions = () => {
             </span>
           )}
         </motion.button>
-      </div>
+      </div>}
 
       {/* Back to Top Button */}
       <AnimatePresence>

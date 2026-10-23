@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     if (slot !== 1 && slot !== 2) throw new HttpError(400, "Invalid channel.");
     const token = request.nextUrl.searchParams.get("pageToken") || "";
     if (token.length > 256 || (token && !/^[A-Za-z0-9_=-]+$/.test(token))) throw new HttpError(400, "Invalid page token.");
-    const limit = request.nextUrl.searchParams.get("preview") === "1" ? 4 : 24;
+    const limit = request.nextUrl.searchParams.get("preview") === "1" ? 8 : 24;
     const channel = (await getChannels())[slot - 1];
     if (!channel) return NextResponse.json({ channel: null, videos: [], nextPageToken: null, prevPageToken: null });
     const data = await listVideos(channel, slot, token, limit);
