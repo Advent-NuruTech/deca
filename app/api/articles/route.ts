@@ -20,7 +20,7 @@ import {
   markD1ReadModelReady,
   syncD1ArticleDocument,
 } from "@/lib/d1-public-store";
-import { getCachedPublishedArticles } from "@/lib/public-content";
+import { getCachedPublishedArticles, getCachedD1ArticlePage, getCachedNavigationTaxonomy } from "@/lib/public-content";
 import { getResourceTaxonomy, resolveArticleAssignment, validateResourceAssignment } from "@/lib/resource-taxonomy";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 
@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
       const total = totalCount.data().count;
       return NextResponse.json({ articles, hasMore: found.length > limit, nextCursor: articles.at(-1)?.id ?? "", stats: { total, published: publishedCount.data().count, drafts: total - publishedCount.data().count, documents: documentCount.data().count } });
     }
-    const category = request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ?? "";
+    const category = request.nextUrl.searchParams.get("category")?.trim() ?? "";
+    const categoryLower = category.toLowerCase();
     const requestedMajor = request.nextUrl.searchParams.get("majorCategoryId")?.trim() ?? request.nextUrl.searchParams.get("major")?.trim() ?? "";
     const requestedSubcategory = request.nextUrl.searchParams.get("subcategoryId")?.trim() ?? "";
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
@@ -69,6 +70,29 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const allAdmin = adminView && request.nextUrl.searchParams.get("all") === "true";
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
+
+    if (!adminView) {
+      try {
+        const taxonomy = await getCachedNavigationTaxonomy();
+        const subcategory = taxonomy.subcategories.find((item) => item.id === category || item.slug === categoryLower || item.name.toLowerCase() === categoryLower);
+        const major = subcategory ? undefined : taxonomy.majors.find((item) => item.id === category || item.slug === categoryLower || item.name.toLowerCase() === categoryLower);
+        // Multiple category filters are conjunctive, including legacy links.
+        const filters = {
+          major: requestedMajor || (major?.id ?? ""),
+          subcategory: requestedSubcategory || (subcategory?.id ?? ""),
+          legacySubcategory: (taxonomy.subcategories.find((item) => item.id === requestedSubcategory) ?? subcategory)?.slug,
+          subcategoryParent: (taxonomy.subcategories.find((item) => item.id === requestedSubcategory) ?? subcategory)?.parentId,
+          legacy: category && !subcategory && !major ? categoryLower : "",
+          search,
+          noMatch: Boolean((requestedMajor && major && requestedMajor !== major.id) || (requestedSubcategory && subcategory && requestedSubcategory !== subcategory.id)),
+          ...(downloadable === null ? {} : { downloadable: downloadable === "true" }),
+        };
+        const result = await getCachedD1ArticlePage(filters, page, limit);
+        const resourceCategories = result.resourceCategories;
+        const studyCategories = resourceCategories.subcategories.filter((item) => item.parentId === "study-library").map((item) => ({ id: item.id, name: item.name, slug: item.slug, count: item.count }));
+        return NextResponse.json({ articles: result.items, total: result.total, totalPages: result.totalPages, currentPage: result.currentPage, studyCategories, resourceCategories }, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
+      } catch (error) { console.warn("Using Firestore article listing fallback because D1 is unavailable or not ready.", error); }
+    }
 
     let availableArticles: PublicArticle[];
     let resourceCategories: ResourceTaxonomy;
@@ -89,8 +113,8 @@ export async function GET(request: NextRequest) {
       resourceCategories = dataset.resourceCategories;
     }
 
-    const legacySubcategory = resourceCategories.subcategories.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
-    const legacyMajor = resourceCategories.majors.find((item) => item.id === category || item.slug === category || item.name.toLowerCase() === category);
+    const legacySubcategory = resourceCategories.subcategories.find((item) => item.id === category || item.slug === categoryLower || item.name.toLowerCase() === categoryLower);
+    const legacyMajor = resourceCategories.majors.find((item) => item.id === category || item.slug === categoryLower || item.name.toLowerCase() === categoryLower);
 
     const matching = availableArticles
       .filter((article) => {
@@ -99,7 +123,7 @@ export async function GET(request: NextRequest) {
         if (!category) return true;
         if (legacySubcategory) return article.subcategoryId === legacySubcategory.id;
         if (legacyMajor) return article.majorCategoryId === legacyMajor.id;
-        return String(article.category ?? "").toLowerCase() === category || String(article.studyCategory ?? "").toLowerCase() === category;
+        return String(article.category ?? "").toLowerCase() === categoryLower || String(article.studyCategory ?? "").toLowerCase() === categoryLower;
       })
       .filter((article) => {
         if (downloadable === null) return true;

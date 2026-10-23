@@ -43,6 +43,14 @@ CREATE INDEX IF NOT EXISTS idx_public_articles_major
 CREATE INDEX IF NOT EXISTS idx_public_articles_subcategory
   ON public_articles(subcategory_id, published_at DESC);
 
+-- Matches the public listing order, including older resources without published_at.
+CREATE INDEX IF NOT EXISTS idx_public_articles_effective_date
+  ON public_articles(COALESCE(published_at, created_at) DESC, id);
+CREATE INDEX IF NOT EXISTS idx_public_articles_major_effective_date
+  ON public_articles(major_category_id, COALESCE(published_at, created_at) DESC, id);
+CREATE INDEX IF NOT EXISTS idx_public_articles_sub_effective_date
+  ON public_articles(subcategory_id, COALESCE(published_at, created_at) DESC, id);
+
 CREATE TABLE IF NOT EXISTS public_products (
   id                  TEXT PRIMARY KEY,
   slug                TEXT NOT NULL UNIQUE,
@@ -73,6 +81,11 @@ CREATE INDEX IF NOT EXISTS idx_public_products_category
   ON public_products(category, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_public_products_featured
   ON public_products(featured, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_public_products_created
+  ON public_products(created_at DESC, id);
+CREATE INDEX IF NOT EXISTS idx_public_products_featured_category
+  ON public_products(category, featured, created_at DESC, id);
 
 CREATE TABLE IF NOT EXISTS public_read_model_state (
   area        TEXT PRIMARY KEY,

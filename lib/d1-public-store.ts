@@ -225,6 +225,63 @@ export async function readD1Articles(): Promise<PublicArticle[]> {
   }));
 }
 
+export type D1ArticleFilters = { major?: string; subcategory?: string; legacySubcategory?: string; subcategoryParent?: string; legacy?: string; noMatch?: boolean; search?: string; downloadable?: boolean };
+export type D1ProductFilters = { category?: string; search?: string; featured?: boolean; status?: string };
+
+type Page<T> = { items: T[]; total: number; currentPage: number; totalPages: number };
+function articleWhere(filters: D1ArticleFilters) {
+  const conditions: string[] = []; const params: unknown[] = [];
+  if (filters.noMatch) conditions.push("0 = 1");
+  if (filters.major) { conditions.push("major_category_id = ?"); params.push(filters.major); }
+  if (filters.subcategory) {
+    if (filters.legacySubcategory && filters.subcategoryParent) {
+      const legacyField = filters.subcategoryParent === "study-library" ? "legacy_study_category" : "legacy_category";
+      conditions.push(`(subcategory_id = ? OR (subcategory_id IS NULL AND major_category_id = ? AND lower(${legacyField}) = ?))`);
+      params.push(filters.subcategory, filters.subcategoryParent, filters.legacySubcategory);
+    } else { conditions.push("subcategory_id = ?"); params.push(filters.subcategory); }
+  }
+  if (filters.legacy) { conditions.push("(lower(legacy_category) = ? OR lower(legacy_study_category) = ?)"); params.push(filters.legacy, filters.legacy); }
+  if (filters.downloadable !== undefined) { conditions.push("is_downloadable = ?"); params.push(filters.downloadable ? 1 : 0); }
+  if (filters.search) { conditions.push("(instr(lower(title), ?) > 0 OR instr(lower(excerpt), ?) > 0 OR instr(lower(tags_json), ?) > 0)"); params.push(filters.search, filters.search, filters.search); }
+  return { sql: conditions.length ? ` WHERE ${conditions.join(" AND ")}` : "", params };
+}
+function productWhere(filters: D1ProductFilters) {
+  const conditions: string[] = []; const params: unknown[] = [];
+  if (filters.category) { conditions.push("category = ?"); params.push(filters.category); }
+  if (filters.featured !== undefined) { conditions.push("featured = ?"); params.push(filters.featured ? 1 : 0); }
+  if (filters.status && filters.status !== "active") conditions.push("0 = 1");
+  if (filters.search) { conditions.push("(instr(lower(name), ?) > 0 OR instr(lower(description), ?) > 0)"); params.push(filters.search, filters.search); }
+  return { sql: conditions.length ? ` WHERE ${conditions.join(" AND ")}` : "", params };
+}
+export async function readD1ArticlePage(filters: D1ArticleFilters, page: number, limit: number): Promise<Page<PublicArticle>> {
+  const where = articleWhere(filters);
+  const total = Number((await d1First<{ count: number }>(`SELECT count(*) AS count FROM public_articles${where.sql}`, where.params))?.count ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / limit)); const currentPage = Math.min(page, totalPages);
+  const rows = await d1All<ArticleRow>(`SELECT * FROM public_articles${where.sql} ORDER BY COALESCE(published_at, created_at) DESC, id LIMIT ? OFFSET ?`, [...where.params, limit, (currentPage - 1) * limit]);
+  return { items: await rowsToArticles(rows), total, totalPages, currentPage };
+}
+export async function readD1ArticleHighlights(filters: D1ArticleFilters, limit: number): Promise<PublicArticle[]> {
+  const where = articleWhere(filters);
+  return rowsToArticles(await d1All<ArticleRow>(`SELECT * FROM public_articles${where.sql} ORDER BY COALESCE(published_at, created_at) DESC, id LIMIT ?`, [...where.params, limit]));
+}
+export async function readD1ArticleCategoryCounts(): Promise<{ major: string; subcategory: string | null; legacy_category: string | null; legacy_study_category: string | null; count: number }[]> {
+  return d1All("SELECT major_category_id AS major, subcategory_id AS subcategory, legacy_category, legacy_study_category, count(*) AS count FROM public_articles GROUP BY major_category_id, subcategory_id, legacy_category, legacy_study_category");
+}
+export async function readD1ProductPage(filters: D1ProductFilters, page: number, limit: number): Promise<Page<PublicProduct>> {
+  const where = productWhere(filters);
+  const total = Number((await d1First<{ count: number }>(`SELECT count(*) AS count FROM public_products${where.sql}`, where.params))?.count ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / limit)); const currentPage = Math.min(page, totalPages);
+  const rows = await d1All<ProductRow>(`SELECT * FROM public_products${where.sql} ORDER BY created_at DESC, id LIMIT ? OFFSET ?`, [...where.params, limit, (currentPage - 1) * limit]);
+  return { items: rowsToProducts(rows), total, totalPages, currentPage };
+}
+export async function readD1ProductHighlights(filters: D1ProductFilters, limit: number): Promise<PublicProduct[]> {
+  const where = productWhere(filters);
+  return rowsToProducts(await d1All<ProductRow>(`SELECT * FROM public_products${where.sql} ORDER BY created_at DESC, id LIMIT ?`, [...where.params, limit]));
+}
+export async function readD1ProductCategorySummaries(): Promise<{ category: string; count: number; images_json: string | null }[]> {
+  return d1All(`SELECT category, count(*) AS count, (SELECT images_json FROM public_products AS latest WHERE latest.category = products.category ORDER BY created_at DESC, id LIMIT 1) AS images_json FROM public_products AS products GROUP BY category`);
+}
+
 export async function readD1ArticleBySlug(slug: string): Promise<PublicArticle | null> {
   const rows = await d1All<ArticleRow>("SELECT * FROM public_articles WHERE slug = ? LIMIT 1", [slug]);
   return rows.length ? (await rowsToArticles(rows))[0] : null;

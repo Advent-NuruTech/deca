@@ -10,7 +10,7 @@ import {
   syncD1ProductDocument,
 } from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
-import { getCachedActiveProducts } from "@/lib/public-content";
+import { getCachedActiveProducts, getCachedD1ProductPage } from "@/lib/public-content";
 import {
   assertUniqueProductSlug,
   productSlug,
@@ -69,12 +69,19 @@ export async function GET(request: NextRequest) {
       const products = found.slice(0, limit);
       return NextResponse.json({ products, hasMore: found.length > limit, nextCursor: products.at(-1)?.id ?? "" });
     }
-    const category = request.nextUrl.searchParams.get("category")?.trim().toLowerCase() ?? "";
+    const category = request.nextUrl.searchParams.get("category")?.trim() ?? "";
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
     const featured = request.nextUrl.searchParams.get("featured");
     const status = request.nextUrl.searchParams.get("status")?.trim().toLowerCase() ?? "";
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
+
+    if (!adminView) {
+      try {
+        const result = await getCachedD1ProductPage({ category, search, status, ...(featured === null ? {} : { featured: featured === "true" }) }, page, limit);
+        return NextResponse.json({ products: result.items, total: result.total, totalPages: result.totalPages, currentPage: result.currentPage }, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
+      } catch (error) { console.warn("Using Firestore product listing fallback because D1 is unavailable or not ready.", error); }
+    }
 
     const availableProducts = adminView
       ? (await firestore().collection("products").get()).docs.map((document) => serializeProduct(document) as unknown as StoredRecord)

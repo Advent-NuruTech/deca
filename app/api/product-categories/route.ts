@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
 import { PRODUCT_CATEGORIES_TAG, PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
 import { firestore } from "@/lib/firestore";
+import { getCachedPublicProductCategories } from "@/lib/public-content";
 import {
   assertUniqueProductCategorySlug,
   getProductCategories,
@@ -19,9 +20,9 @@ export async function GET(request: NextRequest) {
       const count = await firestore().collection("products").where("category", "==", countFor).count().get();
       return NextResponse.json({ count: count.data().count });
     }
-    const categories = await getProductCategories(adminView
-      ? { initialize: true, includeInactive: true, includeCounts: request.nextUrl.searchParams.get("light") !== "true" }
-      : { includeInactive: false });
+    const categories = adminView
+      ? await getProductCategories({ initialize: true, includeInactive: true, includeCounts: request.nextUrl.searchParams.get("light") !== "true" })
+      : await getCachedPublicProductCategories();
     return NextResponse.json(
       { categories },
       adminView ? undefined : { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } },

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { timestamp } from "@/lib/articles";
 import { PUBLIC_CACHE_CONTROL } from "@/lib/cache-tags";
-import { getCachedActiveProducts, getCachedPublishedArticles } from "@/lib/public-content";
+import { getCachedActiveProducts, getCachedPublishedArticles, getCachedD1Home } from "@/lib/public-content";
 import { STUDY_MAJOR_ID } from "@/lib/resource-taxonomy";
 
 function productTimestamp(value: unknown): number {
@@ -13,6 +13,11 @@ function productTimestamp(value: unknown): number {
 }
 
 export async function GET() {
+  try {
+    return NextResponse.json(await getCachedD1Home(), { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
+  } catch (error) {
+    console.warn("Using Firestore home fallback because D1 is unavailable or not ready.", error);
+  }
   const [{ articles, resourceCategories }, products] = await Promise.all([
     getCachedPublishedArticles(),
     getCachedActiveProducts(),
