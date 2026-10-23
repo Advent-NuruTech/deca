@@ -7,11 +7,9 @@ import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import type { PublicProduct, ProductVariant } from "@/lib/types";
 import { useCart } from "@/components/providers/CartProvider";
-import SEO from "@/components/public/SEO";
 import ProductGallery from "@/components/public/product/ProductGallery";
 import ProductInfo from "@/components/public/product/ProductInfo";
 import RelatedProducts from "@/components/public/product/RelatedProducts";
-import { richTextToPlainText } from "@/lib/rich-text";
 
 export default function ProductDetailPage({ slug }: { slug: string }) {
   const [product, setProduct] = useState<PublicProduct | null>(null);
@@ -89,13 +87,6 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
 
   return (
     <>
-      <SEO
-        title={product.seoTitle || product.name}
-        description={product.seoDescription || richTextToPlainText(product.description)}
-        keywords={product.seoKeywords || []}
-        image={product.images?.[0]}
-        type="product"
-      />
       <div className="min-h-screen bg-gray-50 pt-24 pb-32">
         <div className="container mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">

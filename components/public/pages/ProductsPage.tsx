@@ -8,7 +8,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import type { ProductCategory, PublicProduct } from "@/lib/types";
 import SEO from "../SEO";
-import { Check, ChevronDown, ImageOff, Search, ShoppingCart, X } from "lucide-react";
+import { Check, ChevronDown, Home, ImageOff, Search, ShoppingCart, X } from "lucide-react";
 import ProductsGrid from "../products/ProductsGrid";
 import ProductsPagination from "../products/ProductsPagination";
 
@@ -45,7 +45,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
   useEffect(() => {
     if (!drawerOpen) return;
     const previous = document.body.style.overflow; document.body.style.overflow = "hidden"; drawer.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setDrawerOpen(false); if (event.key === "Tab" && drawer.current) { const buttons = drawer.current.querySelectorAll<HTMLButtonElement>("button:not([disabled])"); const first = buttons[0], last = buttons[buttons.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } } };
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setDrawerOpen(false); if (event.key === "Tab" && drawer.current) { const buttons = drawer.current.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]"); const first = buttons[0], last = buttons[buttons.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } } };
     document.addEventListener("keydown", onKey); return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", onKey); categoryButton.current?.focus(); };
   }, [drawerOpen]);
   const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
@@ -110,6 +110,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
   ];
 
   const categoryName = categories.find((item) => item.value === category)?.label || "All Products";
+  const homeLink = <Link href="/" className="mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-emerald-700"><Home size={18} aria-hidden="true" />Home</Link>;
   const categoryList = (close: boolean) => categories.map((item) => <button key={item.value} onClick={() => { handleCategoryChange(item.value); if (close) setDrawerOpen(false); }} aria-pressed={category === item.value} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm ${category === item.value ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-700 hover:bg-gray-100"}`}><span className="flex-1">{item.label}</span>{category === item.value && <Check size={17} />}</button>);
 
   return (
@@ -132,7 +133,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
       </div>
       <section className="bg-gray-50 py-5 sm:py-10" aria-label="Product results">
         <div className="mx-auto flex max-w-7xl items-start gap-8 px-4 sm:px-6">
-          {desktopOpen && <aside id="product-categories" aria-label="Product categories" className="sticky top-36 hidden max-h-[calc(100dvh-9rem)] w-60 shrink-0 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 lg:block"><h2 className="px-4 py-3 font-bold">Categories</h2>{categoryList(false)}</aside>}
+          {desktopOpen && <aside id="product-categories" aria-label="Product categories" className="sticky top-36 hidden max-h-[calc(100dvh-9rem)] w-60 shrink-0 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 lg:block">{homeLink}<h2 className="px-4 py-3 font-bold">Categories</h2>{categoryList(false)}</aside>}
           <div className="min-w-0 flex-1">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-2"><div><h2 className="text-2xl font-bold text-gray-900">{search ? "Search results" : category ? categoryName : "Explore products"}</h2><p className="mt-1 text-sm text-gray-500" aria-live="polite">{loading ? "Finding products..." : `${total} ${total === 1 ? "product" : "products"}${search ? ` for "${search}"` : ""}`}</p></div>{category && <button onClick={() => handleCategoryChange("")} className="text-sm font-semibold text-emerald-700 hover:underline">Clear category</button>}</div>
             {error ? <div role="alert" className="rounded-xl bg-white p-8 text-center text-gray-600">Could not load products. <button onClick={() => setRetry((value) => value + 1)} className="font-semibold text-emerald-700 underline">Try again</button></div> : <ProductsGrid products={products} loading={loading} />}
@@ -140,7 +141,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
           </div>
         </div>
       </section>
-      {drawerOpen && <div className="fixed inset-0 z-[100]" role="presentation"><div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOpen(false)} /><div ref={drawer} role="dialog" aria-modal="true" aria-labelledby="product-categories-heading" className="absolute inset-y-0 left-0 flex w-[min(85vw,340px)] flex-col bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-gray-100 p-5"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Browse the shop</p><h2 id="product-categories-heading" className="mt-1 text-xl font-bold text-gray-900">Categories</h2></div><button onClick={() => setDrawerOpen(false)} aria-label="Close categories" className="rounded-full p-2 text-gray-600 hover:bg-gray-100"><X size={22} /></button></div><div id="product-categories" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">{categoryList(true)}</div></div></div>}
+      {drawerOpen && <div className="fixed inset-0 z-[100]" role="presentation"><div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOpen(false)} /><div ref={drawer} role="dialog" aria-modal="true" aria-labelledby="product-categories-heading" className="absolute inset-y-0 left-0 flex w-[min(85vw,340px)] flex-col bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-gray-100 p-5"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Browse the shop</p><h2 id="product-categories-heading" className="mt-1 text-xl font-bold text-gray-900">Categories</h2></div><button onClick={() => setDrawerOpen(false)} aria-label="Close categories" className="rounded-full p-2 text-gray-600 hover:bg-gray-100"><X size={22} /></button></div><div id="product-categories" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">{homeLink}{categoryList(true)}</div></div></div>}
     </>
   );
 };

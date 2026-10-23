@@ -13,7 +13,7 @@ export default function ProductCard({ product, index, compact = false }: { produ
   const share = async () => {
     const url = new URL(`/products/${product.slug}`, window.location.origin).href;
     try {
-      if (navigator.share) await navigator.share({ title: product.name, text: description, url });
+      if (navigator.share) await navigator.share({ url });
       else { await navigator.clipboard.writeText(url); toast.success("Link copied to clipboard"); }
     } catch (error) {
       if (!(error instanceof Error && error.name === "AbortError")) toast.error("Unable to share this link. Please try again.");
