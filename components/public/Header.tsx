@@ -158,6 +158,7 @@ const Header = () => {
 
   const navItems = [
     { name: "Home", path: "/" },
+    { name: "Practical Life", path: "/practical-christianity" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];

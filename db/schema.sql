@@ -112,3 +112,9 @@ INSERT OR IGNORE INTO admin_updates (id, title, content)
   WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'authors-management');
 
 INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('authors-management');
+
+INSERT OR IGNORE INTO admin_updates (id, title, content)
+  SELECT 'practical-christianity', 'Practical Christianity pathway is live', '<p>Visitors can now explore the four practical-life pathways, choose a skill area, and send an enquiry to learn, volunteer, find mentorship, or support an initiative.</p><p>Open <strong>Life Skills</strong> in the admin menu to review enquiries, contact each person, and update their follow-up status.</p>'
+  WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'practical-christianity');
+
+INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('practical-christianity');

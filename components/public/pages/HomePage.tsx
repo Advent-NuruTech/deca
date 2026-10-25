@@ -1,7 +1,7 @@
 "use client";
 
 // src/pages/HomePage.jsx
-import { useEffect, useState, useRef, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
@@ -28,6 +28,7 @@ import ActivityCarousel from "../ActivityCarousel";
 import YouTubeVideos2 from "../YouTubeVideos2";
 import NewsletterSignup from "../newsletter-signup";
 import HomeLoadingScreen from "../HomeLoadingScreen";
+import PracticalChristianityPreview from "../PracticalChristianityPreview";
 const remsamVideo = "/assets/remsam.mp4";
 const heroPhrase = "Faith, Family, Farming";
 
@@ -96,13 +97,11 @@ const HomePage = () => {
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  // The page initially renders a loading screen, so a section ref is not yet
+  // hydrated when this hook runs. Observe document scroll instead.
+  const { scrollYProgress } = useScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.18], [1, 0.95]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -178,7 +177,6 @@ const HomePage = () => {
       <div className="bg-white overflow-hidden">
   {/* ========== 1. VIDEO HERO ========== */}
 <section
-  ref={heroRef}
   className="relative min-h-screen min-h-[100svh] flex items-center justify-center overflow-hidden pt-28 pb-32 md:pt-24 md:pb-28"
 >
   {/* Video Background */}
@@ -397,6 +395,8 @@ const HomePage = () => {
             </div>
           </div>
         </section>
+
+        <PracticalChristianityPreview />
 
         {/* ========== 5. WHAT'S NEW (Featured Articles) ========== */}
         {(loading || featuredArticles.length > 0) && <section className="py-16 bg-white">
