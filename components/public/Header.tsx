@@ -8,7 +8,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
-import NotificationBell from "@/components/notifications/NotificationBell";
 import { useCart } from "@/components/providers/CartProvider";
 import type { ProductCategory, ResourceTaxonomy } from "@/lib/types";
 import { getPublicProductCategories, getPublicTaxonomy } from "@/lib/public-settings-client";
@@ -343,7 +342,6 @@ const Header = () => {
           {/* Right side icons - Cart and Admin (only if logged in) */}
           <div className="flex items-center gap-3">
             <Link href="/account" aria-label={user ? "Your account" : "Sign in or create an account"} className={`rounded-lg p-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isScrolled || isLightHeroPage ? "text-gray-700 hover:text-emerald-600" : "text-white hover:text-emerald-300"}`}><UserRound className="h-5 w-5" /></Link>
-            <NotificationBell dark={!isScrolled && !isLightHeroPage} />
             {/* Cart */}
             <Link
               href="/cart"

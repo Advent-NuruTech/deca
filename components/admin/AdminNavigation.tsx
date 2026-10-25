@@ -149,7 +149,7 @@ export default function AdminNavigation({ children, account }: { children: React
         <div className={`border-t border-white/10 p-4 ${compact ? "px-3" : ""}`}>
           <div className={`mb-2 flex items-center ${compact ? "justify-center" : "justify-between px-1"}`}>
             {!compact && <span className="text-xs font-medium text-emerald-100/70">Notifications</span>}
-            <NotificationBell dark />
+            <NotificationBell dark placement="above" />
           </div>
           <a href="/" target="_blank" rel="noreferrer" title={compact ? "View website" : undefined} className={`mb-2 flex min-h-10 items-center rounded-xl text-sm text-emerald-50/75 transition hover:bg-white/10 hover:text-white ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
             <ExternalLink size={18} />

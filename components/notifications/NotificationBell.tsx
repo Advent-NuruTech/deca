@@ -20,7 +20,7 @@ function timeLabel(value?: string) {
   return date.toLocaleDateString("en-KE", { day: "numeric", month: "short" });
 }
 
-export default function NotificationBell({ dark = false }: { dark?: boolean }) {
+export default function NotificationBell({ dark = false, placement = "below" }: { dark?: boolean; placement?: "above" | "below" }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,7 +76,7 @@ export default function NotificationBell({ dark = false }: { dark?: boolean }) {
       <Bell size={20} aria-hidden="true" />
       {unreadCount > 0 && <span className="absolute right-0.5 top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-4 text-white ring-2 ring-white">{unreadCount > 99 ? "99+" : unreadCount}</span>}
     </button>
-    {open && <section role="dialog" aria-label="Notifications" className="absolute right-0 z-[70] mt-2 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+    {open && <section role="dialog" aria-label="Notifications" className={`absolute right-0 z-[70] w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl ${placement === "above" ? "bottom-full mb-2" : "mt-2"}`}>
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3"><div><h2 className="font-bold text-slate-900">Notifications</h2><p className="text-xs text-slate-500">{unreadCount ? `${unreadCount} unread` : "You’re all caught up"}</p></div>{unreadCount > 0 && <button type="button" onClick={() => void markRead(notifications.map((notification) => notification.id))} className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"><CheckCheck size={15} /> Mark all read</button>}</div>
       <div className="max-h-[min(65vh,32rem)] overflow-y-auto">{loading && notifications.length === 0 ? <p role="status" className="flex items-center justify-center gap-2 p-8 text-sm text-slate-500"><LoaderCircle className="animate-spin" size={18} /> Loading notifications…</p> : notifications.length === 0 ? <p className="p-8 text-center text-sm text-slate-500">New account and order updates will appear here.</p> : <ul>{notifications.map((notification) => <li key={notification.id} className={`border-b border-slate-100 last:border-0 ${notification.readAt ? "bg-white" : "bg-emerald-50/70"}`}>{notification.href ? <Link href={notification.href} onClick={() => { void markRead([notification.id]); setOpen(false); }} className="block px-4 py-3 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-emerald-600">{notificationContent(notification)}</Link> : <button type="button" onClick={() => void markRead([notification.id])} className="block w-full px-4 py-3 text-left transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-emerald-600">{notificationContent(notification)}</button>}</li>)}</ul>}</div>
     </section>}
