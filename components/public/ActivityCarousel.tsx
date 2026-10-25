@@ -1,14 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, BriefcaseBusiness, Hammer, HeartHandshake, Lightbulb } from "lucide-react";
-import { Autoplay, EffectFade } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { lifeSkillPathGuidance, lifeSkillPaths } from "@/lib/life-skills";
-
-import "swiper/css";
-import "swiper/css/effect-fade";
 
 const pathwayIcons = [Lightbulb, Hammer, BriefcaseBusiness, HeartHandshake];
 const backgroundImages = [
@@ -20,32 +16,39 @@ const backgroundImages = [
 ];
 
 export default function ActivityCarousel() {
+  const [activeBackgroundIndex, setActiveBackgroundIndex] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setInterval(() => {
+      setActiveBackgroundIndex((current) => (current + 1) % backgroundImages.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <section
       aria-labelledby="our-impact-heading"
       className="relative isolate overflow-hidden bg-emerald-950 py-16 text-white sm:py-20"
     >
-      <Swiper
-        aria-hidden="true"
-        modules={[Autoplay, EffectFade]}
-        effect="fade"
-        speed={1400}
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        loop
-        className="absolute inset-0 -z-20 h-full w-full"
-      >
-        {backgroundImages.map((image) => (
-          <SwiperSlide key={image}>
-            <div
-              className="h-full w-full scale-105 bg-cover bg-center motion-safe:animate-[pulse_12s_ease-in-out_infinite]"
-              style={{ backgroundImage: `url(${image})` }}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-950/95 via-emerald-950/88 to-slate-950/92" />
+      <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={backgroundImages[activeBackgroundIndex]}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImages[activeBackgroundIndex]})` }}
+          />
+        </AnimatePresence>
+      </div>
+      <div aria-hidden="true" className="absolute inset-0 z-10 bg-black/45" />
 
-      <div className="relative container mx-auto px-4">
+      <div className="relative z-20 container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -65,7 +68,15 @@ export default function ActivityCarousel() {
           </p>
         </motion.div>
 
-        <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-2 md:overflow-visible md:pb-0 xl:grid-cols-4">
+        <motion.div
+          animate={{ x: [0, 7, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          className="mt-7 flex items-center justify-end gap-2 text-sm font-bold text-amber-200 md:hidden"
+        >
+          Swipe to explore <ArrowRight size={18} />
+        </motion.div>
+
+        <div className="mt-3 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mt-10 md:grid md:grid-cols-2 md:overflow-visible md:pb-0 xl:grid-cols-4">
           {lifeSkillPaths.map((path, index) => {
             const Icon = pathwayIcons[index];
             const guidance = lifeSkillPathGuidance[path.id];
