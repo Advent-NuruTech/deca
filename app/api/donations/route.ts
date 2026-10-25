@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAuth } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
 import { serializeValue } from "@/lib/products";
+import { notifyAdmins, notifySafely, notifyUser } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +32,20 @@ export async function POST(request: NextRequest) {
     });
     const snapshot = await reference.get();
     const donation = serializeValue({ _id: snapshot.id, id: snapshot.id, ...snapshot.data() });
+    notifySafely(Promise.all([
+      notifyAdmins({
+        kind: "donation",
+        title: "New donation recorded",
+        body: `${identity?.name ?? "A visitor"} recorded a USD ${Math.round(amount * 100) / 100} donation.`,
+        href: "/admin/dashboard",
+      }),
+      ...(identity ? [notifyUser(identity.uid, {
+        kind: "donation" as const,
+        title: "Donation received",
+        body: "Thank you. Your donation has been recorded and is pending review.",
+        href: "/donate",
+      })] : []),
+    ]), `donation ${reference.id}`);
     return NextResponse.json({ success: true, donation }, { status: 201 });
   } catch (error) {
     return errorResponse(error);

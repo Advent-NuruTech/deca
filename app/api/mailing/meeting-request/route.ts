@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { getMailDb, FieldValue, sendMeetingRequestWelcome } from "@/lib/mailing-server";
+import { notifyAdmins, notifySafely } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   try {
@@ -31,6 +32,12 @@ export async function POST(request: Request) {
     });
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
       `https://${process.env.VERCEL_URL ?? new URL(request.url).host}`;
+    notifySafely(notifyAdmins({
+      kind: "contact",
+      title: "New meeting-link request",
+      body: `${name} requested an online meeting link.`,
+      href: "/admin/mailing",
+    }), `meeting request ${contact.id}`);
     try {
       const delivery = await sendMeetingRequestWelcome({ id: memberId, email, name }, baseUrl);
       if (delivery.failures.length) {

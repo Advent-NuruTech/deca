@@ -10,6 +10,7 @@ import {
 } from "@/lib/d1-public-store";
 import { firestore } from "@/lib/firestore";
 import { sendOrderConfirmation } from "@/lib/order-confirmation-email";
+import { notifyAdmins, notifySafely, notifyUser } from "@/lib/notifications";
 import {
   createOrderNumber,
   orderTimestamps,
@@ -86,6 +87,20 @@ export async function POST(request: NextRequest) {
 
     revalidateTag(PUBLIC_PRODUCTS_TAG, { expire: 0 });
     const order = serializeOrder(await orderReference.get());
+    notifySafely(Promise.all([
+      notifyUser(user.uid, {
+        kind: "order",
+        title: "Order received",
+        body: `Your order ${order.orderNumber} has been received and is awaiting confirmation.`,
+        href: "/account",
+      }),
+      notifyAdmins({
+        kind: "order",
+        title: "New order received",
+        body: `${order.customer.name} placed ${order.orderNumber} for KES ${order.total.toLocaleString("en-KE")}.`,
+        href: "/admin/orders?status=pending",
+      }),
+    ]), `order ${order.id}`);
     let confirmationEmailSent = false;
     try {
       await sendOrderConfirmation(order);

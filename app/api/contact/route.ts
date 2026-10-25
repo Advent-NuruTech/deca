@@ -1,7 +1,8 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
-import { errorResponse, HttpError } from "@/lib/auth";
+import { errorResponse, HttpError, requireAuth } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
+import { notifyAdmins, notifySafely, notifyUser } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +28,9 @@ export async function POST(request: NextRequest) {
       throw new HttpError(400, "Subject must be at most 200 characters");
     }
 
+    const identity = request.headers.get("authorization") ? await requireAuth(request) : null;
     const result = await firestore().collection("contacts").add({
+      ...(identity ? { userId: identity.uid } : {}),
       name: name.trim(),
       email: email.trim().toLowerCase(),
       subject: typeof subject === "string" ? subject.trim() : "",
@@ -36,6 +39,21 @@ export async function POST(request: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
+
+    notifySafely(Promise.all([
+      notifyAdmins({
+        kind: "contact",
+        title: "New contact message",
+        body: `${name.trim()} sent${typeof subject === "string" && subject.trim() ? `: ${subject.trim()}` : " a message"}.`,
+        href: "/admin/dashboard",
+      }),
+      ...(identity ? [notifyUser(identity.uid, {
+        kind: "contact" as const,
+        title: "Message received",
+        body: "We received your message and will get back to you soon.",
+        href: "/contact",
+      })] : []),
+    ]), `contact ${result.id}`);
 
     return NextResponse.json(
       { id: result.id, message: "Email sent successfully" },

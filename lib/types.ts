@@ -7,6 +7,16 @@ export interface AppUser {
   updatedAt?: unknown;
 }
 
+export interface AppNotification {
+  id: string;
+  title: string;
+  body: string;
+  href?: string;
+  kind: "account" | "order" | "payment" | "contact" | "donation" | "interest" | "system";
+  readAt?: string | null;
+  createdAt?: string;
+}
+
 export interface ProductSpecifications {
   [key: string]: string;
 }

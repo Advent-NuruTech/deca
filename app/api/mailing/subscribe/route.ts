@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { getMailDb, FieldValue, sendNewsletterWelcome } from "@/lib/mailing-server";
+import { notifyAdmins, notifySafely } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   try {
@@ -38,6 +39,12 @@ export async function POST(request: Request) {
       return "subscribed";
     });
     if (result === "already-subscribed") return Response.json({ status: result });
+    notifySafely(notifyAdmins({
+      kind: "system",
+      title: "New newsletter subscriber",
+      body: `${name || email} joined the newsletter.`,
+      href: "/admin/mailing",
+    }), `newsletter ${id}`);
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
       `https://${process.env.VERCEL_URL ?? new URL(request.url).host}`;

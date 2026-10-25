@@ -5,6 +5,7 @@ import { errorResponse, HttpError } from "@/lib/auth";
 import { adminAuth } from "@/lib/firebase/admin";
 import { firestore } from "@/lib/firestore";
 import type { AppUser } from "@/lib/types";
+import { notifyAdmins, notifySafely, notifyUser } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,13 +43,13 @@ export async function POST(request: NextRequest) {
     }
 
     const userRef = firestore().collection("users").doc(tokenUser.uid);
-    await firestore().runTransaction(async (transaction) => {
+    const created = await firestore().runTransaction(async (transaction) => {
       const existing = await transaction.get(userRef);
       if (existing.exists) {
         if (isAdminSignup && existing.data()?.role !== "admin") {
           throw new HttpError(409, "A non-admin profile already exists for this account");
         }
-        return;
+        return false;
       }
 
       transaction.set(userRef, {
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
+      return true;
     });
 
     const profile = await userRef.get();
@@ -78,6 +80,22 @@ export async function POST(request: NextRequest) {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
+    if (created) {
+      notifySafely(Promise.all([
+        notifyUser(tokenUser.uid, {
+          kind: "account",
+          title: role === "admin" ? "Admin account ready" : "Welcome to RemSam Homestead",
+          body: role === "admin" ? "Your administrator workspace is ready." : "Your account is ready. Order and account updates will appear here.",
+          href: role === "admin" ? "/admin/dashboard" : "/account",
+        }),
+        ...(role === "user" ? [notifyAdmins({
+          kind: "account" as const,
+          title: "New customer account",
+          body: `${data.name} created an account.`,
+          href: "/admin/dashboard",
+        })] : []),
+      ]), `registration ${tokenUser.uid}`);
+    }
     return NextResponse.json(response, { status: 201 });
   } catch (error) {
     return errorResponse(error);

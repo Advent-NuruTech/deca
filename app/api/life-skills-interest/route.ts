@@ -1,8 +1,9 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
-import { errorResponse, HttpError } from "@/lib/auth";
+import { errorResponse, HttpError, requireAuth } from "@/lib/auth";
 import { firestore } from "@/lib/firestore";
 import { defaultLifeSkillsSettings, isLifeSkillPath, validateLifeSkillsSettings } from "@/lib/life-skills";
+import { notifyAdmins, notifySafely, notifyUser } from "@/lib/notifications";
 
 function requiredText(value: unknown, label: string, maxLength: number) {
   if (typeof value !== "string" || !value.trim() || value.trim().length > maxLength) {
@@ -26,7 +27,9 @@ export async function POST(request: NextRequest) {
     const cleanedMessage = typeof message === "string" ? message.trim() : "";
     if (cleanedMessage.length > 2_000) throw new HttpError(400, "Your message must be no more than 2,000 characters.");
 
+    const identity = request.headers.get("authorization") ? await requireAuth(request) : null;
     const result = await firestore().collection("lifeSkillsInterests").add({
+      ...(identity ? { userId: identity.uid } : {}),
       name: cleanedName,
       email: cleanedEmail,
       phone: typeof phone === "string" ? phone.trim() : "",
@@ -38,6 +41,20 @@ export async function POST(request: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
+    notifySafely(Promise.all([
+      notifyAdmins({
+        kind: "interest",
+        title: "New Life Skills enquiry",
+        body: `${cleanedName} is interested in ${skillArea} (${role}).`,
+        href: "/admin/life-skills",
+      }),
+      ...(identity ? [notifyUser(identity.uid, {
+        kind: "interest" as const,
+        title: "Enquiry received",
+        body: "Your Life Skills enquiry has been received.",
+        href: "/practical-christianity",
+      })] : []),
+    ]), `life skills interest ${result.id}`);
     return NextResponse.json({ id: result.id, message: "Your interest has been received." }, { status: 201 });
   } catch (error) {
     return errorResponse(error);

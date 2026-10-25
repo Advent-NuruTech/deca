@@ -3,6 +3,7 @@ import { errorResponse, requireAuth } from "@/lib/auth";
 import { adminAuth } from "@/lib/firebase/admin";
 import { firestore } from "@/lib/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import { notifySafely, notifyUser } from "@/lib/notifications";
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,6 +26,12 @@ export async function PATCH(request: NextRequest) {
     const name = typeof body === "object" && body !== null && "name" in body && typeof body.name === "string" ? body.name.trim() : "";
     if (!name || name.length > 120) return NextResponse.json({ message: "Enter a name of up to 120 characters." }, { status: 400 });
     await firestore().collection("users").doc(profile.uid).update({ name, updatedAt: FieldValue.serverTimestamp() });
+    notifySafely(notifyUser(profile.uid, {
+      kind: "account",
+      title: "Profile updated",
+      body: "Your account name has been updated.",
+      href: "/account?section=settings",
+    }), `profile ${profile.uid}`);
     return NextResponse.json({ ...profile, name });
   } catch (error) { return errorResponse(error); }
 }
