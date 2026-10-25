@@ -3,17 +3,49 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, BriefcaseBusiness, Hammer, HeartHandshake, Lightbulb } from "lucide-react";
+import { Autoplay, EffectFade } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { lifeSkillPathGuidance, lifeSkillPaths } from "@/lib/life-skills";
 
+import "swiper/css";
+import "swiper/css/effect-fade";
+
 const pathwayIcons = [Lightbulb, Hammer, BriefcaseBusiness, HeartHandshake];
+const backgroundImages = [
+  "/assets/farm1.jpeg",
+  "/assets/farm3.jpeg",
+  "/assets/preach2.jpeg",
+  "/assets/study1.jpeg",
+  "/assets/recipe1.jpeg",
+];
 
 export default function ActivityCarousel() {
   return (
     <section
       aria-labelledby="our-impact-heading"
-      className="bg-white py-16 sm:py-20"
+      className="relative isolate overflow-hidden bg-emerald-950 py-16 text-white sm:py-20"
     >
-      <div className="container mx-auto px-4">
+      <Swiper
+        aria-hidden="true"
+        modules={[Autoplay, EffectFade]}
+        effect="fade"
+        speed={1400}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        loop
+        className="absolute inset-0 -z-20 h-full w-full"
+      >
+        {backgroundImages.map((image) => (
+          <SwiperSlide key={image}>
+            <div
+              className="h-full w-full scale-105 bg-cover bg-center motion-safe:animate-[pulse_12s_ease-in-out_infinite]"
+              style={{ backgroundImage: `url(${image})` }}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-950/95 via-emerald-950/88 to-slate-950/92" />
+
+      <div className="relative container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -21,19 +53,19 @@ export default function ActivityCarousel() {
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-3xl text-center"
         >
-          <p className="inline-flex rounded-full bg-emerald-100 px-4 py-1 text-sm font-semibold text-emerald-800">
+          <p className="inline-flex rounded-full bg-white/10 px-4 py-1 text-sm font-semibold text-amber-300 ring-1 ring-white/15 backdrop-blur-sm">
             Our Impact
           </p>
-          <h2 id="our-impact-heading" className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-            Transforming Lives Through <span className="text-emerald-700">Faith &amp; Action</span>
+          <h2 id="our-impact-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            Transforming Lives Through <span className="text-amber-300">Faith &amp; Action</span>
           </h2>
-          <div className="mx-auto mt-5 h-1 w-24 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500" />
-          <p className="mx-auto mt-5 max-w-2xl leading-7 text-slate-600">
+          <div className="mx-auto mt-5 h-1 w-24 rounded-full bg-gradient-to-r from-amber-300 to-emerald-300" />
+          <p className="mx-auto mt-5 max-w-2xl leading-7 text-emerald-50/85">
             From the farm to the classroom, from the pulpit to the printing press &ndash; here&apos;s how we&apos;re making a difference.
           </p>
         </motion.div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-2 md:overflow-visible md:pb-0 xl:grid-cols-4">
           {lifeSkillPaths.map((path, index) => {
             const Icon = pathwayIcons[index];
             const guidance = lifeSkillPathGuidance[path.id];
@@ -45,7 +77,7 @@ export default function ActivityCarousel() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
-                className="group h-full"
+                className="group h-full w-[86vw] max-w-sm shrink-0 snap-start md:w-auto md:max-w-none"
               >
                 <Link
                   href={`/practical-christianity?path=${path.id}#get-involved`}

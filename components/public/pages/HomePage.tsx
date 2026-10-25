@@ -339,9 +339,7 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ========== 3. ACTIVITY CAROUSEL (Visual Story) ========== */}
-        <ActivityCarousel />
-
+     
         {/* ========== 4. MISSION STATEMENT (Now meaningful) ========== */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
@@ -396,8 +394,7 @@ const HomePage = () => {
           </div>
         </section>
 
-        <PracticalChristianityPreview />
-
+      
         {/* ========== 5. WHAT'S NEW (Featured Articles) ========== */}
         {(loading || featuredArticles.length > 0) && <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
@@ -451,6 +448,11 @@ const HomePage = () => {
             <div className="mt-8 text-center"><Link href="/products" className="inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700">Shop all products <ArrowRight size={16} aria-hidden="true" /></Link></div>
           </div>
         </section>
+
+
+   {/* ========== 3. ACTIVITY CAROUSEL (Visual Story) ========== */}
+        <ActivityCarousel />
+
 
         {/* ========== 7. YOUTUBE VIDEOS ========== */}
         <section className="py-16 bg-white">
