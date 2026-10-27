@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, FileText, Search, X } from "lucide-react";
 import StudyMaterialCard from "@/components/public/StudyMaterialCard";
+import PageHero from "@/components/public/PageHero";
 import api from "@/lib/public-api";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 
@@ -95,12 +96,7 @@ export default function StudyMaterialsPage() {
 
   return (
     <>
-      {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 44, 34, .94), rgba(2, 44, 34, .72)), url('/assets/health-resource-library.png')" }} />
-        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Learn and grow</p><h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{majorCategory?.name ?? "Study Library"}</h1><p className="mt-4 text-base text-emerald-50/90 sm:text-lg">Explore downloadable guides and resources for your journey.</p>
-        </div>
-      </section>}
+      {!query && <PageHero eyebrow="Learn and grow" title={majorCategory?.name ?? "Study Library"} description="Explore downloadable guides and resources for your journey, with helpful topics gathered in one place." primaryAction={{ href: "#study-materials-content", label: "Browse resources" }} secondaryAction={{ href: "/newsletter", label: "Get updates" }} aside={<><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">Your study library</p><h2 className="mt-3 text-2xl font-bold text-slate-950">Practical guidance to keep and share.</h2><p className="mt-4 text-sm leading-6 text-slate-600">Search by topic or use a category to find the resource that fits your current study.</p></>} />}
       {query && <div className="h-20 bg-emerald-950" aria-hidden="true" />}
       <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
@@ -108,7 +104,7 @@ export default function StudyMaterialsPage() {
           <button ref={categoryButton} onClick={() => { if (window.matchMedia("(min-width: 1024px)").matches) setDesktopCategoriesOpen((open) => !open); else setDrawerOpen(true); }} aria-expanded={drawerOpen || desktopCategoriesOpen} className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 sm:px-5"><span className="max-w-[100px] truncate sm:max-w-[220px]">{category === "" ? "Categories" : categoryName}</span><ChevronDown size={18} /></button>
         </div>
       </div>
-      <section className="bg-gray-50 py-10 sm:py-14" aria-label="Study materials results">
+      <section id="study-materials-content" className="scroll-mt-20 bg-gray-50 py-10 sm:py-14" aria-label="Study materials results">
         <div className="mx-auto flex max-w-7xl items-start gap-8 px-4 sm:px-6">
           {desktopCategoriesOpen && <aside id="study-categories" aria-label="Study material categories" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] w-60 shrink-0 overflow-y-auto overscroll-contain rounded-xl border border-gray-200 bg-white p-3 lg:block"><h2 className="px-4 py-3 text-base font-bold text-gray-900">Categories</h2>{categoryList(false)}</aside>}
           <div className="min-w-0 flex-1">

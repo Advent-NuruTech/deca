@@ -22,7 +22,7 @@ const heroImages = [
   },
 ] as const;
 
-export default function HomeHeroCarousel() {
+export default function HomeHeroCarousel({ preload = true }: { preload?: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -56,7 +56,7 @@ export default function HomeHeroCarousel() {
           src={image.src}
           alt={index === activeIndex ? image.alt : ""}
           fill
-          preload={index === 0}
+          preload={preload && index === 0}
           quality={100}
           sizes="100vw"
           className={`object-cover object-center transition-opacity duration-1000 motion-reduce:transition-none ${

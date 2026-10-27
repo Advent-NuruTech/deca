@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Check, ChevronDown, FileText, Search, X } from "lucide-react";
 import StudyMaterialCard from "@/components/public/StudyMaterialCard";
+import PageHero from "@/components/public/PageHero";
 import api from "@/lib/public-api";
 import type { PublicArticle, ResourceTaxonomy } from "@/lib/types";
 export type { PublicArticle } from "@/lib/types";
@@ -113,15 +114,7 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
 
   return (
     <>
-      {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 35, 27, .67), rgba(2, 35, 27, .48)), url('/assets/health-resource-library.png')" }} />
-        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Resources</p>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{majorCategory?.name ?? "Articles & Blogs"}</h1>
-          <p className="mt-4 text-base text-emerald-50 sm:text-lg">Browse the latest resources by category.</p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3"><a href="#articles-content" className="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">Browse All</a><Link href="/donate" className="rounded-lg border border-white/70 bg-black/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/15">Support Our Work</Link></div>
-        </div>
-      </section>}
+      {!query && <PageHero eyebrow="Resources" title={majorCategory?.name ?? "Articles & Blogs"} description="Browse the latest resources by category, then choose the guidance that best supports your next step." primaryAction={{ href: "#articles-content", label: "Browse all" }} secondaryAction={{ href: "/donate", label: "Support our work" }} aside={<><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">Start exploring</p><h2 className="mt-3 text-2xl font-bold text-slate-950">Helpful learning, ready when you are.</h2><p className="mt-4 text-sm leading-6 text-slate-600">Filter articles by topic or search for a question you are working through.</p></>} />}
       {query && <div className="h-20 bg-emerald-950" aria-hidden="true" />}
       <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">

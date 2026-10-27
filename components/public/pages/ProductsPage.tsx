@@ -4,13 +4,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/providers/CartProvider";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import type { ProductCategory, PublicProduct } from "@/lib/types";
 import SEO from "../SEO";
 import { Check, ChevronDown, Home, ImageOff, Search, ShoppingCart, X } from "lucide-react";
 import ProductsGrid from "../products/ProductsGrid";
 import ProductsPagination from "../products/ProductsPagination";
+import PageHero from "@/components/public/PageHero";
 
 type ProductsResponse = {
   products: PublicProduct[];
@@ -22,7 +23,6 @@ type CategoriesResponse = { categories: ProductCategory[] };
 
 const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) => {
   const router = useRouter();
-  const pathname = usePathname();
   const { itemCount } = useCart();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<PublicProduct[]>([]);
@@ -120,8 +120,8 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
         description="Buy organic seeds, fresh produce, and other agricultural products from our farm."
         keywords={["Organic Seeds", "Fresh Produce", "Farm Products"]}
       />
-      {pathname !== "/products" && <div className="h-20" aria-hidden="true" />}
-      <div className={`sticky z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6 ${pathname === "/products" ? "top-0" : "top-14 md:top-16"}`}>
+      {!query && <PageHero eyebrow="GILEAD shop" title={category ? categoryName : "Shop natural products."} description="Explore thoughtfully selected seeds, fresh produce and wellbeing products that support healthier everyday living." primaryAction={{ href: "#product-results", label: "Browse products" }} secondaryAction={{ href: "/cart", label: "View cart" }} aside={<><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">Shop with purpose</p><h2 className="mt-3 text-2xl font-bold text-slate-950">Simple choices for daily wellbeing.</h2><p className="mt-4 text-sm leading-6 text-slate-600">Search our selection or use a category to find exactly what you need.</p></>} />}
+      <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
           <label className="flex min-w-0 flex-1 items-center gap-2 px-2 text-gray-500 sm:px-3"><Search size={20} aria-hidden="true" /><span className="sr-only">Search products</span><input type="search" value={query} onChange={(event) => { if (!query && event.target.value) window.scrollTo({ top: 0, behavior: "smooth" }); setQuery(event.target.value); if (searchParams.get("page")) { const params = new URLSearchParams(searchParams.toString()); params.delete("page"); router.replace(`/products${params.size ? `?${params}` : ""}`, { scroll: false }); } }} placeholder="Search products..." className="min-w-0 w-full py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 sm:text-base" /></label>
           <button ref={categoryButton} onClick={() => { if (window.matchMedia("(min-width: 1024px)").matches) setDesktopOpen((open) => !open); else setDrawerOpen(true); }} aria-expanded={drawerOpen || desktopOpen} aria-controls="product-categories" className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 sm:px-5"><span className="max-w-[100px] truncate sm:max-w-[220px]">{category ? categoryName : "Categories"}</span><ChevronDown size={18} /></button>
@@ -131,7 +131,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
           {categories.map((item) => <button key={item.value} type="button" onClick={() => handleCategoryChange(item.value)} aria-current={category === item.value ? "true" : undefined} className={`flex shrink-0 items-center gap-2 border-b-2 px-1 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-emerald-700 ${category === item.value ? "border-emerald-700 text-emerald-800" : "border-transparent text-gray-600 hover:text-emerald-700"}`}>{item.value && (item.image ? <img src={item.image} alt="" className="h-8 w-8 rounded-full border border-gray-200 bg-white object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-400"><ImageOff size={15} aria-hidden="true" /></span>)}{item.value ? item.label : "All"}</button>)}
         </nav>
       </div>
-      <section className="bg-gray-50 py-5 sm:py-10" aria-label="Product results">
+      <section id="product-results" className="scroll-mt-20 bg-gray-50 py-5 sm:py-10" aria-label="Product results">
         <div className="mx-auto flex max-w-7xl items-start gap-8 px-4 sm:px-6">
           {desktopOpen && <aside id="product-categories" aria-label="Product categories" className="sticky top-36 hidden max-h-[calc(100dvh-9rem)] w-60 shrink-0 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 lg:block">{homeLink}<h2 className="px-4 py-3 font-bold">Categories</h2>{categoryList(false)}</aside>}
           <div className="min-w-0 flex-1">

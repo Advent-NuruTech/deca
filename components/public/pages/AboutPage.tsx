@@ -13,11 +13,11 @@ import {
   Phone,
   Salad,
   ShieldCheck,
-  Sparkles,
   Stethoscope,
   UsersRound,
 } from "lucide-react";
 import { customerServiceContacts, officialPhoneContacts, siteConfig } from "@/lib/site-config";
+import PageHero from "@/components/public/PageHero";
 
 const departments = [
   {
@@ -113,19 +113,14 @@ const servicePillars = [
 export default function AboutPage() {
   return (
     <main className="bg-white">
-      <section className="relative isolate overflow-hidden bg-sky-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
-        <Image src="/assets/health-wellness-space.png" alt="A calm botanical space for wellbeing learning" fill priority sizes="100vw" className="-z-20 object-cover object-[center_30%]" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-sky-950 via-sky-950/90 to-sky-950/35" />
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-300">Gilead Medicare Food and Nutrition Services</p>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.14em] text-sky-200">Institutional Structure</p>
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-sky-200/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-sky-100 backdrop-blur"><Sparkles className="h-4 w-4 text-sky-300" aria-hidden="true" />Tagline: The Balm of Healing</p>
-            <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Whole-person care, learning, and service.</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-sky-100">Gilead Medicare Food and Nutrition Services is an independent, privately operated institution dedicated to health education, nutrition, natural wellness, spiritual care, medical missionary training, and community service.</p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Gilead Medicare Food and Nutrition Services"
+        title="Whole-person care, learning, and service."
+        description="Gilead Medicare Food and Nutrition Services is an independent, privately operated institution dedicated to health education, nutrition, natural wellness, spiritual care, medical missionary training, and community service."
+        primaryAction={{ href: "/programmes", label: "Explore our programmes" }}
+        secondaryAction={{ href: "/contact", label: "Contact our team" }}
+        aside={<><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">Institutional structure</p><h2 className="mt-3 text-2xl font-bold text-slate-950">The Balm of Healing.</h2><p className="mt-4 text-sm leading-6 text-slate-600">Our work connects physical wellbeing, nutrition, spiritual care, education and community service.</p><ul className="mt-6 space-y-3 border-t border-slate-200 pt-5 text-sm font-semibold text-slate-700"><li>Health and natural-wellness learning</li><li>Nutrition and lifestyle education</li><li>Compassionate community service</li></ul></>}
+      />
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
