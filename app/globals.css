@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -42,6 +43,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Existing home loading screen */
 .home-loading-screen {
   position: fixed;
   inset: 0;
@@ -147,13 +149,24 @@ body {
 }
 
 @keyframes home-loading-progress {
-  from { transform: translateX(-110%); }
-  to { transform: translateX(350%); }
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(350%);
+  }
 }
 
 @keyframes home-loading-breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-0.25rem) scale(1.025); }
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-0.25rem) scale(1.025);
+  }
 }
 
 @media (max-width: 640px) {
@@ -162,6 +175,7 @@ body {
   }
 }
 
+/* Accessibility: respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .home-loading-logo-wrap,
   .home-loading-track span {
@@ -213,7 +227,8 @@ body {
     @apply prose prose-emerald min-h-[32rem] max-h-[70vh] max-w-none overflow-y-auto rounded-b-xl border border-t-0 border-brand-border bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-brand;
   }
 
-  .rich-editor, .article-rich-content {
+  .rich-editor,
+  .article-rich-content {
     font-family: "Times New Roman", serif;
     font-size: 14px;
     overflow-wrap: anywhere;
@@ -224,8 +239,13 @@ body {
     @apply pointer-events-none text-brand-muted;
   }
 
-  .notice { @apply mt-2 text-sm; }
-  .error-notice { @apply text-red-600; }
+  .notice {
+    @apply mt-2 text-sm;
+  }
+
+  .error-notice {
+    @apply text-red-600;
+  }
 }
 
 @keyframes fade-in {
@@ -233,6 +253,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -248,9 +269,11 @@ body {
 }
 
 @keyframes gradient {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }

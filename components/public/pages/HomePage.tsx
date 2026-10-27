@@ -62,72 +62,77 @@ export default function HomePage() {
     <main className="overflow-hidden bg-white">
       {/* Hero */}
       <section className="relative isolate min-h-[560px] overflow-hidden bg-slate-950 text-white">
+        {/* Original images remain unchanged */}
         <HomeHeroCarousel />
 
-        <div className="mx-auto grid min-h-[560px] max-w-7xl items-end gap-10 px-4 pb-12 pt-6 sm:px-6 sm:pb-16 lg:grid-cols-[1.08fr_0.92fr] lg:px-8">
-          {/* Main hero content */}
-          <div className="max-w-3xl">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-12 sm:px-6 sm:py-16 lg:min-h-[640px] lg:grid-cols-[1.08fr_0.92fr] lg:content-end lg:gap-6 lg:px-8">
+          <div className="h-full max-w-3xl border border-white/40 bg-[#008EFE] p-6 text-white shadow-2xl sm:p-8">
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               Healthier people.{" "}
-              <span className="text-[#008EFE]">
+              <span className="text-white">
                 Stronger communities.
               </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90">
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-white">
               {siteConfig.tagline} From health education and wellness coaching
               to healthy-food services and community outreach, our programmes
               help people make informed wellbeing choices.
             </p>
-
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/invite-gilead"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 font-bold text-slate-950 shadow-lg transition hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008EFE]"
-              >
-                Invite GILEAD for a programme
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-
-              <Link
-                href="/programmes"
-                className="inline-flex items-center justify-center rounded-xl border border-white/50 bg-slate-950/20 px-5 py-3.5 font-bold text-white backdrop-blur transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008EFE]"
-              >
-                Explore our programmes
-              </Link>
-            </div>
           </div>
 
-          <aside className="hidden border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl lg:block sm:p-8">
-  <p className="text-sm font-bold uppercase tracking-widest text-[#008EFE]">
-    Our commitment
-  </p>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-2 lg:col-start-1 lg:row-start-2">
+            <Link
+              href="/invite-gilead"
+              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#079326] px-4 py-4 text-base font-bold text-white shadow-lg transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:px-6 sm:text-lg"
+            >
+              Invite GILEAD for a programme
+              <ArrowRight className="h-5 w-5 shrink-0" />
+            </Link>
 
-  <h2 className="mt-3 text-2xl font-bold text-slate-950">
-    Education-first, person-centred support.
-  </h2>
+            <Link
+              href="/programmes"
+              className="inline-flex min-h-14 items-center justify-center rounded-xl bg-[#008EFE] px-4 py-4 text-center text-base font-bold text-white shadow-lg transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:px-6 sm:text-lg"
+            >
+              Explore our programmes
+            </Link>
+          </div>
 
-  <ul className="mt-6 space-y-4 text-sm leading-6 text-slate-700">
-    <li className="flex gap-3">
-      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
-      <span>Clear education within our recognised and lawful scope.</span>
-    </li>
+          <aside className="h-full border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl sm:p-8 lg:col-start-2 lg:row-start-1">
+            <p className="text-sm font-bold uppercase tracking-widest text-[#008EFE]">
+              Our commitment
+            </p>
 
-    <li className="flex gap-3">
-      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
-      <span>
-        Appropriate referral to licensed medical professionals where needed.
-      </span>
-    </li>
+            <h2 className="mt-3 text-2xl font-bold text-slate-950">
+              Education-first, person-centred support.
+            </h2>
 
-    <li className="flex gap-3">
-      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
-      <span>
-        Tailored programmes for families, institutions and communities.
-      </span>
-    </li>
-  </ul>
-</aside>
+            <ul className="mt-6 space-y-4 text-sm leading-6 text-slate-700">
+              <li className="flex gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
+                <span>
+                  Clear education within our recognised and lawful scope.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
+                <span>
+                  Appropriate referral to licensed medical professionals where
+                  needed.
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#079326]" />
+                <span>
+                  Tailored programmes for families, institutions and
+                  communities.
+                </span>
+              </li>
+            </ul>
+          </aside>
+
         </div>
       </section>
 
@@ -201,6 +206,7 @@ export default function HomePage() {
                     sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
                     className="object-cover transition duration-500 group-hover:scale-105"
                   />
+
                   <span className="absolute left-4 top-4 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-extrabold tracking-[0.14em] text-white backdrop-blur-sm">
                     {String(index + 1).padStart(2, "0")}
                   </span>
@@ -210,6 +216,7 @@ export default function HomePage() {
                   <h3 className="text-xl font-bold text-slate-950">
                     {area.title}
                   </h3>
+
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {area.summary}
                   </p>
