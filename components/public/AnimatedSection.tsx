@@ -1,14 +1,14 @@
 "use client";
 
 // components/AnimatedSection.jsx
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import type { ReactNode } from "react";
 
 type AnimatedSectionProps = {
   children: ReactNode;
   delay?: number;
-  direction?: "up" | "down" | "left" | "right" | "fade";
+  direction?: "up" | "down" | "left" | "right" | "fade" | "jump";
   duration?: number;
   className?: string;
   threshold?: number;
@@ -24,6 +24,7 @@ const AnimatedSection = ({
   threshold = 0.1,
   once = true,
 }: AnimatedSectionProps) => {
+  const prefersReducedMotion = useReducedMotion();
   const [ref, inView] = useInView({
     triggerOnce: once,
     threshold: threshold,
@@ -41,6 +42,8 @@ const AnimatedSection = ({
         return { x: -50, y: 0 };
       case "fade":
         return { opacity: 0 };
+      case "jump":
+        return { y: 36, scale: 0.96 };
       default:
         return { y: 50, x: 0 };
     }
@@ -48,17 +51,20 @@ const AnimatedSection = ({
 
   const variants: Variants = {
     hidden: {
-      opacity: 0,
-      ...getInitialPosition(),
+      opacity: prefersReducedMotion ? 1 : 0,
+      ...(prefersReducedMotion ? {} : getInitialPosition()),
     },
     visible: {
       opacity: 1,
       y: 0,
       x: 0,
+      scale: 1,
       transition: {
-        duration: duration,
+        duration: prefersReducedMotion ? 0 : duration,
         delay: delay,
-        ease: [0.25, 0.1, 0.25, 1], // Cubic bezier for smooth easing
+        ...(direction === "jump" && !prefersReducedMotion
+          ? { type: "spring", stiffness: 235, damping: 19, mass: 0.72 }
+          : { ease: [0.22, 1, 0.36, 1] }),
       },
     },
   };

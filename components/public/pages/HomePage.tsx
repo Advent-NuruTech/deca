@@ -12,6 +12,7 @@ import {
 import { serviceAreas, siteConfig } from "@/lib/site-config";
 import HomeHeroCarousel from "@/components/public/HomeHeroCarousel";
 import HomeListings from "@/components/public/HomeListings";
+import AnimatedSection from "@/components/public/AnimatedSection";
 
 const pillars = [
   {
@@ -140,19 +141,21 @@ export default function HomePage() {
       {/* Three pillars */}
       <section className="relative z-10 -mt-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-4 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 md:grid-cols-3 md:p-6">
-          {pillars.map(({ icon: Icon, title, text }) => (
-            <article key={title} className="flex gap-4 rounded-xl p-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-[#079326]">
-                <Icon className="h-5 w-5" />
-              </span>
+          {pillars.map(({ icon: Icon, title, text }, index) => (
+            <AnimatedSection key={title} direction="jump" delay={index * 0.08} duration={0.45}>
+              <article className="flex gap-4 rounded-xl p-3">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-[#079326]">
+                  <Icon className="h-5 w-5" />
+                </span>
 
-              <div>
-                <h2 className="font-bold text-slate-950">{title}</h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
-                  {text}
-                </p>
-              </div>
-            </article>
+                <div>
+                  <h2 className="font-bold text-slate-950">{title}</h2>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {text}
+                  </p>
+                </div>
+              </article>
+            </AnimatedSection>
           ))}
         </div>
       </section>
@@ -161,7 +164,7 @@ export default function HomePage() {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div className="max-w-3xl">
+            <AnimatedSection direction="left" className="max-w-3xl">
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">
                 What we do
               </p>
@@ -175,54 +178,57 @@ export default function HomePage() {
                 food, community work and referral navigation so organisations
                 and households can build lasting wellbeing practices.
               </p>
-            </div>
+            </AnimatedSection>
 
-            <figure className="relative min-h-64 overflow-hidden rounded-3xl bg-slate-100 shadow-lg">
-              <Image
-                src="/assets/health-whole-foods.png"
-                alt="Fresh whole foods arranged for nutrition education"
-                fill
-                sizes="(min-width: 1024px) 45vw, 100vw"
-                className="object-cover"
-              />
+            <AnimatedSection direction="right" delay={0.08}>
+              <figure className="relative min-h-64 overflow-hidden rounded-3xl bg-slate-100 shadow-lg">
+                <Image
+                  src="/assets/health-whole-foods.png"
+                  alt="Fresh whole foods arranged for nutrition education"
+                  fill
+                  sizes="(min-width: 1024px) 45vw, 100vw"
+                  className="object-cover"
+                />
 
-              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-6 pb-5 pt-16 text-sm font-semibold text-white">
-                Practical food and wellbeing learning for real communities.
-              </figcaption>
-            </figure>
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-6 pb-5 pt-16 text-sm font-semibold text-white">
+                  Practical food and wellbeing learning for real communities.
+                </figcaption>
+              </figure>
+            </AnimatedSection>
           </div>
 
           {/* Service areas */}
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {serviceAreas.map((area, index) => (
-              <article
-                key={area.title}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#008EFE] hover:shadow-lg"
-              >
-                <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
-                  <Image
-                    src={serviceAreaImages[area.title].src}
-                    alt={serviceAreaImages[area.title].alt}
-                    fill
-                    sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                  />
+              <AnimatedSection key={area.title} direction="jump" delay={index * 0.07} duration={0.45}>
+                <article
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#008EFE] hover:shadow-lg"
+                >
+                  <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
+                    <Image
+                      src={serviceAreaImages[area.title].src}
+                      alt={serviceAreaImages[area.title].alt}
+                      fill
+                      sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
 
-                  <span className="absolute left-4 top-4 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-extrabold tracking-[0.14em] text-white backdrop-blur-sm">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
+                    <span className="absolute left-4 top-4 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-extrabold tracking-[0.14em] text-white backdrop-blur-sm">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
 
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-950">
-                    {area.title}
-                  </h3>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-slate-950">
+                      {area.title}
+                    </h3>
 
-                  <p className="mt-3 text-sm leading-6 text-slate-600">
-                    {area.summary}
-                  </p>
-                </div>
-              </article>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      {area.summary}
+                    </p>
+                  </div>
+                </article>
+              </AnimatedSection>
             ))}
           </div>
 
@@ -238,11 +244,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <HomeListings />
+      <AnimatedSection direction="up">
+        <HomeListings />
+      </AnimatedSection>
 
       {/* Final call to action */}
       <section className="bg-[#008EFE] px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 rounded-3xl border border-white/40 bg-[#008EFE] p-8 md:flex-row md:items-center md:justify-between md:p-10">
+        <AnimatedSection direction="jump" className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-8 rounded-3xl border border-white/40 bg-[#008EFE] p-8 md:flex-row md:items-center md:justify-between md:p-10">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 text-white">
               <BookOpenCheck className="h-5 w-5" />
@@ -268,7 +277,8 @@ export default function HomePage() {
           >
             Start an invitation
           </Link>
-        </div>
+          </div>
+        </AnimatedSection>
       </section>
     </main>
   );

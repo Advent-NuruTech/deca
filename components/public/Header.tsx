@@ -7,7 +7,15 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
-const links = [{ label: "Home", href: "/" }, { label: "Programmes", href: "/programmes" }, { label: "Invite GILEAD", href: "/invite-gilead" }, { label: "About", href: "/about" }, { label: "Contact", href: "/contact" }];
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Programmes", href: "/programmes" },
+  { label: "Products", href: "/products" },
+  { label: "Resources", href: "/articles" },
+  { label: "Invite GILEAD", href: "/invite-gilead" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function Header() {
   const pathname = usePathname();
