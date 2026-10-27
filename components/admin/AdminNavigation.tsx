@@ -95,38 +95,49 @@ export default function AdminNavigation({ children, account }: { children: React
   const home = isAccount ? "/account" : "/admin/dashboard";
   const sidebar = (isMobile = false) => {
     const compact = collapsed && !isMobile;
+    const navigationItem = (active: boolean) => active
+      ? isMobile
+        ? "border-l-4 border-[#008EFE] bg-slate-100 text-[#079326]"
+        : "border-l-4 border-[#008EFE] bg-white text-[#079326] shadow-lg shadow-black/10"
+      : isMobile
+        ? "border-l-4 border-transparent text-slate-700 hover:bg-slate-100 hover:text-[#079326]"
+        : "border-l-4 border-transparent text-white hover:bg-white/10";
+    const navigationIcon = (active: boolean) => active
+      ? "text-[#079326]"
+      : isMobile
+        ? "text-slate-500 group-hover:text-[#079326]"
+        : "text-white";
 
     return (
       <div className="flex h-full flex-col">
-        <div className={`flex h-20 items-center border-b border-white/10 ${compact ? "justify-center px-3" : "gap-3 px-5"}`}>
+        <div className={`flex h-20 items-center border-b ${isMobile ? "border-slate-200" : "border-white/10"} ${compact ? "justify-center px-3" : "gap-3 px-5"}`}>
           <Link href={home} className="flex min-w-0 items-center gap-3" aria-label={title}>
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
               <img src="/logo.png" alt="" className="h-9 w-9 rounded-xl object-contain" />
             </span>
             {!compact && (
               <span className="min-w-0">
-                <span className="block text-sm font-bold tracking-wide text-white">{title}</span>
-                <span className="mt-0.5 block text-xs text-emerald-100/70">{subtitle}</span>
+                <span className={`block text-sm font-bold tracking-wide ${isMobile ? "text-slate-950" : "text-white"}`}>{title}</span>
+                <span className={`mt-0.5 block text-xs ${isMobile ? "text-slate-500" : "text-white/75"}`}>{subtitle}</span>
               </span>
             )}
           </Link>
           {isMobile && (
-            <button onClick={() => setMobileOpen(false)} className="ml-auto rounded-xl p-2 text-emerald-100 transition hover:bg-white/10 hover:text-white" aria-label="Close navigation">
+            <button onClick={() => setMobileOpen(false)} className="ml-auto rounded-xl p-2 text-slate-600 transition hover:bg-slate-100 hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]" aria-label="Close navigation">
               <X size={20} />
             </button>
           )}
         </div>
 
         <nav aria-label={isAccount ? "Account navigation" : "Admin navigation"} className={`flex-1 overflow-y-auto py-6 ${compact ? "px-3" : "px-4"}`}>
-          {!compact && <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/60">Workspace</p>}
+          {!compact && <p className={`mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] ${isMobile ? "text-slate-500" : "text-white/75"}`}>Workspace</p>}
           <div className="space-y-1.5">
             {isAccount ? ([{ id: "orders" as const, label: "Orders", icon: ShoppingCart }, { id: "settings" as const, label: "Settings", icon: Settings }].map(({ id, label, icon: Icon }) => {
               const active = account.section === id;
-              return <button key={id} type="button" onClick={() => { account.onSectionChange(id); setMobileOpen(false); }} title={compact ? label : undefined} aria-current={active ? "page" : undefined} className={`group relative flex min-h-11 w-full items-center rounded-xl text-sm font-medium transition-all ${compact ? "justify-center px-2" : "gap-3 px-3.5"} ${active ? "bg-white text-emerald-950 shadow-lg shadow-emerald-950/15" : "text-emerald-50/75 hover:bg-white/10 hover:text-white"}`}>
-                {active && <span className="absolute -left-1 h-5 w-1 rounded-full bg-amber-400" />}
-                <Icon size={20} className={`shrink-0 ${active ? "text-emerald-700" : "text-emerald-100/70 group-hover:text-white"}`} />
+              return <button key={id} type="button" onClick={() => { account.onSectionChange(id); setMobileOpen(false); }} title={compact ? label : undefined} aria-current={active ? "page" : undefined} className={`group relative flex min-h-11 w-full items-center rounded-xl text-sm font-medium transition-all ${compact ? "justify-center px-2" : "gap-3 px-3.5"} ${navigationItem(active)}`}>
+                <Icon size={20} className={`shrink-0 ${navigationIcon(active)}`} />
                 {!compact && <span className="flex-1 text-left">{label}</span>}
-                {!compact && active && <ChevronRight size={16} className="text-emerald-700/60" />}
+                {!compact && active && <ChevronRight size={16} className="text-[#079326]" />}
               </button>;
             })) : links.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -136,37 +147,36 @@ export default function AdminNavigation({ children, account }: { children: React
                   href={href}
                   title={compact ? label : undefined}
                   aria-current={active ? "page" : undefined}
-                  className={`group relative flex min-h-11 items-center rounded-xl text-sm font-medium transition-all ${compact ? "justify-center px-2" : "gap-3 px-3.5"} ${active ? "bg-white text-emerald-950 shadow-lg shadow-emerald-950/15" : "text-emerald-50/75 hover:bg-white/10 hover:text-white"}`}
+                  className={`group relative flex min-h-11 items-center rounded-xl text-sm font-medium transition-all ${compact ? "justify-center px-2" : "gap-3 px-3.5"} ${navigationItem(active)}`}
                 >
-                  {active && <span className="absolute -left-1 h-5 w-1 rounded-full bg-amber-400" />}
-                  <Icon size={20} className={`shrink-0 ${active ? "text-emerald-700" : "text-emerald-100/70 group-hover:text-white"}`} />
+                  <Icon size={20} className={`shrink-0 ${navigationIcon(active)}`} />
                   {!compact && <span className="flex-1">{label}</span>}
-                  {!compact && active && <ChevronRight size={16} className="text-emerald-700/60" />}
+                  {!compact && active && <ChevronRight size={16} className="text-[#079326]" />}
                 </Link>
               );
             })}
           </div>
         </nav>
 
-        <div className={`border-t border-white/10 p-4 ${compact ? "px-3" : ""}`}>
+        <div className={`border-t p-4 ${isMobile ? "border-slate-200" : "border-white/10"} ${compact ? "px-3" : ""}`}>
           <div className={`mb-2 flex items-center ${compact ? "justify-center" : "justify-between px-1"}`}>
-            {!compact && <span className="text-xs font-medium text-emerald-100/70">Notifications</span>}
-            <NotificationBell dark placement="above" />
+            {!compact && <span className={`text-xs font-medium ${isMobile ? "text-slate-600" : "text-white/75"}`}>Notifications</span>}
+            <NotificationBell dark={!isMobile} placement="above" />
           </div>
-          <a href="/" target="_blank" rel="noreferrer" title={compact ? "View website" : undefined} className={`mb-2 flex min-h-10 items-center rounded-xl text-sm text-emerald-50/75 transition hover:bg-white/10 hover:text-white ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
+          <a href="/" target="_blank" rel="noreferrer" title={compact ? "View website" : undefined} className={`mb-2 flex min-h-10 items-center rounded-xl text-sm transition ${isMobile ? "text-slate-700 hover:bg-slate-100 hover:text-[#079326]" : "text-white hover:bg-white/10"} ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
             <ExternalLink size={18} />
             {!compact && <span>View website</span>}
           </a>
-          <button onClick={signOut} title={compact ? "Sign out" : undefined} className={`flex min-h-10 w-full items-center rounded-xl text-sm text-emerald-50/75 transition hover:bg-red-400/15 hover:text-red-100 ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
+          <button onClick={signOut} title={compact ? "Sign out" : undefined} className={`flex min-h-10 w-full items-center rounded-xl text-sm transition ${isMobile ? "text-slate-700 hover:bg-slate-100 hover:text-[#079326]" : "text-white hover:bg-white/10"} ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
             <LogOut size={18} />
             {!compact && <span>Sign out</span>}
           </button>
           {!compact && (
-            <div className="mt-4 flex min-w-0 items-center gap-3 rounded-xl bg-black/10 px-3 py-3">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs font-bold uppercase text-emerald-800">{(user?.name || user?.email || "A").slice(0, 1)}</span>
+            <div className={`mt-4 flex min-w-0 items-center gap-3 rounded-xl px-3 py-3 ${isMobile ? "bg-slate-100" : "bg-black/10"}`}>
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-xs font-bold uppercase text-[#079326]">{(user?.name || user?.email || "A").slice(0, 1)}</span>
               <span className="min-w-0">
-                <span className="block truncate text-xs font-semibold text-white">{user?.name || (isAccount ? "Customer" : "Administrator")}</span>
-                <span className="block truncate text-[11px] text-emerald-100/60">{user?.email}</span>
+                <span className={`block truncate text-xs font-semibold ${isMobile ? "text-slate-900" : "text-white"}`}>{user?.name || (isAccount ? "Customer" : "Administrator")}</span>
+                <span className={`block truncate text-[11px] ${isMobile ? "text-slate-500" : "text-white/75"}`}>{user?.email}</span>
               </span>
             </div>
           )}
@@ -177,17 +187,17 @@ export default function AdminNavigation({ children, account }: { children: React
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <aside className={`sticky top-0 hidden h-screen shrink-0 bg-gradient-to-b from-emerald-950 via-emerald-900 to-teal-950 shadow-xl transition-[width] duration-300 ease-out lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:block ${collapsed ? "lg:w-[88px]" : "lg:w-72"}`}>
+      <aside className={`sticky top-0 hidden h-screen shrink-0 bg-[#079326] shadow-xl transition-[width] duration-300 ease-out lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:block ${collapsed ? "lg:w-[88px]" : "lg:w-72"}`}>
         {sidebar()}
-        <button onClick={toggleSidebar} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} className="absolute -right-4 top-[98px] grid h-8 w-8 place-items-center rounded-full border border-emerald-100 bg-white text-emerald-800 shadow-md transition hover:scale-105 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+        <button onClick={toggleSidebar} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} className="absolute -right-4 top-[98px] grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-white text-[#079326] shadow-md transition hover:scale-105 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#008EFE] focus:ring-offset-2">
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </aside>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 top-16 z-50 lg:hidden">
           <button className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm" onClick={() => setMobileOpen(false)} aria-label="Close navigation" />
-          <aside role="dialog" aria-modal="true" aria-label={isAccount ? "Account navigation" : "Admin navigation"} className="relative h-full w-[min(88vw,320px)] bg-gradient-to-b from-emerald-950 via-emerald-900 to-teal-950 shadow-2xl">
+          <aside role="dialog" aria-label={isAccount ? "Account navigation" : "Admin navigation"} className="relative h-full w-[min(88vw,320px)] bg-white shadow-2xl">
             {sidebar(true)}
           </aside>
         </div>
@@ -195,7 +205,7 @@ export default function AdminNavigation({ children, account }: { children: React
 
       <div className={`min-h-screen transition-[padding] duration-300 ease-out ${collapsed ? "lg:pl-[88px]" : "lg:pl-72"}`}>
         <header className="sticky top-0 z-30 flex h-16 items-center border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-6 lg:hidden">
-          <button onClick={() => setMobileOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-700" aria-label="Open navigation" aria-expanded={mobileOpen}>
+          <button onClick={() => setMobileOpen((open) => !open)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-[#008EFE] hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen}>
             <Menu size={21} />
           </button>
           <div className="ml-3 min-w-0">
@@ -203,7 +213,7 @@ export default function AdminNavigation({ children, account }: { children: React
             <p className="text-xs text-slate-500">{subtitle}</p>
           </div>
           <div className="ml-auto"><NotificationBell /></div>
-          <Link href={home} className="ml-2 grid h-9 w-9 place-items-center rounded-xl bg-emerald-50 text-emerald-700" aria-label={isAccount ? "Account" : "Dashboard"}>
+          <Link href={home} className="ml-2 grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-[#079326]" aria-label={isAccount ? "Account" : "Dashboard"}>
             <LayoutDashboard size={18} />
           </Link>
         </header>

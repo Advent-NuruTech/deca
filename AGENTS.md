@@ -23,6 +23,19 @@ hierarchy, responsive layouts, accessible semantics and keyboard states, clear l
 empty, error, and success feedback, and polished interaction details. Preserve established
 design tokens and patterns, and verify user flows on both mobile and desktop before handoff.
 
+## Brand-color invariant — non-negotiable
+
+The supplied Gilead Medicare logo at `public/assets/logo.jpeg` is the sole authority for
+brand color. Its exact approved brand colors are **blue `#008EFE`** (RGB `0, 142, 254`)
+and **green `#079326`** (RGB `7, 147, 38`). Use only these exact values for all branded
+UI, graphics, illustrations, icons, gradients, hover/focus/active states, and newly added
+design tokens. Do not introduce substitute, approximate, tinted, shaded, or additional
+brand colors. Never use a "close enough" blue or green. When modifying an existing feature,
+bring every branded element within that feature into alignment with these exact colors; do
+not preserve legacy or noncompliant brand-color styling. Neutral colors needed for legible
+text, surfaces, borders, and accessibility are permitted, but they must not be presented as
+brand colors. If a new color would otherwise be needed, ask for explicit approval first.
+
 ## Search indexing and administrative security
 
 No route under `/admin` may be indexed. Preserve all three enforcement layers:
