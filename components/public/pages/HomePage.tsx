@@ -174,7 +174,7 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-4 text-lg leading-8 text-slate-600">
-                GILEAD / EDENRISE brings together education, coaching, healthy
+                Gilead Medicare brings together education, coaching, healthy
                 food, community work and referral navigation so organisations
                 and households can build lasting wellbeing practices.
               </p>
@@ -252,31 +252,31 @@ export default function HomePage() {
       <section className="bg-[#008EFE] px-4 py-16 sm:px-6 lg:px-8">
         <AnimatedSection direction="jump" className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-8 rounded-3xl border border-white/40 bg-[#008EFE] p-8 md:flex-row md:items-center md:justify-between md:p-10">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2 text-white">
-              <BookOpenCheck className="h-5 w-5" />
-              <p className="text-sm font-bold uppercase tracking-wider">
-                For organisations &amp; communities
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 text-white">
+                <BookOpenCheck className="h-5 w-5" />
+                <p className="text-sm font-bold uppercase tracking-wider">
+                  For organisations &amp; communities
+                </p>
+              </div>
+
+              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950">
+                Plan a programme that fits your audience.
+              </h2>
+
+              <p className="mt-4 text-lg leading-8 text-slate-950 sm:text-xl sm:leading-9">
+                Tell us your proposed dates, available time, audience, requested
+                topics and facilitation preferences. We will review the
+                invitation and confirm the available facilitator.
               </p>
             </div>
 
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950">
-              Plan a programme that fits your audience.
-            </h2>
-
-            <p className="mt-4 text-lg leading-8 text-slate-950 sm:text-xl sm:leading-9">
-              Tell us your proposed dates, available time, audience, requested
-              topics and facilitation preferences. We will review the
-              invitation and confirm the available facilitator.
-            </p>
-          </div>
-
-          <Link
-            href="/invite-gilead"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#079326] px-6 py-3.5 font-bold text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-          >
-            Start an invitation
-          </Link>
+            <Link
+              href="/invite-gilead"
+              className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#079326] px-6 py-3.5 font-bold text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              Start an invitation
+            </Link>
           </div>
         </AnimatedSection>
       </section>

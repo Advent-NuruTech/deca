@@ -1,10 +1,10 @@
 export const siteConfig = {
-  name: "GILEAD / EDENRISE",
-  shortName: "GILEAD",
-  tagline: "Comprehensive wellness activities for healthier communities.",
+  name: "Gilead Medicare Food and Nutrition Services",
+  shortName: "Gilead Medicare",
+  tagline: "Health education, nutrition, and community care.",
   email: "info@gileadmedicare.co.ke",
   description:
-    "GILEAD / EDENRISE provides health education, wellness programmes, healthy-food services, training, and referral navigation.",
+    "Gilead Medicare Food and Nutrition Services provides health education, nutrition programmes, healthy-food services, training, and referral navigation.",
 } as const;
 
 /** Public contact channels approved for use across the website. */

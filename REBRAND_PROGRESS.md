@@ -1,8 +1,8 @@
-# GILEAD / EDENRISE rebrand progress
+# Gilead Medicare rebrand progress
 
 ## Current phase — complete
 
-- Replaced the public brand foundation with `GILEAD / EDENRISE` and a sky-blue visual system.
+- Replaced the public brand foundation with `Gilead Medicare Food and Nutrition Services` and the approved Gilead Medicare visual system.
 - Rebuilt the public header, footer, home page, About page and Contact page around the new mission.
 - Added the public `/programmes` directory covering all ten requested service areas.
 - Added `/invite-gilead` as a clear, non-persistent request landing page with an email fallback.

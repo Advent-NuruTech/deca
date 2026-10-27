@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import PageHero from "@/components/public/PageHero";
 
-export const metadata: Metadata = { title: "Programmes & services", description: "Explore GILEAD / EDENRISE health education, wellness, healthy-food, training and referral programmes." };
+export const metadata: Metadata = { title: "Programmes & services", description: "Explore Gilead Medicare health education, wellness, healthy-food, training and referral programmes." };
 
 const programmes = [
   ["Health & wellness consultancy", ["Health education, promotion, awareness and disease-prevention education", "Wellness assessments, personal consultations and healthy-lifestyle programmes", "Family, community, corporate and workplace wellness education", "Public talks, seminars, lectures, workshops and health campaigns"]],
