@@ -2,7 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
-import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
+import { PUBLIC_PRODUCTS_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
 import {
   beginD1ReadModelUpdate,
   deleteD1Product,
@@ -32,7 +32,7 @@ export async function GET(
     if (!product) {
       throw new HttpError(404, "Product not found");
     }
-    return NextResponse.json(product, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
+    return NextResponse.json(product, { headers: { "Cache-Control": PUBLIC_PRODUCTS_CACHE_CONTROL } });
   } catch (error) {
     return errorResponse(error);
   }

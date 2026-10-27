@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BriefcaseBusiness, CheckCircle2, Hammer, HeartHandshake, Lightbulb, Send } from "lucide-react";
 import { api } from "@/lib/api";
 import { defaultLifeSkillsSettings, lifeSkillPathGuidance, type LifeSkillPathId, type LifeSkillsSettings } from "@/lib/life-skills";
+import PageHero from "@/components/public/PageHero";
 
 const icons = [Lightbulb, Hammer, BriefcaseBusiness, HeartHandshake];
 type FormValues = { name: string; email: string; phone: string; path: LifeSkillPathId; skillArea: string; role: string; message: string };
@@ -58,14 +59,13 @@ export default function PracticalChristianityPage() {
 
   return (
     <div className="bg-stone-50 text-slate-900">
-      <section id="pathways" className="relative scroll-mt-20 overflow-hidden bg-emerald-950 pb-14 pt-32 text-white sm:pb-20 sm:pt-40" aria-labelledby="pathways-heading">
+      <PageHero eyebrow="Practical Christianity" title="Transforming lives through faith and action." description="Use your skills to serve people, strengthen families and share Christ's hope through practical pathways." primaryAction={{ href: "#pathways", label: "Choose your pathway" }} secondaryAction={{ href: "/contact", label: "Talk with us" }} aside={<><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">Take your next step</p><h2 className="mt-3 text-2xl font-bold text-slate-950">Find a pathway that fits where you are now.</h2><p className="mt-4 text-sm leading-6 text-slate-600">Choose a card below and your pathway will be selected for the enquiry form.</p></>} />
+      <section id="pathways" className="relative scroll-mt-20 overflow-hidden bg-slate-950 py-14 text-white sm:py-20" aria-labelledby="pathways-heading">
         <motion.div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(52,211,153,0.22),transparent_27%),radial-gradient(circle_at_88%_70%,rgba(245,158,11,0.16),transparent_25%)]" animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.06, 1] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
         <div className="relative container mx-auto px-4">
           <div className="text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-300">Practical Christianity</p>
-            <h1 id="pathways-heading" className="mx-auto mt-4 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl">Transforming lives through faith &amp; action</h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-emerald-50/85 sm:text-lg">Use your skills to serve people, strengthen families, and share Christ&apos;s hope.</p>
-            <h2 className="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Choose your next step</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#008EFE]">Practical Christianity</p>
+            <h2 id="pathways-heading" className="mx-auto mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">Choose your next step</h2>
             <p className="mx-auto mt-3 max-w-2xl text-emerald-50/85">Choose the pathway that fits where you are now. Selecting any card takes you straight to the enquiry form with that pathway already chosen.</p>
           </div>
           <div className="mt-9 grid gap-4 md:grid-cols-2 xl:grid-cols-4">

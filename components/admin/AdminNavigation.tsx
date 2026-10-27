@@ -15,7 +15,6 @@ import {
   Mail,
   Menu,
   MessageCircle,
-  HandHeart,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
@@ -38,7 +37,6 @@ const links = [
   { href: "/admin/updates", label: "Updates", icon: Bell },
   { href: "/admin/mailing", label: "Mailing", icon: Mail },
   { href: "/admin/chat", label: "Chat", icon: MessageCircle },
-  { href: "/admin/life-skills", label: "Life Skills", icon: HandHeart },
   { href: "/admin/invitations", label: "Invitations", icon: CalendarDays },
 ];
 

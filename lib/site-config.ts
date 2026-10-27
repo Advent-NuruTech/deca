@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "GILEAD / EDENRISE",
   shortName: "GILEAD",
-  tagline: "Comprehensive business activities for healthier communities.",
+  tagline: "Comprehensive wellness activities for healthier communities.",
   email: "info@gileadmedicare.co.ke",
   description:
     "GILEAD / EDENRISE provides health education, wellness programmes, healthy-food services, training, and referral navigation.",

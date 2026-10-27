@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { serviceAreas, siteConfig } from "@/lib/site-config";
 import HomeHeroCarousel from "@/components/public/HomeHeroCarousel";
+import HomeListings from "@/components/public/HomeListings";
 
 const pillars = [
   {
@@ -138,10 +139,10 @@ export default function HomePage() {
 
       {/* Three pillars */}
       <section className="relative z-10 -mt-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-4 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-sky-100 md:grid-cols-3 md:p-6">
+        <div className="mx-auto grid max-w-7xl gap-4 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 md:grid-cols-3 md:p-6">
           {pillars.map(({ icon: Icon, title, text }) => (
             <article key={title} className="flex gap-4 rounded-xl p-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-sky-100 text-sky-700">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-[#079326]">
                 <Icon className="h-5 w-5" />
               </span>
 
@@ -161,7 +162,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div className="max-w-3xl">
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-700">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#008EFE]">
                 What we do
               </p>
 
@@ -176,7 +177,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <figure className="relative min-h-64 overflow-hidden rounded-3xl bg-sky-100 shadow-lg">
+            <figure className="relative min-h-64 overflow-hidden rounded-3xl bg-slate-100 shadow-lg">
               <Image
                 src="/assets/health-whole-foods.png"
                 alt="Fresh whole foods arranged for nutrition education"
@@ -196,9 +197,9 @@ export default function HomePage() {
             {serviceAreas.map((area, index) => (
               <article
                 key={area.title}
-                className="group overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-sky-200 hover:shadow-lg"
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#008EFE] hover:shadow-lg"
               >
-                <div className="relative aspect-[16/9] overflow-hidden bg-sky-100">
+                <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
                   <Image
                     src={serviceAreaImages[area.title].src}
                     alt={serviceAreaImages[area.title].alt}
@@ -228,7 +229,7 @@ export default function HomePage() {
           <div className="mt-10 text-center">
             <Link
               href="/programmes"
-              className="inline-flex items-center gap-2 font-bold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-600"
+              className="inline-flex items-center gap-2 font-bold text-[#008EFE] hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008EFE]"
             >
               View the full programme directory
               <ArrowRight className="h-4 w-4" />
@@ -236,6 +237,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <HomeListings />
 
       {/* Final call to action */}
       <section className="bg-[#008EFE] px-4 py-16 sm:px-6 lg:px-8">

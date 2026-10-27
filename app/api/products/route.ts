@@ -2,7 +2,7 @@ import { FieldPath } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { errorResponse, HttpError, requireAdmin } from "@/lib/auth";
-import { PUBLIC_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
+import { PUBLIC_PRODUCTS_CACHE_CONTROL, PUBLIC_PRODUCTS_TAG } from "@/lib/cache-tags";
 import {
   beginD1ReadModelUpdate,
   deleteD1Product,
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     if (!adminView) {
       try {
         const result = await getCachedD1ProductPage({ category, search, status, ...(featured === null ? {} : { featured: featured === "true" }) }, page, limit);
-        return NextResponse.json({ products: result.items, total: result.total, totalPages: result.totalPages, currentPage: result.currentPage }, { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } });
+        return NextResponse.json({ products: result.items, total: result.total, totalPages: result.totalPages, currentPage: result.currentPage }, { headers: { "Cache-Control": PUBLIC_PRODUCTS_CACHE_CONTROL } });
       } catch (error) { console.warn("Using Firestore product listing fallback because D1 is unavailable or not ready.", error); }
     }
 
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { products, total, totalPages, currentPage },
-      adminView ? undefined : { headers: { "Cache-Control": PUBLIC_CACHE_CONTROL } },
+      adminView ? undefined : { headers: { "Cache-Control": PUBLIC_PRODUCTS_CACHE_CONTROL } },
     );
   } catch (error) {
     return errorResponse(error);
