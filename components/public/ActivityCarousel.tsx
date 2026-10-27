@@ -8,11 +8,11 @@ import { lifeSkillPathGuidance, lifeSkillPaths } from "@/lib/life-skills";
 
 const pathwayIcons = [Lightbulb, Hammer, BriefcaseBusiness, HeartHandshake];
 const backgroundImages = [
-  "/assets/farm1.jpeg",
-  "/assets/farm3.jpeg",
-  "/assets/preach2.jpeg",
-  "/assets/study1.jpeg",
-  "/assets/recipe1.jpeg",
+  "/assets/health-herbal-garden.png",
+  "/assets/health-wellness-space.png",
+  "/assets/health-programmes.png",
+  "/assets/health-resource-library.png",
+  "/assets/health-whole-foods.png",
 ];
 
 export default function ActivityCarousel() {

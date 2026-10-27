@@ -4,16 +4,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --brand-primary: #059669;
-  --brand-primary-dark: #065f46;
-  --brand-primary-deep: #064e3b;
-  --brand-soft: #ecfdf5;
-  --brand-accent: #f59e0b;
-  --brand-canvas: #f8faf9;
+  --brand-primary: #0284c7;
+  --brand-primary-dark: #0369a1;
+  --brand-primary-deep: #0c4a6e;
+  --brand-soft: #f0f9ff;
+  --brand-accent: #38bdf8;
+  --brand-canvas: #f8fcff;
   --brand-surface: #ffffff;
-  --brand-ink: #172126;
+  --brand-ink: #0f2940;
   --brand-muted: #64748b;
-  --brand-border: #dbe7df;
+  --brand-border: #d9edf9;
 }
 
 @theme inline {

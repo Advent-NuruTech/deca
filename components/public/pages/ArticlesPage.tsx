@@ -114,7 +114,7 @@ export default function ArticlesPage({ initialCategory = "" }: { initialCategory
   return (
     <>
       {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 35, 27, .67), rgba(2, 35, 27, .48)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 35, 27, .67), rgba(2, 35, 27, .48)), url('/assets/health-resource-library.png')" }} />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Resources</p>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{majorCategory?.name ?? "Articles & Blogs"}</h1>

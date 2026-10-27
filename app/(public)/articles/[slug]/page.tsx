@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!article) return { title: "Article not found | RemSam Homestead" };
     const title = String(article.title || "RemSam Homestead");
     const description = String(article.seoDescription || article.excerpt || "Explore resources from RemSam Homestead.");
-    const image = String(article.featuredImage || "/assets/study.jpg");
+    const image = String(article.featuredImage || "/assets/health-resource-library.png");
     const url = new URL(`/articles/${encodeURIComponent(slug)}`, siteUrl).toString();
     const imageUrl = new URL(image, siteUrl).toString();
     return {

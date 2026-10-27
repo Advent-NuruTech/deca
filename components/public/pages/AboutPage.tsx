@@ -1,68 +1,14 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, HeartHandshake, ShieldCheck, Sprout, UsersRound } from "lucide-react";
+import { siteConfig } from "@/lib/site-config";
 
-import { Heart } from "lucide-react";
-import AnimatedSection from "../AnimatedSection";
-import HeroSection from "../HeroSection";
-import SEO from "../SEO";
+const values = [
+  { icon: HeartHandshake, title: "Our purpose", text: "To equip people and communities with clear, practical knowledge for healthier everyday living." },
+  { icon: UsersRound, title: "Our approach", text: "We tailor learning to the audience, whether it is a household, church, school, workplace or community group." },
+  { icon: ShieldCheck, title: "Our responsibility", text: "We provide education and wellness support within our lawful scope, with referrals to licensed professionals where appropriate." },
+];
 
-const AboutPage = () => (
-  <>
-    <SEO
-      title="About Us | RemSam Homestead"
-      description="Read the mission and convictions of the RemSam Homestead Family."
-    />
-
-    <HeroSection
-      badge="Our Story"
-      title="Rooted in <span class='text-emerald-600'>Faith</span>,<br />Growing Together"
-      subtitle="Learn together with the RemSam Homestead Family through practical knowledge in homeschooling, agriculture, home making, health, and Biblical preparedness."
-      primaryText="Read Our Mission"
-      primaryLink="#mission"
-      secondaryText="Get Involved"
-      secondaryLink="/donate"
-      imageSrc="/assets/about.jpeg"
-      imageAlt="African mother homeschooling her children"
-    />
-
-    <section id="mission" className="bg-white py-20">
-      <div className="container mx-auto px-4">
-        <AnimatedSection delay={0.1} direction="up">
-          <article className="mx-auto max-w-4xl rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-6 shadow-sm md:p-10">
-            <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
-                <Heart className="h-7 w-7 text-emerald-600" />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">Read Our Mission</h1>
-            </div>
-
-            <div className="space-y-5 text-[1.05rem] leading-8 text-gray-700">
-              <p>Hello everyone. Blessings to you visiting this family website. This website does not represent any church’s views but personal convictions of the RemSam Homestead Family without fundamentally disagreeing with the Seventh-day Adventist Fundamental Principles of 1889.</p>
-
-              <p>Our mission is to learn together and assist fellow pilgrims with practical knowledge in homeschooling, agriculture, home making and the preparedness for the Revelation 13 crisis. We hold to our heart dearly the Scripture in Hebrews 10:24, 25.</p>
-
-              <blockquote className="rounded-2xl border-l-4 border-emerald-500 bg-white/80 p-5 italic text-gray-800 shadow-sm">
-                “God&apos;s purpose in giving the third angel&apos;s message to the world is to prepare a people to stand true to Him during the investigative judgment. This is the purpose for which we establish and maintain our publishing houses, our schools, our sanitariums, hygienic restaurants, treatment rooms, and food factories. This is our purpose in carrying forward every line of work in the cause. Ms 154, 1902, p. 4. (&quot;Instruction to Men in Positions of Responsibility,&quot; October 24, 1902.)”
-              </blockquote>
-
-              <p>This website also has products that you may check and order. We are having a model farm which we try on these products and you can visit and be satisfied you’re acquiring genuine products.</p>
-
-              <p>It is not our goal to solicit tithes and offerings. In the spirit of Spirit of Prophecy, we hold that:</p>
-
-              <blockquote className="rounded-2xl border-l-4 border-amber-500 bg-white/80 p-5 italic text-gray-800 shadow-sm">
-                “It is better to put confidence in the ministers of the conference where you live and in the officers of the church where you worship. Draw nigh to your brethren. Love them with a true heart fervently, and encourage them to bear their responsibilities faithfully in the fear of God. &quot;Be thou an example of the believers, in word, in conversation, in charity, in spirit, in faith, in purity&quot; [1 Timothy 4:12]. --Letter 96, 1911 (Published in The Early Elmshaven Years, p. 397.)”
-              </blockquote>
-
-              <p>This is the only way we can keep check of them when they do something wrong and can have a voice towards the right path. I can’t point out the problems in churches and conferences while am not faithful on my part to put confidence in them by faithfully returning tithes and offerings.</p>
-
-              <p>Hence if there is any donation the visitor will be moved to make, it is upon them and they should specify exactly what it is for. We won’t reject any donation for it will help maintaining the website, printing non-commercial evangelism tracts for we run a publishing house and host training sessions in medical missionary work and workshops on Practical Biblical Christianity.</p>
-
-              <p className="pt-2 font-semibold text-gray-900">Blessings<br />RemSam Homestead Family.</p>
-            </div>
-          </article>
-        </AnimatedSection>
-      </div>
-    </section>
-  </>
-);
-
-export default AboutPage;
+export default function AboutPage() {
+  return <main className="bg-white"><section className="relative isolate overflow-hidden bg-sky-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28"><Image src="/assets/health-wellness-space.png" alt="A calm botanical space for wellbeing learning" fill priority sizes="100vw" className="-z-20 object-cover object-[center_30%]" /><div className="absolute inset-0 -z-10 bg-gradient-to-r from-sky-950 via-sky-950/90 to-sky-950/35" /><div className="mx-auto max-w-7xl"><div className="max-w-3xl"><p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-300">About GILEAD / EDENRISE</p><h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">Education, wellbeing and community care.</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-sky-100">{siteConfig.description} We bring practical learning and thoughtful support closer to families, groups and organisations.</p></div></div></section><section className="px-4 py-16 sm:px-6 lg:px-8"><div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">{values.map(({ icon: Icon, title, text }) => <article key={title} className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"><span className="grid h-12 w-12 place-items-center rounded-xl bg-sky-100 text-sky-700"><Icon className="h-6 w-6" /></span><h2 className="mt-5 text-xl font-bold text-slate-950">{title}</h2><p className="mt-3 text-sm leading-6 text-slate-600">{text}</p></article>)}</div></section><section className="bg-sky-50 px-4 py-16 sm:px-6 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center"><div className="relative min-h-96 overflow-hidden rounded-3xl shadow-xl"><Image src="/assets/health-herbal-garden.png" alt="A thriving garden of herbs and vegetables" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" /><div className="absolute bottom-5 left-5 rounded-xl bg-white/95 px-4 py-3 text-sm font-bold text-sky-950 shadow-lg backdrop-blur">Wellbeing grows through shared learning.</div></div><div className="max-w-2xl"><p className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.16em] text-sky-700"><Sprout className="h-4 w-4" />A connected model</p><h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Care and learning that connect.</h2><div className="mt-5 space-y-4 leading-7 text-slate-600"><p>GILEAD / EDENRISE combines health and wellness consultancy, nutrition education, healthy food, coaching, natural and herbal wellness education, training, media and community programmes.</p><p>Our future wellness-centre vision brings these elements together with a hygienic restaurant, health-food shop, medical-missionary education, traditional and herbal wellness, referral services, and separately licensed healthcare or facility services where licensing is in place.</p></div><Link href="/programmes" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-sky-700 px-5 py-3 font-bold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">Explore our programmes <ArrowRight className="h-4 w-4" /></Link></div></div></section></main>;
+}

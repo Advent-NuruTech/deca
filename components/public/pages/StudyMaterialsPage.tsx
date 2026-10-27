@@ -96,7 +96,7 @@ export default function StudyMaterialsPage() {
   return (
     <>
       {!query && <section className="relative overflow-hidden bg-emerald-950 pt-36 pb-14 text-white md:pt-44 md:pb-20">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 44, 34, .94), rgba(2, 44, 34, .72)), url('/assets/study.jpg')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(90deg, rgba(2, 44, 34, .94), rgba(2, 44, 34, .72)), url('/assets/health-resource-library.png')" }} />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Learn and grow</p><h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{majorCategory?.name ?? "Study Library"}</h1><p className="mt-4 text-base text-emerald-50/90 sm:text-lg">Explore downloadable guides and resources for your journey.</p>
         </div>

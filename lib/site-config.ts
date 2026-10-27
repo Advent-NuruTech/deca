@@ -1,0 +1,17 @@
+export const siteConfig = {
+  name: "GILEAD / EDENRISE",
+  shortName: "GILEAD",
+  tagline: "Comprehensive business activities for healthier communities.",
+  email: "info@gileadmedicare.co.ke",
+  description:
+    "GILEAD / EDENRISE provides health education, wellness programmes, healthy-food services, training, and referral navigation.",
+} as const;
+
+export const serviceAreas = [
+  { title: "Health & wellness consultancy", summary: "Education, assessments, prevention and workplace wellness programmes.", items: ["Health education", "Preventive-health education", "Wellness assessments", "Corporate wellness education"] },
+  { title: "Nutrition & healthy food", summary: "Practical nutrition education, healthy cooking and hygienic food services.", items: ["Healthy meal planning", "Cooking demonstrations", "Healthy-food catering", "Plant-based nutrition education"] },
+  { title: "Wellness coaching", summary: "Personal, family, group and online coaching for sustainable healthy habits.", items: ["Lifestyle coaching", "Weight-management education", "Stress-management education", "Wellness membership programmes"] },
+  { title: "Natural & herbal wellness", summary: "Traditional knowledge and herbal education within a recognized and lawful scope.", items: ["Medicinal-plant education", "Herb cultivation education", "Herbal product information", "Licensed-professional referrals"] },
+  { title: "Medical-missionary & community health", summary: "Outreach, talks, campaigns and navigation that support community wellbeing.", items: ["Community health outreach", "First-aid education", "Health publications", "Health-service navigation"] },
+  { title: "Training, media & hospitality", summary: "Short courses, digital education, healthy-food hospitality and wellness-centre consultancy.", items: ["Health & wellness courses", "Online courses and webinars", "Health-food café activities", "Wellness programme development"] },
+] as const;
