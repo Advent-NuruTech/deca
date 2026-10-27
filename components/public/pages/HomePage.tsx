@@ -29,6 +29,33 @@ const pillars = [
   },
 ];
 
+const serviceAreaImages: Record<string, { src: string; alt: string }> = {
+  "Health & wellness consultancy": {
+    src: "/assets/Health & wellness consultancy.jpg",
+    alt: "Health and wellness consultation materials",
+  },
+  "Nutrition & healthy food": {
+    src: "/assets/Nutrition & healthy food.jpg",
+    alt: "A colourful selection of fresh whole foods",
+  },
+  "Wellness coaching": {
+    src: "/assets/Wellness coaching.jpg",
+    alt: "A wellness coaching consultation with healthy-living resources",
+  },
+  "Natural & herbal wellness": {
+    src: "/assets/health-herbal-garden.png",
+    alt: "A thriving garden of herbs and vegetables",
+  },
+  "Medical-missionary & community health": {
+    src: "/assets/Medical-missionary & community health.jpg",
+    alt: "Community health outreach and first-aid education materials",
+  },
+  "Training, media & hospitality": {
+    src: "/assets/Training, media & hospitality.jpg",
+    alt: "A wellness training and hospitality session",
+  },
+};
+
 export default function HomePage() {
   return (
     <main className="overflow-hidden bg-white">
@@ -173,28 +200,29 @@ export default function HomePage() {
             {serviceAreas.map((area, index) => (
               <article
                 key={area.title}
-                className="rounded-2xl border border-sky-100 bg-sky-50/40 p-6 transition duration-200 hover:-translate-y-1 hover:border-sky-200 hover:bg-white hover:shadow-lg"
+                className="group overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-sky-200 hover:shadow-lg"
               >
-                <span className="text-sm font-extrabold text-sky-700">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                <div className="relative aspect-[16/9] overflow-hidden bg-sky-100">
+                  <Image
+                    src={serviceAreaImages[area.title].src}
+                    alt={serviceAreaImages[area.title].alt}
+                    fill
+                    sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute left-4 top-4 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-extrabold tracking-[0.14em] text-white backdrop-blur-sm">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
 
-                <h3 className="mt-3 text-xl font-bold capitalize text-slate-950">
-                  {area.title}
-                </h3>
-
-                <p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">
-                  {area.summary}
-                </p>
-
-                <ul className="mt-5 space-y-2 border-t border-sky-100 pt-4 text-sm text-slate-700">
-                  {area.items.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-slate-950">
+                    {area.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    {area.summary}
+                  </p>
+                </div>
               </article>
             ))}
           </div>
