@@ -3,13 +3,13 @@ import NewsletterSignup from "@/components/public/newsletter-signup";
 import NewsletterShare from "@/components/public/newsletter-share";
 
 export const metadata: Metadata = {
-  title: "Newsletter | RemSam Homestead",
+  title: "Newsletter | Gilead Medicare",
   description:
-    "Get faith, family, and farming updates from RemSam Homestead delivered to your inbox.",
+    "Get health, wellness, and community-care updates from Gilead Medicare delivered to your inbox.",
   openGraph: {
-    title: "Newsletter | RemSam Homestead",
+    title: "Newsletter | Gilead Medicare",
     description:
-      "Get faith, family, and farming updates from RemSam Homestead delivered to your inbox.",
+      "Get health, wellness, and community-care updates from Gilead Medicare delivered to your inbox.",
     url: "/newsletter",
     type: "website",
   },
@@ -20,7 +20,7 @@ export default function NewsletterPage() {
     <div className="container mx-auto max-w-6xl px-4 py-16 sm:py-20">
       <div className="mx-auto mb-8 max-w-3xl text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-          RemSam Homestead
+          Gilead Medicare
         </p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
           Newsletter

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export function GET() {
   return NextResponse.json({
     status: "OK",
-    message: "RemSam Homestead API is running (Next.js Route Handlers)",
+    message: "Gilead Medicare API is running (Next.js Route Handlers)",
     services: {
       r2: Boolean(
         process.env.R2_ACCESS_KEY_ID &&

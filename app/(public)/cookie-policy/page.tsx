@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/public/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Cookie Policy", description: "How RemSam Homestead uses cookies and browser storage.", alternates: { canonical: "https://remsamhomestead.com/cookie-policy" } };
+export const metadata: Metadata = { title: "Cookie Policy", description: "How Gilead Medicare uses cookies and browser storage.", alternates: { canonical: "https://gileadmedicare.co.ke/cookie-policy" } };
 
 export default function CookiePolicy() {
   return <LegalPage title="Cookie Policy" intro="How this website and its service providers use cookies and similar browser technologies.">

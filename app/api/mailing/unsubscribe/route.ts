@@ -20,13 +20,22 @@ async function unsubscribe(request: Request) {
   return { id };
 }
 
-function page(message: string, action = "") {
+function legacyPage(message: string, action = "") {
   const safeAction = action.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const form = action ? `<form method="post" action="${safeAction}"><button type="submit">Unsubscribe</button></form>` : "";
   const safeMessage = message.replace(/[&<>"']/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   })[character] ?? character);
   return new Response(`<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Email preferences | Remsam Homestead</title></head><body style="margin:0;background:${brand.colors.canvas};font:16px Arial,Helvetica,sans-serif;color:${brand.colors.ink}"><main style="box-sizing:border-box;width:min(520px,calc(100% - 32px));margin:12vh auto;padding:clamp(24px,7vw,42px);background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:18px;box-shadow:0 16px 48px rgba(20,83,45,.09);text-align:center"><p style="color:${brand.colors.primaryDark};font-size:11px;font-weight:800;letter-spacing:2px">REMSAM HOMESTEAD</p><h1 style="font-size:clamp(25px,6vw,32px);line-height:1.2">${safeMessage}</h1>${form}<p style="margin-top:22px;color:${brand.colors.muted};font-size:12px;line-height:1.6">You are in control of your inbox. You can safely close this page if you did not request to unsubscribe.</p></main><style>button{width:100%;min-height:48px;padding:12px 18px;border:0;border-radius:10px;background:${brand.colors.primary};color:#fff;font:700 15px Arial,Helvetica,sans-serif;cursor:pointer}button:hover{background:${brand.colors.primaryDark}}</style></body></html>`, {
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
+  });
+}
+
+function page(message: string, action = "") {
+  const safeAction = action.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const safeMessage = message.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
+  const form = action ? `<form method="post" action="${safeAction}"><button type="submit">Unsubscribe</button></form>` : "";
+  return new Response(`<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Email preferences | Gilead Medicare</title></head><body style="margin:0;background:${brand.colors.canvas};font:16px Arial,Helvetica,sans-serif;color:${brand.colors.ink}"><main style="box-sizing:border-box;width:min(520px,calc(100% - 32px));margin:12vh auto;padding:clamp(24px,7vw,42px);background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:18px;box-shadow:0 16px 48px rgba(15,23,42,.09);text-align:center"><img src="/assets/logo.jpeg" alt="Gilead Medicare" width="88" height="88" style="width:88px;height:88px;object-fit:cover;border-radius:16px"><p style="color:${brand.colors.primaryDeep};font-size:11px;font-weight:800;letter-spacing:2px">GILEAD MEDICARE</p><h1 style="font-size:clamp(25px,6vw,32px);line-height:1.2">${safeMessage}</h1>${form}<p style="margin-top:22px;color:${brand.colors.muted};font-size:12px;line-height:1.6">You are in control of your inbox. You can safely close this page if you did not request to unsubscribe.</p></main><style>button{width:100%;min-height:48px;padding:12px 18px;border:0;border-radius:10px;background:${brand.colors.primaryDeep};color:#fff;font:700 15px Arial,Helvetica,sans-serif;cursor:pointer}button:hover{background:${brand.colors.primary}}</style></body></html>`, {
     headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
   });
 }

@@ -5,16 +5,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --brand-primary: #0284c7;
-  --brand-primary-dark: #0369a1;
-  --brand-primary-deep: #0c4a6e;
-  --brand-soft: #f0f9ff;
-  --brand-accent: #38bdf8;
-  --brand-canvas: #f8fcff;
+  --brand-primary: #008EFE;
+  --brand-primary-dark: #008EFE;
+  --brand-primary-deep: #079326;
+  --brand-soft: #f8fafc;
+  --brand-accent: #079326;
+  --brand-canvas: #f8fafc;
   --brand-surface: #ffffff;
-  --brand-ink: #0f2940;
+  --brand-ink: #111827;
   --brand-muted: #64748b;
-  --brand-border: #d9edf9;
+  --brand-border: #e2e8f0;
 }
 
 @theme inline {
@@ -43,7 +43,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Existing home loading screen */
 .home-loading-screen {
   position: fixed;
   inset: 0;
@@ -56,9 +55,7 @@ body {
   overflow: hidden;
   padding: 3rem 1.25rem;
   color: var(--brand-ink);
-  background:
-    radial-gradient(circle at 50% 38%, rgba(5, 150, 105, 0.12), transparent 34%),
-    linear-gradient(145deg, #ffffff 0%, var(--brand-canvas) 55%, var(--brand-soft) 100%);
+  background: #ffffff;
 }
 
 .home-loading-glow {
@@ -67,8 +64,8 @@ body {
   width: min(72vw, 32rem);
   aspect-ratio: 1;
   border-radius: 9999px;
-  background: rgba(16, 185, 129, 0.1);
-  filter: blur(4rem);
+  background: #f1f5f9;
+  filter: blur(5rem);
 }
 
 .home-loading-content {
@@ -81,26 +78,26 @@ body {
 
 .home-loading-logo-wrap {
   display: grid;
-  width: 6rem;
-  height: 6rem;
+  width: 7.5rem;
+  height: 7.5rem;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(5, 150, 105, 0.2);
-  border-radius: 1.75rem;
+  border: 2px solid #008EFE;
+  border-radius: 2rem;
   background: var(--brand-surface);
-  box-shadow: 0 1.25rem 3rem rgba(6, 78, 59, 0.14);
+  box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.14);
   animation: home-loading-breathe 2.2s ease-in-out infinite;
 }
 
 .home-loading-logo {
-  width: 5rem;
-  height: 5rem;
-  color: var(--brand-primary);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .home-loading-brand {
   margin-top: 1.5rem;
-  color: var(--brand-primary-deep);
+  color: #079326;
   font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 800;
   letter-spacing: -0.025em;
@@ -108,7 +105,7 @@ body {
 
 .home-loading-tagline {
   margin-top: 0.3rem;
-  color: var(--brand-accent);
+  color: #008EFE;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -128,7 +125,7 @@ body {
   margin-top: 1rem;
   overflow: hidden;
   border-radius: 9999px;
-  background: rgba(6, 95, 70, 0.12);
+  background: #e2e8f0;
 }
 
 .home-loading-track span {
@@ -136,8 +133,8 @@ body {
   width: 42%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--brand-primary-dark), var(--brand-primary), var(--brand-accent));
-  box-shadow: 0 0 1rem rgba(5, 150, 105, 0.35);
+  background: #079326;
+  box-shadow: none;
   animation: home-loading-progress 1.45s ease-in-out infinite;
 }
 

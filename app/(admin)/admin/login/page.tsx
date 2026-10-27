@@ -52,10 +52,10 @@ export default function AdminLogin() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 group">
             <div className="relative">
-              <img src="/logo.png" alt="RemSam Homestead Logo" className="w-12 h-12 object-contain rounded-full bg-white" />
+              <img src="/assets/logo.jpeg" alt="Gilead Medicare logo" className="w-12 h-12 object-contain rounded-full bg-white" />
               <div className="absolute inset-0 rounded-full" />
             </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">RemSam Homestead</span>
+            <span className="text-3xl font-bold bg-gradient-to-r from-[#008EFE] to-[#079326] text-transparent bg-clip-text">Gilead Medicare</span>
           </Link>
         </div>
 
@@ -101,7 +101,7 @@ export default function AdminLogin() {
           <div className="mt-6 p-3 bg-emerald-50 rounded-lg border border-emerald-100"><p className="text-xs text-gray-600 text-center flex items-center justify-center gap-2"><Shield size={14} className="text-emerald-500" />This area is restricted to authorized personnel only</p></div>
           <div className="mt-6 text-center"><Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-emerald-600 transition-colors group"><ArrowRight size={14} className="rotate-180 group-hover:-translate-x-1 transition-transform" />Back to Website</Link></div>
         </div>
-        <p className="text-center mt-8 text-sm text-gray-400">© {new Date().getFullYear()} RemSam Homestead. All rights reserved.</p>
+        <p className="text-center mt-8 text-sm text-gray-400">© {new Date().getFullYear()} Gilead Medicare. All rights reserved.</p>
       </div>
     </div>
   );

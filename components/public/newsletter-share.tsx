@@ -8,7 +8,7 @@ export default function NewsletterShare() {
     const url = new URL("/newsletter", window.location.origin).href;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "RemSam Homestead Newsletter", text: "Stay connected with RemSam Homestead.", url });
+        await navigator.share({ title: "Gilead Medicare Newsletter", text: "Stay connected with Gilead Medicare.", url });
       } else {
         await navigator.clipboard.writeText(url);
         toast.success("Newsletter link copied");

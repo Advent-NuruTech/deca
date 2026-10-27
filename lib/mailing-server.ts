@@ -46,7 +46,7 @@ function escapeHtml(value: string) {
 }
 
 function safeSiteUrl(value: string) {
-  const fallback = "https://remsamhomestead.com";
+  const fallback = "https://gileadmedicare.co.ke";
   try {
     const url = new URL(value || fallback);
     return url.protocol === "https:" ? url.origin : fallback;
@@ -62,7 +62,7 @@ function unsubscribeUrl(recipientId: string, baseUrl: string) {
   return `${safeSiteUrl(baseUrl)}/api/mailing/unsubscribe?id=${recipientId}&sig=${signature}`;
 }
 
-function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string, options: DeliveryOptions = {}) {
+function legacyEmailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string, options: DeliveryOptions = {}) {
   const greeting = personalizedGreeting(recipient.name);
   const preview = campaign.preheader || automaticPreviewText(campaign.body);
   const body = inlineVideoLinks(sanitizeRichText(campaign.body));
@@ -79,6 +79,16 @@ function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string
   ].join(` <span style="color:${brand.colors.muted}">·</span> `);
   const logoUrl = `${siteUrl}/assets/logo-white.png`;
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(campaign.subject)}</title><style>@media only screen and (max-width:600px){.email-outer{padding:6px!important}.email-card{width:100%!important;border-radius:8px!important}.email-brand{padding:22px 12px!important}.email-content{padding:22px 18px 28px!important}.email-headline{font-size:30px!important;line-height:1.16!important}.email-footer{padding:20px 12px!important}.content-card{padding:12px!important}.content-copy{padding-left:12px!important}.content-thumb{width:104px!important}}</style></head><body style="margin:0;background:${brand.colors.canvas};color:${brand.colors.ink};font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preview)}</div><table role="presentation" class="email-outer" width="100%" cellspacing="0" cellpadding="0" style="width:100%;background:${brand.colors.canvas};padding:18px 8px"><tr><td align="center"><table role="presentation" class="email-card" width="720" cellspacing="0" cellpadding="0" style="width:100%;max-width:720px;background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:12px;overflow:hidden"><tr><td class="email-brand" align="center" style="padding:28px 24px;background:${brand.colors.primaryDeep};background-image:linear-gradient(145deg,${brand.colors.primaryDark},${brand.colors.primaryDeep});color:#fff"><img src="${logoUrl}" alt="Remsam Homestead" width="78" height="78" style="display:block;width:78px;height:78px;object-fit:contain;margin:0 auto 12px;border:0"><div style="font-size:12px;letter-spacing:3px;font-weight:800;color:#fde68a">REMSAM HOMESTEAD</div><div style="height:1px;width:64px;background:${brand.colors.accent};margin:15px auto 11px"></div><div style="font-size:17px;line-height:1.4;font-style:italic;color:#fff">${escapeHtml(campaign.letterTitle)}</div></td></tr><tr><td class="email-content" style="padding:34px 38px 38px"><div style="height:3px;width:42px;background:${brand.colors.accent};margin:0 0 20px"></div><p style="margin:0 0 16px;color:${brand.colors.ink};font-size:17px;line-height:1.5">${escapeHtml(greeting)}</p><h1 class="email-headline" style="font-size:34px;line-height:1.18;letter-spacing:-.5px;margin:0 0 24px;color:${brand.colors.ink};font-family:Georgia,serif">${escapeHtml(campaign.headline)}</h1><div style="font-size:17px;line-height:1.7;color:${brand.colors.ink}">${body}</div>${options.contentAfterBody ?? ""}${button}</td></tr><tr><td class="email-footer" style="padding:22px 24px;background:${brand.colors.soft};border-top:1px solid ${brand.colors.border};color:${brand.colors.muted};font-size:13px;line-height:1.8;text-align:center"><strong style="color:${brand.colors.primaryDark};letter-spacing:1.5px">REMSAM HOMESTEAD</strong><br>Faith, Family, Farming<br>${footerLinks}<br><a href="${siteUrl}" style="color:${brand.colors.primaryDark};text-decoration:underline">Visit Remsam Homestead</a><br><span style="font-size:11px;color:${brand.colors.muted}">© Remsam Homestead</span></td></tr></table></td></tr></table></body></html>`;
+}
+
+function emailDocument(campaign: Campaign, recipient: Recipient, baseUrl: string, options: DeliveryOptions = {}) {
+  const greeting = personalizedGreeting(recipient.name);
+  const preview = campaign.preheader || automaticPreviewText(campaign.body);
+  const body = inlineVideoLinks(sanitizeRichText(campaign.body));
+  const unsubscribe = campaign.kind === "newsletter" ? unsubscribeUrl(recipient.id, baseUrl) : "";
+  const button = campaign.buttonUrl && campaign.buttonLabel ? `<p style="margin:28px 0"><a href="${escapeHtml(campaign.buttonUrl)}" style="display:inline-block;padding:14px 24px;border-radius:10px;background:${brand.colors.primaryDeep};color:#fff;text-decoration:none;font:700 15px Arial,sans-serif">${escapeHtml(campaign.buttonLabel)}</a></p>` : "";
+  const siteUrl = safeSiteUrl(baseUrl);
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(campaign.subject)}</title></head><body style="margin:0;background:${brand.colors.canvas};color:${brand.colors.ink};font-family:Arial,Helvetica,sans-serif"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;background:${brand.colors.canvas};padding:18px 8px"><tr><td align="center"><table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:100%;max-width:720px;background:${brand.colors.surface};border:1px solid ${brand.colors.border};border-radius:12px;overflow:hidden"><tr><td align="center" style="padding:28px 24px;background:${brand.colors.primaryDeep};color:#fff"><img src="${siteUrl}/assets/logo.jpeg" alt="Gilead Medicare" width="78" height="78" style="display:block;width:78px;height:78px;object-fit:cover;border-radius:16px;margin:0 auto 12px;border:0"><div style="font-size:12px;letter-spacing:3px;font-weight:800">GILEAD MEDICARE</div><div style="height:1px;width:64px;background:${brand.colors.primary};margin:15px auto 11px"></div><div style="font-size:17px;line-height:1.4;font-style:italic">${escapeHtml(campaign.letterTitle)}</div></td></tr><tr><td style="padding:34px 38px 38px"><p style="margin:0 0 16px;font-size:17px;line-height:1.5">${escapeHtml(greeting)}</p><h1 style="font-size:34px;line-height:1.18;letter-spacing:-.5px;margin:0 0 24px;color:${brand.colors.ink};font-family:Georgia,serif">${escapeHtml(campaign.headline)}</h1><div style="font-size:17px;line-height:1.7;color:${brand.colors.ink}">${body}</div>${options.contentAfterBody ?? ""}${button}</td></tr><tr><td style="padding:22px 24px;background:${brand.colors.soft};border-top:1px solid ${brand.colors.border};color:${brand.colors.muted};font-size:13px;line-height:1.8;text-align:center"><strong style="color:${brand.colors.primaryDeep};letter-spacing:1.5px">GILEAD MEDICARE</strong><br>Health education · wellness · community care<br><a href="${siteUrl}" style="color:${brand.colors.primaryDeep};text-decoration:underline">Visit Gilead Medicare</a>${unsubscribe ? `<br><a href="${escapeHtml(unsubscribe)}" style="color:${brand.colors.primaryDeep};text-decoration:underline">Unsubscribe</a>` : ""}</td></tr></table></td></tr></table></body></html>`;
 }
 
 export function getMailDb() { return firestore(); }
@@ -220,12 +230,12 @@ async function latestWelcomeItems(baseUrl: string): Promise<WelcomeItem[]> {
     video ? {
       eyebrow: "Latest video",
       title: video.title,
-      description: "Watch the newest story from Remsam Homestead.",
+      description: "Watch the newest story from Gilead Medicare.",
       url: `https://www.youtube.com/watch?v=${encodeURIComponent(video.id)}`,
       image: absolutePublicUrl(video.thumbnail, baseUrl),
     } : {
       eyebrow: "Latest video",
-      title: "Watch the latest from Remsam Homestead",
+      title: "Watch the latest from Gilead Medicare",
       description: "Visit our video library for the newest story and update.",
       url: absolutePublicUrl("/videos", baseUrl),
       image: "",
@@ -233,7 +243,7 @@ async function latestWelcomeItems(baseUrl: string): Promise<WelcomeItem[]> {
     article ? {
       eyebrow: "Latest article",
       title: article.title,
-      description: article.excerpt || "Read the newest article from Remsam Homestead.",
+      description: article.excerpt || "Read the newest article from Gilead Medicare.",
       url: absolutePublicUrl(`/articles/${encodeURIComponent(article.slug)}`, baseUrl),
       image: absolutePublicUrl(article.featuredImage, baseUrl),
     } : {
@@ -246,12 +256,12 @@ async function latestWelcomeItems(baseUrl: string): Promise<WelcomeItem[]> {
     study ? {
       eyebrow: "From the study library",
       title: study.title,
-      description: study.excerpt || "Explore the newest resource in the Remsam study library.",
+      description: study.excerpt || "Explore the newest resource in the Gilead study library.",
       url: absolutePublicUrl(`/articles/${encodeURIComponent(study.slug)}`, baseUrl),
       image: absolutePublicUrl(study.featuredImage, baseUrl),
     } : {
       eyebrow: "From the study library",
-      title: "Explore the Remsam study library",
+      title: "Explore the Gilead study library",
       description: "Find the latest learning resource and downloadable material.",
       url: absolutePublicUrl("/study-materials", baseUrl),
       image: "",
@@ -276,10 +286,10 @@ function welcomeItemsText(items: WelcomeItem[]) {
 export async function sendNewsletterWelcome(recipient: Recipient, baseUrl: string, subscriptionCycleId = recipient.id) {
   const items = await latestWelcomeItems(baseUrl);
   return deliverCampaign({
-    kind: "newsletter", subject: "Welcome to Remsam Homestead", letterTitle: "Welcome to the homestead",
-    headline: "Faith, family, and farming—delivered with care", preheader: "You’re now part of the Remsam Homestead community.",
-    body: "<p>Thank you for joining us. You’ll receive thoughtful stories, practical homestead ideas, faith-filled encouragement, and news from our farm in Kenya.</p><p>Here are three fresh places to begin: our newest video, latest article, and newest study-library resource.</p>",
-    buttonLabel: "Visit Remsam Homestead", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
+    kind: "newsletter", subject: "Welcome to Gilead Medicare", letterTitle: "Welcome to Gilead",
+    headline: "Wellness updates—delivered with care", preheader: "You’re now part of the Gilead Medicare community.",
+    body: "<p>Thank you for joining us. You’ll receive health education, practical wellness ideas, and community-care updates.</p><p>Here are three places to begin: our newest video, latest article, and newest study-library resource.</p>",
+    buttonLabel: "Visit Gilead Medicare", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
   }, [recipient], baseUrl, `newsletter-welcome:${subscriptionCycleId}`, {
     contentAfterBody: welcomeItemsHtml(items),
     textSuffix: welcomeItemsText(items),
@@ -288,9 +298,9 @@ export async function sendNewsletterWelcome(recipient: Recipient, baseUrl: strin
 
 export async function sendMeetingRequestWelcome(recipient: Recipient, baseUrl: string) {
   return deliverCampaign({
-    kind: "meeting", subject: "We received your Remsam Homestead meeting request", letterTitle: "Meeting request received",
-    headline: "Thank you for reaching out", preheader: "The Remsam Homestead team will follow up with your meeting details.",
+    kind: "meeting", subject: "We received your Gilead Medicare meeting request", letterTitle: "Meeting request received",
+    headline: "Thank you for reaching out", preheader: "The Gilead Medicare team will follow up with your meeting details.",
     body: "<p>Your request is safely with our team. We’ll review it and send the online meeting link as soon as it is ready.</p><p>We look forward to connecting with you.</p>",
-    buttonLabel: "Visit Remsam Homestead", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
+    buttonLabel: "Visit Gilead Medicare", buttonUrl: safeSiteUrl(baseUrl), videoUrl: "",
   }, [recipient], baseUrl, `meeting-request:${recipient.id}:${Date.now()}`);
 }

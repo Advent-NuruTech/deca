@@ -2,7 +2,7 @@
 import StudyMaterialsPage from "@/components/public/pages/StudyMaterialsPage";
 
 export const metadata: Metadata = {
-  title: "Study Materials | RemSam Homestead",
+  title: "Study Materials | Gilead Medicare",
   description: "Download free study materials, guides, and resources for faith and learning.",
 };
 

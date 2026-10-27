@@ -1,6 +1,6 @@
-# Remsam Kenya
+# Gilead Medicare
 
-Remsam Kenya is a full-stack Next.js App Router application. The public site,
+Gilead Medicare is a full-stack Next.js App Router application. The public site,
 admin dashboard, same-origin APIs, and service integrations all run from this
 repository root.
 

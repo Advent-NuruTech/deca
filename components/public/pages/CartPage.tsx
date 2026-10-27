@@ -30,8 +30,8 @@ export default function CartPage() {
   return (
     <>
       <SEO
-        title="Shopping Cart | RemSam Homestead"
-        description="View your shopping cart at RemSam Homestead. Review organic seeds, fresh produce, and other farm products before checkout."
+        title="Shopping Cart | Gilead Medicare"
+        description="View your shopping cart at Gilead Medicare. Review products before checkout."
         keywords={["Cart", "Shopping Cart", "Checkout", "Organic Seeds"]}
       />
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">

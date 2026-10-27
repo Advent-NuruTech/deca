@@ -42,7 +42,7 @@ const links = [
   { href: "/admin/invitations", label: "Invitations", icon: CalendarDays },
 ];
 
-const sidebarPreferenceKey = "remsam-admin-sidebar-collapsed";
+const sidebarPreferenceKey = "gilead-admin-sidebar-collapsed";
 
 type AccountSection = "orders" | "settings";
 
@@ -90,7 +90,7 @@ export default function AdminNavigation({ children, account }: { children: React
   }
 
   const isAccount = !!account;
-  const title = isAccount ? "RemSam Account" : "RemSam Admin";
+  const title = isAccount ? "Gilead Account" : "Gilead Admin";
   const subtitle = isAccount ? "Your personal workspace" : "Management workspace";
   const home = isAccount ? "/account" : "/admin/dashboard";
   const sidebar = (isMobile = false) => {

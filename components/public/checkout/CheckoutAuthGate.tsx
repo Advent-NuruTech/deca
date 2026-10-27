@@ -16,6 +16,6 @@ export default function CheckoutAuthGate({ children }: { children: ReactNode }) 
     <h2 className="text-2xl font-bold text-gray-900">Sign in to complete checkout</h2>
     <p className="mt-2 text-gray-600">Your account keeps your order details together. You?ll return to checkout after signing in.</p>
     <Link href="/sign-in?returnTo=%2Fcheckout" className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-5 font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">Sign in</Link>
-    <p className="mt-5 text-center text-sm text-gray-600">New to RemSam? <Link href="/sign-up?returnTo=%2Fcheckout" className="font-semibold text-emerald-700 underline underline-offset-4">Create an account</Link></p>
+    <p className="mt-5 text-center text-sm text-gray-600">New to Gilead? <Link href="/sign-up?returnTo=%2Fcheckout" className="font-semibold text-emerald-700 underline underline-offset-4">Create an account</Link></p>
   </section>;
 }

@@ -39,7 +39,7 @@ export async function resolveChannel(input: string, slot: number): Promise<YouTu
 }
 
 function fallbackChannels(): (YouTubeChannel | null)[] {
-  return [process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID, process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID_2].map((id, index) => id && /^UC[A-Za-z0-9_-]{22}$/.test(id) ? { id, title: index === 0 ? "Prophetic Mirror" : "RemSam Homestead", uploadsPlaylistId: `UU${id.slice(2)}`, url: `https://www.youtube.com/channel/${id}` } : null);
+  return [process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID, process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID_2].map((id, index) => id && /^UC[A-Za-z0-9_-]{22}$/.test(id) ? { id, title: index === 0 ? "Gilead Medicare" : "Gilead Edenrise", uploadsPlaylistId: `UU${id.slice(2)}`, url: `https://www.youtube.com/channel/${id}` } : null);
 }
 
 export async function readChannels(): Promise<(YouTubeChannel | null)[]> {

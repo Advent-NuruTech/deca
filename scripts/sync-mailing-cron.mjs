@@ -1,7 +1,7 @@
 const apiKey = process.env.CRONJOB_ORG_API_KEY;
 const cronSecret = process.env.CRON_SECRET;
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://remsamhomestead.com").replace(/\/+$/, "");
-const jobTitle = "Remsam Homestead scheduled mailing delivery";
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://gileadmedicare.co.ke").replace(/\/+$/, "");
+const jobTitle = "Gilead Medicare scheduled mailing delivery";
 
 if (!apiKey || !cronSecret) {
   throw new Error("Set CRONJOB_ORG_API_KEY and CRON_SECRET before syncing the mailing cron job.");

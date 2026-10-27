@@ -116,7 +116,7 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
   return (
     <>
       <SEO
-        title="Shop | RemSam Homestead"
+        title="Shop | Gilead Medicare"
         description="Buy organic seeds, fresh produce, and other agricultural products from our farm."
         keywords={["Organic Seeds", "Fresh Produce", "Farm Products"]}
       />

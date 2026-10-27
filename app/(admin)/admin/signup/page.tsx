@@ -62,8 +62,8 @@ export default function AdminSignup() {
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-3">
-            <img src="/logo.png" alt="RemSam Homestead Logo" className="h-12 w-12 rounded-full bg-white object-contain" />
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent">RemSam Homestead</span>
+            <img src="/assets/logo.jpeg" alt="Gilead Medicare logo" className="h-12 w-12 rounded-full bg-white object-contain" />
+            <span className="bg-gradient-to-r from-[#008EFE] to-[#079326] bg-clip-text text-3xl font-bold text-transparent">Gilead Medicare</span>
           </Link>
         </div>
 

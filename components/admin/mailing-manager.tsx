@@ -22,13 +22,13 @@ type MailingData = {
 const emptyData: MailingData = { members: [], subscribers: [], schedules: [], history: [], counts: { verified: 0, pending: 0, active: 0, paused: 0, unsubscribed: 0, totalMembers: 0, totalSubscribers: 0, emailsSent: 0 } };
 const initialCampaign: Campaign = {
   kind: "newsletter",
-  subject: "A new letter from Remsam Homestead",
+  subject: "A new letter from Gilead Medicare",
   letterTitle: "From the homestead",
   headline: "Faith, family, and farming",
-  preheader: "A thoughtful update from Remsam Homestead.",
-  body: "<p>Share the latest story, resource, or update from Remsam Homestead here.</p>",
-  buttonLabel: "Visit Remsam Homestead",
-  buttonUrl: "https://remsamhomestead.com",
+  preheader: "A thoughtful update from Gilead Medicare.",
+  body: "<p>Share the latest story, resource, or update from Gilead Medicare here.</p>",
+  buttonLabel: "Visit Gilead Medicare",
+  buttonUrl: "https://gileadmedicare.co.ke",
   videoUrl: "",
 };
 
@@ -171,7 +171,7 @@ export default function MailingManager() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <div><p className="text-sm font-bold uppercase tracking-[.18em] text-brand-dark">Remsam Homestead</p><h1 className="mt-1 text-3xl font-bold text-brand-ink md:text-4xl">Email studio</h1><p className="mt-2 max-w-2xl text-brand-muted">Write, schedule, and review every community email from one calm workspace.</p></div>
+        <div><p className="text-sm font-bold uppercase tracking-[.18em] text-brand-dark">Gilead Medicare</p><h1 className="mt-1 text-3xl font-bold text-brand-ink md:text-4xl">Email studio</h1><p className="mt-2 max-w-2xl text-brand-muted">Write, schedule, and review every community email from one calm workspace.</p></div>
         <button onClick={() => void load()} disabled={loading} className="flex items-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-2.5 font-semibold text-brand-dark hover:bg-brand-soft disabled:opacity-60"><RefreshCw size={17} className={loading ? "animate-spin" : ""} /> Refresh</button>
       </header>
 
@@ -196,7 +196,7 @@ export default function MailingManager() {
           {sourceHistory && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-border bg-brand-soft px-4 py-3 text-sm text-brand-dark"><span>Editing a follow-up to <strong>{sourceHistory.subject}</strong>, sent {dateLabel(sourceHistory.sentAt)}. The original record remains in history.</span><button type="button" onClick={() => { setSourceHistory(null); setCampaign(initialCampaign); setAudienceMode("all"); }} className="font-bold underline">Start a new email</button></div>}
           <div className="mt-5 space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Mailing list"><select value={campaign.kind} onChange={(event) => update("kind", event.target.value as MailKind)} disabled={!!sourceHistory} className="input-field mt-1.5"><option value="newsletter">Remsam newsletter</option><option value="meeting">Online meeting members</option></select></Field>
+              <Field label="Mailing list"><select value={campaign.kind} onChange={(event) => update("kind", event.target.value as MailKind)} disabled={!!sourceHistory} className="input-field mt-1.5"><option value="newsletter">Gilead newsletter</option><option value="meeting">Online meeting members</option></select></Field>
               <Field label="Subject"><input required maxLength={180} value={campaign.subject} onChange={(event) => update("subject", event.target.value)} className="input-field mt-1.5" /></Field>
               <Field label="Email label"><input required maxLength={140} value={campaign.letterTitle} onChange={(event) => update("letterTitle", event.target.value)} className="input-field mt-1.5" /></Field>
               <Field label="Headline"><input required maxLength={180} value={campaign.headline} onChange={(event) => update("headline", event.target.value)} className="input-field mt-1.5" /></Field>
@@ -208,7 +208,7 @@ export default function MailingManager() {
                 <span id="inbox-preview-help" className="mt-1.5 flex justify-between gap-3 text-xs font-normal text-brand-muted"><span>{inboxPreviewIsAutomatic ? "Updates automatically from your message. Edit it anytime." : "Custom preview. Select Generate preview to refresh it from the message."}</span><span aria-label={`${campaign.preheader.length} of ${INBOX_PREVIEW_MAX_LENGTH} characters`}>{campaign.preheader.length}/{INBOX_PREVIEW_MAX_LENGTH}</span></span>
               </Field>
             </div>
-            <div><RichTextEditor label="Message" placeholder="Write the Remsam Homestead message…" value={campaign.body} maxTextLength={12000} allowImages onChange={(value) => update("body", value)} /></div>
+            <div><RichTextEditor label="Message" placeholder="Write the Gilead Medicare message…" value={campaign.body} maxTextLength={12000} allowImages onChange={(value) => update("body", value)} /></div>
             <div className="grid gap-4 sm:grid-cols-2"><Field label="Button label"><input value={campaign.buttonLabel} onChange={(event) => update("buttonLabel", event.target.value)} className="input-field mt-1.5" /></Field><Field label={campaign.kind === "meeting" ? "Meeting link" : "Button link"}><input required={campaign.kind === "meeting"} type="url" value={campaign.buttonUrl} onChange={(event) => update("buttonUrl", event.target.value)} className="input-field mt-1.5" placeholder="https://" /></Field></div>
           </div>
         </section>
@@ -276,9 +276,9 @@ function EmailPreview({ campaign }: { campaign: Campaign }) {
     <div className="mb-3 flex flex-wrap items-end justify-between gap-2"><div><h2 id="email-preview-heading" className="text-xl font-bold text-brand-ink">Email preview</h2><p className="text-sm text-brand-muted">A live approximation of what readers will receive.</p></div><span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand-dark">{campaign.subject || "No subject"}</span></div>
     <div className="max-h-[75vh] overflow-y-auto rounded-2xl border border-brand-border bg-[#f8faf9] p-2 shadow-inner sm:p-5">
       <article className="mx-auto max-w-[720px] overflow-hidden rounded-xl border border-brand-border bg-white shadow-sm">
-        <header className="bg-brand-deep px-5 py-7 text-center text-white sm:px-8"><img src="/assets/logo-white.png" alt="Remsam Homestead" className="mx-auto mb-3 h-[72px] w-[72px] object-contain" /><p className="text-xs font-extrabold tracking-[.22em] text-amber-300">REMSAM HOMESTEAD</p><div className="mx-auto my-3 h-px w-16 bg-amber-400" /><p className="text-base italic">{campaign.letterTitle || "From the homestead"}</p></header>
+        <header className="bg-brand-deep px-5 py-7 text-center text-white sm:px-8"><img src="/assets/logo.jpeg" alt="Gilead Medicare" className="mx-auto mb-3 h-[72px] w-[72px] object-contain" /><p className="text-xs font-extrabold tracking-[.22em] text-white">GILEAD MEDICARE</p><div className="mx-auto my-3 h-px w-16 bg-[#008EFE]" /><p className="text-base italic">{campaign.letterTitle || "From Gilead"}</p></header>
         <div className="px-5 py-7 sm:px-9"><div className="mb-5 h-1 w-11 bg-amber-500" /><p className="mb-4 text-base text-brand-ink">Hello,</p><h3 className="mb-6 font-serif text-3xl font-bold leading-tight text-brand-ink">{campaign.headline || "Your email headline"}</h3><div className="prose prose-emerald max-w-none text-brand-ink [&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl" dangerouslySetInnerHTML={{ __html: body }} />{safeButtonUrl && campaign.buttonLabel && <a href={safeButtonUrl} target="_blank" rel="noreferrer" className="mt-7 inline-block rounded-xl bg-brand px-6 py-3 font-bold text-white no-underline">{campaign.buttonLabel}</a>}</div>
-        <footer className="border-t border-brand-border bg-brand-soft px-5 py-6 text-center text-xs leading-6 text-brand-muted"><strong className="tracking-widest text-brand-dark">REMSAM HOMESTEAD</strong><br />Faith, Family, Farming<br />About Us · Contact Us · Study Library{campaign.kind === "newsletter" ? " · Unsubscribe" : ""}</footer>
+        <footer className="border-t border-brand-border bg-brand-soft px-5 py-6 text-center text-xs leading-6 text-brand-muted"><strong className="tracking-widest text-brand-dark">GILEAD MEDICARE</strong><br />Health education · wellness · community care<br />About Us · Contact Us · Study Library{campaign.kind === "newsletter" ? " · Unsubscribe" : ""}</footer>
       </article>
     </div>
   </section>;
