@@ -3,6 +3,9 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   cacheComponents: false,
+  images: {
+    qualities: [75, 100],
+  },
   async rewrites() {
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     if (!projectId || !/^[a-z0-9-]+$/.test(projectId)) return [];
