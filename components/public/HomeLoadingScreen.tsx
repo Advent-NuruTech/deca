@@ -1,22 +1,15 @@
-import Image from "next/image";
+import { HeartPulse } from "lucide-react";
 
 export default function HomeLoadingScreen() {
   return (
-    <div className="home-loading-screen" role="status" aria-live="polite" aria-label="Loading Remsam Homestead">
+    <div className="home-loading-screen" role="status" aria-live="polite" aria-label="Loading The Balm of Gilead">
       <div className="home-loading-glow" aria-hidden="true" />
       <div className="home-loading-content">
         <div className="home-loading-logo-wrap" aria-hidden="true">
-          <Image
-            className="home-loading-logo"
-            src="/logo.png"
-            alt=""
-            width={80}
-            height={80}
-            preload
-          />
+          <HeartPulse className="home-loading-logo" strokeWidth={2.25} />
         </div>
-        <p className="home-loading-brand">Remsam Homestead</p>
-        <p className="home-loading-tagline">Faith, Family, Farming</p>
+        <p className="home-loading-brand">The Balm of Gilead</p>
+        <p className="home-loading-tagline">Health education · wellness · community care</p>
         <p className="home-loading-message">Preparing your experience</p>
         <div className="home-loading-track" aria-hidden="true">
           <span />

@@ -17,7 +17,7 @@ import {
   Stethoscope,
   UsersRound,
 } from "lucide-react";
-import { siteConfig } from "@/lib/site-config";
+import { customerServiceContacts, officialPhoneContacts, siteConfig } from "@/lib/site-config";
 
 const departments = [
   {
@@ -108,11 +108,6 @@ const servicePillars = [
   { icon: HeartHandshake, title: "Spiritual well-being", text: "Spiritual Care" },
   { icon: UsersRound, title: "Education and outreach", text: "Training and Community Services" },
   { icon: BriefcaseBusiness, title: "Sustainability", text: "Administration and Support Services" },
-] as const;
-
-const contacts = [
-  { label: "Safaricom", number: "0742445600" },
-  { label: "Airtel", number: "0100967771" },
 ] as const;
 
 export default function AboutPage() {
@@ -210,7 +205,7 @@ export default function AboutPage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 rounded-3xl border border-sky-100 bg-white p-6 shadow-sm sm:p-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div><p className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.16em] text-sky-700"><HandHeart className="h-4 w-4" aria-hidden="true" />Our commitment</p><h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Serving with education, compassion, and care.</h2><p className="mt-5 max-w-2xl leading-7 text-slate-600">Gilead Medicare Food and Nutrition Services seeks to promote physical well-being, healthy living, spiritual encouragement, and community service through education, compassionate care, and responsible wellness practices.</p><Link href="/programmes" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-sky-700 px-5 py-3 font-bold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">Explore our programmes <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>
-          <aside className="rounded-2xl bg-sky-50 p-6 ring-1 ring-sky-100"><p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-700">Official Contacts</p><div className="mt-5 space-y-5"><div><h3 className="font-bold text-slate-950">Main office</h3><div className="mt-3 space-y-2">{contacts.map(({ label, number }) => <a key={number} href={`tel:${number}`} className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Phone className="h-4 w-4 text-sky-600" aria-hidden="true" />{label} {number}</a>)}</div></div><div className="border-t border-sky-200 pt-5"><h3 className="font-bold text-slate-950">Customer Service</h3><div className="mt-3 space-y-2"><a href="tel:0183153489" className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Phone className="h-4 w-4 text-sky-600" aria-hidden="true" />Gents - 0183153489</a><a href="tel:0183175447" className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Phone className="h-4 w-4 text-sky-600" aria-hidden="true" />Ladies - 0183175447</a></div></div><a href={`mailto:${siteConfig.email}`} className="flex items-center gap-3 border-t border-sky-200 pt-5 text-sm font-bold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Mail className="h-4 w-4" aria-hidden="true" />Email: {siteConfig.email}</a></div></aside>
+          <aside className="rounded-2xl bg-sky-50 p-6 ring-1 ring-sky-100"><p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-700">Official Contacts</p><div className="mt-5 space-y-5"><div><h3 className="font-bold text-slate-950">Main office</h3><div className="mt-3 space-y-2">{officialPhoneContacts.map(({ label, number }) => <a key={number} href={`tel:${number}`} className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Phone className="h-4 w-4 text-sky-600" aria-hidden="true" />{label} {number}</a>)}</div></div><div className="border-t border-sky-200 pt-5"><h3 className="font-bold text-slate-950">Customer Service</h3><div className="mt-3 space-y-2">{customerServiceContacts.map(({ label, number }) => <a key={number} href={`tel:${number}`} className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-sky-900 shadow-sm transition hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Phone className="h-4 w-4 text-sky-600" aria-hidden="true" />{label} - {number}</a>)}</div></div><a href={`mailto:${siteConfig.email}`} className="flex items-center gap-3 border-t border-sky-200 pt-5 text-sm font-bold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><Mail className="h-4 w-4" aria-hidden="true" />Email: {siteConfig.email}</a></div></aside>
         </div>
       </section>
     </main>

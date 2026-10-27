@@ -7,7 +7,7 @@ export type NotificationInput = {
   title: string;
   body: string;
   href?: string;
-  kind?: "account" | "order" | "payment" | "contact" | "donation" | "interest" | "system";
+  kind?: "account" | "order" | "payment" | "contact" | "donation" | "interest" | "invitation" | "system";
 };
 
 function clean(value: string, maximum: number) {

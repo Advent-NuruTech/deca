@@ -7,6 +7,17 @@ export const siteConfig = {
     "GILEAD / EDENRISE provides health education, wellness programmes, healthy-food services, training, and referral navigation.",
 } as const;
 
+/** Public contact channels approved for use across the website. */
+export const officialPhoneContacts = [
+  { label: "Safaricom", number: "0742445600" },
+  { label: "Airtel", number: "0100967771" },
+] as const;
+
+export const customerServiceContacts = [
+  { label: "Gents", number: "0183153489" },
+  { label: "Ladies", number: "0183175447" },
+] as const;
+
 export const serviceAreas = [
   { title: "Health & wellness consultancy", summary: "Education, assessments, prevention and workplace wellness programmes.", items: ["Health education", "Preventive-health education", "Wellness assessments", "Corporate wellness education"] },
   { title: "Nutrition & healthy food", summary: "Practical nutrition education, healthy cooking and hygienic food services.", items: ["Healthy meal planning", "Cooking demonstrations", "Healthy-food catering", "Plant-based nutrition education"] },

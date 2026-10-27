@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   Bell,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -38,6 +39,7 @@ const links = [
   { href: "/admin/mailing", label: "Mailing", icon: Mail },
   { href: "/admin/chat", label: "Chat", icon: MessageCircle },
   { href: "/admin/life-skills", label: "Life Skills", icon: HandHeart },
+  { href: "/admin/invitations", label: "Invitations", icon: CalendarDays },
 ];
 
 const sidebarPreferenceKey = "remsam-admin-sidebar-collapsed";

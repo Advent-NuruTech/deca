@@ -12,7 +12,7 @@ export interface AppNotification {
   title: string;
   body: string;
   href?: string;
-  kind: "account" | "order" | "payment" | "contact" | "donation" | "interest" | "system";
+  kind: "account" | "order" | "payment" | "contact" | "donation" | "interest" | "invitation" | "system";
   readAt?: string | null;
   createdAt?: string;
 }

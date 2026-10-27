@@ -118,3 +118,9 @@ INSERT OR IGNORE INTO admin_updates (id, title, content)
   WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'practical-christianity');
 
 INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('practical-christianity');
+
+INSERT OR IGNORE INTO admin_updates (id, title, content)
+  SELECT 'programme-invitations', 'Programme invitations are live', '<p>Visitors can now submit a complete GILEAD programme invitation online, including event, audience, topic, and logistics details.</p><p>Open <strong>Invitations</strong> in the admin menu to review requests, contact organisers, and update each follow-up status.</p>'
+  WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'programme-invitations');
+
+INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('programme-invitations');

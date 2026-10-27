@@ -93,7 +93,7 @@ body {
 .home-loading-logo {
   width: 5rem;
   height: 5rem;
-  object-fit: contain;
+  color: var(--brand-primary);
 }
 
 .home-loading-brand {

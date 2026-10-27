@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import QuickActions from "@/components/admin/QuickActions";
 import { motion } from "framer-motion";
-import { Clock, FileText, Package, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
+import { CalendarDays, Clock, FileText, Package, RefreshCw, ShoppingCart, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import type { PublicArticle, PublicOrder, ResourceTaxonomy } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
@@ -12,6 +12,8 @@ import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-
 type ProductsResponse = { total: number; active: number };
 type ArticlesResponse = { articles: PublicArticle[]; resourceCategories: ResourceTaxonomy };
 type OrdersResponse = { orders: PublicOrder[] };
+type Invitation = { id: string; status: "new" | "contacted" | "in progress" | "confirmed" | "closed" };
+type InvitationsResponse = { invitations: Invitation[] };
 type EmailActivity = { id: string; subject: string; kind: "newsletter" | "meeting"; sent?: number; failed?: number; sentAt?: unknown };
 
 function emailDate(value: unknown) {
@@ -48,6 +50,7 @@ export default function AdminDashboard() {
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [resourceCategories, setResourceCategories] = useState<ResourceTaxonomy>({ majors: [], subcategories: [] });
   const [orders, setOrders] = useState<PublicOrder[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [emailActivity, setEmailActivity] = useState<EmailActivity[]>([]);
@@ -71,15 +74,17 @@ export default function AdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const [productData, articleData, orderData] = await Promise.all([
+      const [productData, articleData, orderData, invitationData] = await Promise.all([
         api.get<ProductsResponse>("/api/products?scope=admin&stats=true"),
         api.get<ArticlesResponse>("/api/articles?scope=admin&limit=100"),
         api.get<OrdersResponse>("/api/orders?limit=100"),
+        api.get<InvitationsResponse>("/api/admin/programme-invitations"),
       ]);
       setProducts(productData);
       setArticles(articleData.articles ?? []);
       setResourceCategories(articleData.resourceCategories ?? { majors: [], subcategories: [] });
       setOrders(orderData.orders ?? []);
+      setInvitations(invitationData.invitations ?? []);
     } catch (nextError) {
       setError(errorMessage(nextError, "Dashboard data could not be loaded"));
     } finally {
@@ -96,8 +101,9 @@ export default function AdminDashboard() {
     pendingOrders: orders.filter((order) => order.orderStatus === "pending").length,
     revenue: orders.filter((order) => order.paymentStatus === "paid").reduce((sum, order) => sum + order.total, 0),
     customers: new Set(orders.map((order) => order.userId).filter(Boolean)).size,
+    openInvitations: invitations.filter((invitation) => invitation.status !== "closed").length,
     paymentRate: orders.length ? Math.round((orders.filter((order) => order.paymentStatus === "paid").length / orders.length) * 100) : 0,
-  }), [articles, orders, products]);
+  }), [articles, invitations, orders, products]);
 
   const articleCategoryStats = useMemo(() => resourceCategories.majors.flatMap((major) => [
     { id: major.id, name: major.name, count: major.count },
@@ -131,6 +137,7 @@ export default function AdminDashboard() {
           <StatCard title="Paid Revenue" value={formatMoney(stats.revenue)} icon={TrendingUp} color="emerald" />
           <StatCard title="Pending Orders" value={stats.pendingOrders} icon={Clock} color="red" href="/admin/orders?status=pending" />
           <StatCard title="Customers" value={stats.customers} icon={Users} color="blue" />
+          <StatCard title="Open Invitations" value={stats.openInvitations} icon={CalendarDays} color="yellow" href="/admin/invitations" />
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
