@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import { decaAssets } from "@/lib/deca-assets";
+import { siteConfig } from "@/lib/site-config";
 
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -40,7 +42,7 @@ const links = [
   { href: "/admin/invitations", label: "Invitations", icon: CalendarDays },
 ];
 
-const sidebarPreferenceKey = "gilead-admin-sidebar-collapsed";
+const sidebarPreferenceKey = "deca-admin-sidebar-collapsed";
 
 type AccountSection = "orders" | "settings";
 
@@ -88,7 +90,7 @@ export default function AdminNavigation({ children, account }: { children: React
   }
 
   const isAccount = !!account;
-  const title = isAccount ? "Gilead Account" : "Gilead Admin";
+  const title = isAccount ? `${siteConfig.shortName} Account` : `${siteConfig.shortName} Admin`;
   const subtitle = isAccount ? "Your personal workspace" : "Management workspace";
   const home = isAccount ? "/account" : "/admin/dashboard";
   const sidebar = (isMobile = false) => {
@@ -111,7 +113,7 @@ export default function AdminNavigation({ children, account }: { children: React
         <div className={`flex h-20 items-center border-b ${isMobile ? "border-slate-200" : "border-white/10"} ${compact ? "justify-center px-3" : "gap-3 px-5"}`}>
           <Link href={home} className="flex min-w-0 items-center gap-3" aria-label={title}>
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
-              <img src="/logo.png" alt="" className="h-9 w-9 rounded-xl object-contain" />
+              <img src={decaAssets.logo} alt="" className="h-9 w-9 rounded-xl object-contain" />
             </span>
             {!compact && (
               <span className="min-w-0">

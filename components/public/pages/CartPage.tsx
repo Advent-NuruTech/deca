@@ -30,15 +30,15 @@ export default function CartPage() {
   return (
     <>
       <SEO
-        title="Shopping Cart | Gilead Medicare"
-        description="View your shopping cart at Gilead Medicare. Review products before checkout."
-        keywords={["Cart", "Shopping Cart", "Checkout", "Organic Seeds"]}
+        title="Shopping Cart | Deca Bookstore"
+        description="Review your Deca Bookstore order before checkout."
+        keywords={["Cart", "Shopping Cart", "Checkout", "Revision books"]}
       />
       <div className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="container mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 md:mb-8">
             <h1 className="text-3xl md:text-5xl font-bold">
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">Shopping Cart</span>
+              <span className="text-[#079326]">Shopping Cart</span>
             </h1>
             {items.length > 0 && (
               <p className="text-gray-500 mt-2">You have {items.length} {items.length === 1 ? "item" : "items"} in your cart</p>

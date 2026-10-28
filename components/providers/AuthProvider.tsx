@@ -14,8 +14,6 @@ import {
   deleteUser,
   onIdTokenChanged,
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
@@ -30,7 +28,6 @@ type AuthContextValue = {
   error: string | null;
   signIn: (email: string, password: string) => Promise<AppUser>;
   register: (name: string, email: string, password: string) => Promise<AppUser>;
-  signInWithGoogle: () => Promise<AppUser>;
   registerAdmin: (name: string, email: string, password: string, signupCode: string) => Promise<AppUser>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<AppUser | null>;
@@ -95,22 +92,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return profile;
   }, [refreshProfile]);
 
-  const signInWithGoogle = useCallback(async () => {
-    setError(null);
-    const credential = await signInWithPopup(firebaseAuth(), new GoogleAuthProvider());
-    const profile = await api.post<AppUser>("/api/auth/register", { name: credential.user.displayName || credential.user.email?.split("@")[0] || "Customer" });
-    setUser(profile);
-    setError(null);
-    return profile;
-  }, []);
-
   const register = useCallback(async (name: string, email: string, password: string) => {
     setError(null);
-    await createUserWithEmailAndPassword(firebaseAuth(), email, password);
-    const profile = await api.post<AppUser>("/api/auth/register", { name });
-    setUser(profile);
-    setError(null);
-    return profile;
+    const credential = await createUserWithEmailAndPassword(firebaseAuth(), email, password);
+    try {
+      const profile = await api.post<AppUser>("/api/auth/register", { name });
+      setUser(profile);
+      setError(null);
+      return profile;
+    } catch (registrationError) {
+      try {
+        await deleteUser(credential.user);
+      } catch {
+        // Preserve the original registration error if Firebase cleanup also fails.
+      }
+      throw registrationError;
+    }
   }, []);
 
   const registerAdmin = useCallback(async (name: string, email: string, password: string, signupCode: string) => {
@@ -136,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ firebaseUser, user, loading, error, signIn, signInWithGoogle, register, registerAdmin, logout, refreshProfile }), [firebaseUser, user, loading, error, signIn, signInWithGoogle, register, registerAdmin, logout, refreshProfile]);
+  const value = useMemo(() => ({ firebaseUser, user, loading, error, signIn, register, registerAdmin, logout, refreshProfile }), [firebaseUser, user, loading, error, signIn, register, registerAdmin, logout, refreshProfile]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

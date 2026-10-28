@@ -44,13 +44,13 @@ export default function CheckoutForm({ formData, errors, onChange, onSubmit, loa
       </div>
     </section>
 
-    <aside className="rounded-2xl border-l-4 border-[#079326] bg-white p-5 text-sm leading-6 text-slate-700 shadow-sm"><strong className="block text-base text-slate-950">Delivery arrangements</strong><p className="mt-1">The GILEAD team will confirm your details and communicate the parcel fee. The amount shown covers products only.</p></aside>
+    <aside className="rounded-2xl border-l-4 border-[#079326] bg-white p-5 text-sm leading-6 text-slate-700 shadow-sm"><strong className="block text-base text-slate-950">Delivery arrangements</strong><p className="mt-1">The Deca team will confirm your details and communicate the parcel fee. The amount shown covers products only.</p></aside>
 
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
       <SectionHeading icon={MessageSquareText} step="3" title="Order notes" description="Optional information that will help us prepare your order." />
       <textarea id="notes" name="notes" value={formData.notes} onChange={onChange} rows={3} maxLength={2000} className={controlClass} placeholder="Anything else we should know?" />
     </section>
 
-    <button type="submit" disabled={loading} aria-busy={loading} className="flex min-h-14 w-full items-center justify-center rounded-xl bg-[#079326] px-6 py-4 font-bold text-slate-950 shadow-sm transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Placing order…" : "Place order"}</button>
+    <button type="submit" disabled={loading} aria-busy={loading} className="flex min-h-14 w-full items-center justify-center rounded-xl bg-[#079326] px-6 py-4 font-bold text-white shadow-sm transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Placing order…" : "Place order"}</button>
   </form>;
 }

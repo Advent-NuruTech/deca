@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       notifySafely(Promise.all([
         notifyUser(tokenUser.uid, {
           kind: "account",
-          title: role === "admin" ? "Admin account ready" : "Welcome to Gilead Medicare",
+          title: role === "admin" ? "Admin account ready" : "Welcome to Deca Bookstore",
           body: role === "admin" ? "Your administrator workspace is ready." : "Your account is ready. Order and account updates will appear here.",
           href: role === "admin" ? "/admin/dashboard" : "/account",
         }),

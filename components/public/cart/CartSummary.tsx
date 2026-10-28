@@ -39,14 +39,14 @@ export default function CartSummary({
           <div className="border-t border-gray-100 pt-4">
             <div className="flex justify-between text-lg">
               <span className="text-gray-800 font-semibold">Products total</span>
-              <span className="text-2xl font-bold text-emerald-700">KES {subtotal.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-[#079326]">KES {subtotal.toLocaleString()}</span>
             </div>
           </div>
         </div>
         <div className="space-y-2 mb-6">
           {features.map((feature) => (
             <div key={feature.text} className="flex items-center gap-2 text-sm text-gray-500">
-              <feature.icon size={14} className="text-emerald-500" />
+              <feature.icon size={14} className="text-[#079326]" />
               <span>{feature.text}</span>
             </div>
           ))}
@@ -56,7 +56,7 @@ export default function CartSummary({
             <motion.span
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden shadow-sm hover:bg-emerald-700 transition"
+              className="w-full bg-[#079326] text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 group relative overflow-hidden shadow-sm hover:bg-[#008EFE] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Proceed to Checkout

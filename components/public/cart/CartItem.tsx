@@ -26,8 +26,7 @@ export default function CartItem({
       whileHover={{ scale: 1.01 }}
       className="group relative"
     >
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
-      <div className="relative bg-white rounded-xl shadow-sm p-4 md:p-6 border border-gray-100 group-hover:border-transparent transition-all duration-500">
+      <div className="relative bg-white rounded-xl shadow-sm p-4 md:p-6 border border-gray-100 group-hover:border-[#008EFE] transition-all duration-500">
         <div className="flex flex-row gap-4 md:gap-6">
           <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
             {item.images?.[0] ? (
@@ -43,7 +42,7 @@ export default function CartItem({
           <div className="min-w-0 flex-grow pr-8 md:pr-0">
             <Link
               href={`/products/${item.slug}`}
-              className="text-base md:text-xl font-semibold text-gray-800 hover:text-emerald-600 transition-colors mb-2 inline-block"
+              className="text-base md:text-xl font-semibold text-gray-800 hover:text-[#079326] transition-colors mb-2 inline-block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"
             >
               {item.name}
             </Link>
@@ -84,7 +83,7 @@ export default function CartItem({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-base md:text-2xl font-bold text-emerald-700">KES {(item.price * item.quantity).toLocaleString()}</p>
+                <p className="text-base md:text-2xl font-bold text-[#079326]">KES {(item.price * item.quantity).toLocaleString()}</p>
                 {item.quantity > 1 && <p className="text-sm text-gray-500">KES {item.price.toLocaleString()} each</p>}
               </div>
             </div>
