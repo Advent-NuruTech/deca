@@ -6,13 +6,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
+import { decaAssets } from "@/lib/deca-assets";
 
 const links = [
   { label: "Home", href: "/" },
-  { label: "Programmes", href: "/programmes" },
-  { label: "Products", href: "/products" },
-  { label: "Resources", href: "/articles" },
-  { label: "Invite GILEAD", href: "/invite-gilead" },
+  { label: "Catalogue", href: "/programmes" },
+  { label: "KJSEA books", href: "/programmes" },
+  { label: "Wholesale orders", href: "/contact" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -49,12 +49,12 @@ export default function Header() {
             <button ref={closeButtonRef} type="button" onClick={() => setOpen(false)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]" aria-label="Close navigation menu"><X size={22} /></button>
           </div>
           <div className="grid gap-1">{links.map((link) => <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className={linkClass(link.href)}>{link.label}</Link>)}</div>
-          <Link href="/invite-gilead" onClick={() => setOpen(false)} className="mt-auto rounded-lg bg-[#079326] px-4 py-3.5 text-center text-base font-bold text-white transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Book a programme</Link>
+          <Link href="/programmes" onClick={() => setOpen(false)} className="mt-auto rounded-lg bg-[#079326] px-4 py-3.5 text-center text-base font-bold text-white transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">View catalogue</Link>
         </div>
       </aside>
     </div>,
     document.body,
   ) : null;
 
-  return <><header className={`sticky top-0 z-50 border-b transition ${scrolled ? "border-slate-200 bg-white/95 shadow-sm backdrop-blur" : "border-transparent bg-white"}`}><nav aria-label="Main navigation" className="mx-auto flex min-h-20 max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><Link href="/" className="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008EFE]"><span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="/assets/logo.jpeg" alt="Gilead Medicare" className="h-14 w-14 object-cover" /></span><span className="leading-tight"><span className="block text-lg font-extrabold tracking-tight text-[#079326]">{siteConfig.shortName}</span><span className="block text-[11px] font-bold tracking-[0.1em] text-[#008EFE]">FOOD &amp; NUTRITION SERVICES</span></span></Link><div className="hidden items-center gap-2 xl:flex">{links.map((link) => <Link key={link.href} href={link.href} className={linkClass(link.href)}>{link.label}</Link>)}</div><Link href="/invite-gilead" className="hidden rounded-lg bg-[#079326] px-5 py-3 text-base font-bold text-white shadow-sm transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] sm:inline-flex">Book a programme</Link><button ref={menuButtonRef} type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)} className="rounded-lg p-2.5 text-[#079326] hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] xl:hidden">{open ? <X size={24} /> : <Menu size={24} />}</button></nav></header>{mobileNavigation}</>;
+  return <><header className={`sticky top-0 z-50 border-b transition ${scrolled ? "border-slate-200 bg-white/95 shadow-sm backdrop-blur" : "border-transparent bg-white"}`}><nav aria-label="Main navigation" className="mx-auto flex min-h-20 max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><Link href="/" className="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#008EFE]"><span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src={decaAssets.logo} alt="Deca Bookstore" className="h-14 w-14 object-contain" /></span><span className="leading-tight"><span className="block text-lg font-extrabold tracking-tight text-[#079326]">{siteConfig.shortName}</span><span className="block text-[11px] font-bold tracking-[0.1em] text-[#008EFE]">REVISION MATERIALS</span></span></Link><div className="hidden items-center gap-2 xl:flex">{links.map((link) => <Link key={link.href} href={link.href} className={linkClass(link.href)}>{link.label}</Link>)}</div><Link href="/programmes" className="hidden rounded-lg bg-[#079326] px-5 py-3 text-base font-bold text-white shadow-sm transition hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] sm:inline-flex">View catalogue</Link><button ref={menuButtonRef} type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)} className="rounded-lg p-2.5 text-[#079326] hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] xl:hidden">{open ? <X size={24} /> : <Menu size={24} />}</button></nav></header>{mobileNavigation}</>;
 }

@@ -1,7 +1,7 @@
 export const brand = {
-  name: "Gilead Medicare",
-  shortName: "Gilead",
-  tagline: "Health education, wellness, community care",
+  name: "Deca Bookstore",
+  shortName: "Deca",
+  tagline: "Revision materials for learners",
   colors: {
     primary: "#008EFE",
     primaryDark: "#008EFE",

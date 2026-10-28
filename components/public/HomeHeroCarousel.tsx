@@ -2,23 +2,24 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { decaAssets } from "@/lib/deca-assets";
 
 const heroImages = [
   {
-    src: "/assets/health-wellbeing-garden.png",
-    alt: "A restorative garden designed for healthy everyday living",
+    src: decaAssets.juniorSchool,
+    alt: "Deca Bookstore KJSEA solving-problem books for junior school",
   },
   {
-    src: "/assets/health-whole-foods.png",
-    alt: "Fresh whole foods arranged for nutrition education",
+    src: decaAssets.integratedScience,
+    alt: "KJSEA solving-problem integrated science revision book",
   },
   {
-    src: "/assets/health-wellness-space.png",
-    alt: "A welcoming space for wellbeing learning and connection",
+    src: decaAssets.socialStudies,
+    alt: "KJSEA solving-problem social studies revision book",
   },
   {
-    src: "/assets/health-herbal-garden.png",
-    alt: "A thriving garden of herbs and vegetables",
+    src: decaAssets.mathematics,
+    alt: "KJSEA solving-problem mathematics revision book",
   },
 ] as const;
 
@@ -41,7 +42,7 @@ export default function HomeHeroCarousel({ preload = true }: { preload?: boolean
   return (
     <div
       className="absolute inset-0 -z-20"
-      aria-label="Highlights from GILEAD's health and wellbeing work"
+      aria-label="Deca Bookstore revision materials"
       role="region"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

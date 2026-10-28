@@ -1,10 +1,10 @@
 export const siteConfig = {
-  name: "Gilead Medicare Food and Nutrition Services",
-  shortName: "Gilead Medicare",
-  tagline: "Health education, nutrition, and community care.",
-  email: "info@gileadmedicare.co.ke",
+  name: "Deca Bookstore",
+  shortName: "Deca Bookstore",
+  tagline: "Revision materials for learners.",
+  email: "denniskamau025@gmail.com",
   description:
-    "Gilead Medicare Food and Nutrition Services provides health education, nutrition programmes, healthy-food services, training, and referral navigation.",
+    "Deca Bookstore supplies KJSEA revision materials for learners, schools, and bulk buyers, with free delivery available.",
 } as const;
 
 /** Public contact channels approved for use across the website. */
