@@ -10,16 +10,18 @@ type ProductsResponse = { products: PublicProduct[] };
 export default function RelatedProducts({
   category,
   currentProductId,
+  saleType,
 }: {
   category: string;
   currentProductId: string;
+  saleType: PublicProduct["saleType"];
 }) {
   const [products, setProducts] = useState<PublicProduct[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     api
-      .get<ProductsResponse>(`/api/products?category=${encodeURIComponent(category)}&limit=5`)
+      .get<ProductsResponse>(`/api/products?category=${encodeURIComponent(category)}&type=${saleType}&limit=5`)
       .then((response) => {
         if (!cancelled) {
           setProducts(response.products.filter((product) => product._id !== currentProductId).slice(0, 4));
@@ -31,7 +33,7 @@ export default function RelatedProducts({
     return () => {
       cancelled = true;
     };
-  }, [category, currentProductId]);
+  }, [category, currentProductId, saleType]);
 
   if (products.length === 0) return null;
   return (

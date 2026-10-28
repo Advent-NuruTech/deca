@@ -8,6 +8,7 @@ import { richTextToPlainText, sanitizeRichText } from "@/lib/rich-text";
 import type { PublicProduct } from "@/lib/types";
 
 const STATUSES = ["active", "inactive", "draft"] as const;
+const SALE_TYPES = ["retail", "wholesale"] as const;
 const MAX_IMAGES = 10;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -64,7 +65,7 @@ function richTextField(
 function numberField(
   input: Record<string, unknown>,
   key: string,
-  options: { required?: boolean; integer?: boolean; min?: number } = {},
+  options: { required?: boolean; integer?: boolean; min?: number; max?: number } = {},
 ): number | undefined {
   const value = input[key];
   if (value === undefined || value === null) {
@@ -78,6 +79,7 @@ function numberField(
     throw new HttpError(400, `${key} must be an integer`);
   }
   if (value < (options.min ?? 0)) throw new HttpError(400, `${key} is out of range`);
+  if (options.max !== undefined && value > options.max) throw new HttpError(400, `${key} is out of range`);
   return value;
 }
 
@@ -150,6 +152,13 @@ export function validateProductBody(value: unknown, partial = false): Record<str
   if (status !== undefined && !STATUSES.includes(status as (typeof STATUSES)[number])) {
     throw new HttpError(400, "status must be active, inactive or draft");
   }
+  const saleType = value.saleType;
+  if (saleType !== undefined && !SALE_TYPES.includes(saleType as (typeof SALE_TYPES)[number])) {
+    throw new HttpError(400, "saleType must be retail or wholesale");
+  }
+  if (saleType === "wholesale" && value.minimumOrderQuantity === undefined) {
+    throw new HttpError(400, "minimumOrderQuantity is required for wholesale products");
+  }
 
   const result: Record<string, unknown> = {};
   const assign = (key: string, next: unknown) => {
@@ -175,6 +184,8 @@ export function validateProductBody(value: unknown, partial = false): Record<str
   assign("seoDescription", optionalString(value, "seoDescription", 500));
   assign("seoKeywords", keywordsField(value));
   assign("status", status);
+  assign("saleType", saleType);
+  assign("minimumOrderQuantity", saleType === "retail" ? 1 : numberField(value, "minimumOrderQuantity", { integer: true, min: 2, max: 999 }));
   assign("organicCertified", booleanField(value, "organicCertified"));
   assign("seedType", optionalString(value, "seedType", 160));
 
@@ -205,6 +216,8 @@ export function validateProductBody(value: unknown, partial = false): Record<str
     result.specifications ??= {};
     result.featured ??= false;
     result.status ??= "active";
+    result.saleType ??= "retail";
+    result.minimumOrderQuantity ??= 1;
     result.organicCertified ??= false;
     result.seoKeywords ??= [];
     result.seoTitle ??= name;
@@ -239,7 +252,12 @@ export function serializeValue(value: unknown): unknown {
 }
 
 export function serializeProduct(document: DocumentSnapshot<DocumentData>): PublicProduct {
-  return serializeValue({ _id: document.id, id: document.id, ...document.data() }) as PublicProduct;
+  const data = document.data() ?? {};
+  const saleType = data.saleType === "wholesale" ? "wholesale" : "retail";
+  const minimumOrderQuantity = saleType === "wholesale" && Number.isInteger(data.minimumOrderQuantity) && data.minimumOrderQuantity >= 2
+    ? data.minimumOrderQuantity
+    : 1;
+  return serializeValue({ _id: document.id, id: document.id, ...data, saleType, minimumOrderQuantity }) as PublicProduct;
 }
 
 export function withCreateTimestamps(data: Record<string, unknown>) {

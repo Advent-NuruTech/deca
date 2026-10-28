@@ -17,6 +17,7 @@ export default function CartItem({
   onQuantityChange: (productId: string, quantity: number) => void;
   index: number;
 }) {
+  const minimumQuantity = item.saleType === "wholesale" ? Math.max(2, item.minimumOrderQuantity ?? 2) : 1;
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -47,6 +48,7 @@ export default function CartItem({
               {item.name}
             </Link>
             {item.variantName && <p className="text-gray-600 text-sm mb-2 md:mb-4">{item.variantName}</p>}
+            {item.saleType === "wholesale" && <p className="mb-2 text-sm font-semibold text-[#008EFE]">Wholesale · Minimum {minimumQuantity}</p>}
             <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3">
                 <span className="sr-only md:not-sr-only md:text-sm md:text-gray-500">Quantity:</span>
@@ -55,17 +57,17 @@ export default function CartItem({
                     type="button"
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onQuantityChange(cartItemKey(item), item.quantity - 1)}
-                    disabled={item.quantity <= 1}
+                    disabled={item.quantity <= minimumQuantity}
                     aria-label={`Decrease ${item.name} quantity`}
                     className={`px-3 py-2 rounded-l-lg transition-colors ${
-                      item.quantity <= 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
+                      item.quantity <= minimumQuantity ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
                     <Minus size={16} />
                   </motion.button>
                   <input
                     type="number"
-                    min="1"
+                    min={minimumQuantity}
                     value={item.quantity}
                     aria-label={`${item.name} quantity`}
                     onChange={(event) => onQuantityChange(cartItemKey(item), Number.parseInt(event.target.value, 10) || 1)}

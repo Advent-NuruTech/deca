@@ -40,9 +40,14 @@ function storedCartItem(value: unknown): CartItem | null {
     Number.isInteger(item.quantity) &&
     item.quantity > 0;
   if (!valid) return null;
+  const saleType = item.saleType === "wholesale" ? "wholesale" : "retail";
+  const minimumOrderQuantity = saleType === "wholesale" && Number.isInteger(item.minimumOrderQuantity) && Number(item.minimumOrderQuantity) >= 2 ? Number(item.minimumOrderQuantity) : 1;
   return {
     ...(item as unknown as CartItem),
     id: typeof item.id === "string" ? item.id : item._id as string,
+    saleType,
+    minimumOrderQuantity,
+    quantity: Math.max(minimumOrderQuantity, item.quantity as number),
   };
 }
 
@@ -70,13 +75,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((product: PublicProduct, quantity = 1, variant?: ProductVariant) => {
     if (product.variants?.length && !variant) return;
-    const safeQuantity = Math.max(1, Math.floor(quantity));
+    const minimumQuantity = product.saleType === "wholesale" ? Math.max(2, product.minimumOrderQuantity ?? 2) : 1;
+    const stock = variant?.stockQuantity ?? product.stockQuantity;
+    if (stock < minimumQuantity) return;
+    const safeQuantity = Math.min(stock, Math.max(minimumQuantity, Math.floor(quantity)));
     setItems((current) => {
       const existing = current.find((item) => item._id === product._id && item.variantId === variant?.id);
       if (!existing) return [...current, { ...product, ...(variant ? { variantId: variant.id, variantName: variant.name, price: variant.price, stockQuantity: variant.stockQuantity, images: variant.image ? [variant.image] : product.images } : {}), quantity: safeQuantity }];
       return current.map((item) =>
         item._id === product._id && item.variantId === variant?.id
-          ? { ...item, quantity: item.quantity + safeQuantity }
+          ? { ...item, ...product, ...(variant ? { variantId: variant.id, variantName: variant.name, price: variant.price, stockQuantity: variant.stockQuantity, images: variant.image ? [variant.image] : product.images } : {}), quantity: Math.min(stock, item.quantity < minimumQuantity ? safeQuantity : item.quantity + safeQuantity) }
           : item,
       );
     });
@@ -87,10 +95,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
-    const safeQuantity = Math.max(1, Math.floor(quantity));
     setItems((current) =>
       current.map((item) =>
-        cartItemKey(item) === productId ? { ...item, quantity: safeQuantity } : item,
+        cartItemKey(item) === productId ? { ...item, quantity: Math.max(item.saleType === "wholesale" ? Math.max(2, item.minimumOrderQuantity ?? 2) : 1, Math.floor(quantity)) } : item,
       ),
     );
   }, []);

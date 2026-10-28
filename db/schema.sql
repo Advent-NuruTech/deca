@@ -124,3 +124,9 @@ INSERT OR IGNORE INTO admin_updates (id, title, content)
   WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'programme-invitations');
 
 INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('programme-invitations');
+
+INSERT OR IGNORE INTO admin_updates (id, title, content)
+  SELECT 'retail-wholesale-products', 'Retail and wholesale products', '<p>Products can now be offered as retail or wholesale. Wholesale products show their minimum order quantity throughout the shop and checkout.</p><p>Open <strong>Products</strong>, add or edit a product, choose <strong>Retail</strong> or <strong>Wholesale</strong>, and enter the minimum quantity for wholesale orders.</p>'
+  WHERE NOT EXISTS (SELECT 1 FROM admin_update_seeds WHERE id = 'retail-wholesale-products');
+
+INSERT OR IGNORE INTO admin_update_seeds (id) VALUES ('retail-wholesale-products');

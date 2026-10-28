@@ -24,6 +24,12 @@ import { richTextToPlainText } from "@/lib/rich-text";
 
 type StoredRecord = Record<string, unknown>;
 
+function saleTypeFilter(request: NextRequest): "retail" | "wholesale" | "" {
+  const value = request.nextUrl.searchParams.get("type")?.trim().toLowerCase() ?? "";
+  if (value && value !== "retail" && value !== "wholesale") throw new HttpError(400, "type must be retail or wholesale");
+  return value as "retail" | "wholesale" | "";
+}
+
 function timestamp(value: unknown): number {
   if (value && typeof value === "object" && "toMillis" in value && typeof value.toMillis === "function") {
     return value.toMillis();
@@ -45,6 +51,7 @@ export async function GET(request: NextRequest) {
       const categoryId = request.nextUrl.searchParams.get("category")?.trim() ?? "";
       const statusFilter = request.nextUrl.searchParams.get("status")?.trim() ?? "";
       const searchTerm = (request.nextUrl.searchParams.get("search") ?? "").trim().toLowerCase();
+      const typeFilter = saleTypeFilter(request);
       const limit = Math.min(50, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 20));
       let cursor = request.nextUrl.searchParams.get("cursor") ?? "";
       const found: ReturnType<typeof serializeProduct>[] = [];
@@ -61,6 +68,7 @@ export async function GET(request: NextRequest) {
           cursor = document.id;
           const product = serializeProduct(document);
           if (statusFilter && product.status !== statusFilter) continue;
+          if (typeFilter && product.saleType !== typeFilter) continue;
           if (searchTerm && !`${product.name ?? ""} ${richTextToPlainText(String(product.description ?? ""))}`.toLowerCase().includes(searchTerm)) continue;
           found.push(product);
           if (found.length > limit) break;
@@ -73,12 +81,13 @@ export async function GET(request: NextRequest) {
     const search = request.nextUrl.searchParams.get("search")?.trim().toLowerCase() ?? "";
     const featured = request.nextUrl.searchParams.get("featured");
     const status = request.nextUrl.searchParams.get("status")?.trim().toLowerCase() ?? "";
+    const typeFilter = saleTypeFilter(request);
     const page = Math.max(1, Number(request.nextUrl.searchParams.get("page")) || 1);
     const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 12));
 
     if (!adminView) {
       try {
-        const result = await getCachedD1ProductPage({ category, search, status, ...(featured === null ? {} : { featured: featured === "true" }) }, page, limit);
+        const result = await getCachedD1ProductPage({ category, search, status, ...(typeFilter ? { saleType: typeFilter } : {}), ...(featured === null ? {} : { featured: featured === "true" }) }, page, limit);
         return NextResponse.json({ products: result.items, total: result.total, totalPages: result.totalPages, currentPage: result.currentPage }, { headers: { "Cache-Control": PUBLIC_PRODUCTS_CACHE_CONTROL } });
       } catch (error) { console.warn("Using Firestore product listing fallback because D1 is unavailable or not ready.", error); }
     }
@@ -88,6 +97,7 @@ export async function GET(request: NextRequest) {
       : await getCachedActiveProducts() as unknown as StoredRecord[];
     const matching = availableProducts
       .filter((product) => !status || product.status === status)
+      .filter((product) => !typeFilter || product.saleType === typeFilter)
       .filter((product) => !category || product.category === category)
       .filter((product) => featured === null || Boolean(product.featured) === (featured === "true"))
       .filter((product) => {

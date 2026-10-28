@@ -48,7 +48,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="inline-block w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full"
+            className="inline-block h-16 w-16 rounded-full border-4 border-[#008EFE] border-t-transparent"
           />
           <p className="mt-4 text-gray-500">Loading product details...</p>
         </div>
@@ -60,11 +60,11 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-24">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-transparent bg-clip-text">
+          <h1 className="mb-4 text-3xl font-bold text-[#079326]">
             Product Not Found
           </h1>
           <p className="text-gray-600">The product you&apos;re looking for doesn&apos;t exist.</p>
-          <Link href="/products" className="inline-block mt-4 px-6 py-2 bg-emerald-600 text-white rounded-lg">
+          <Link href="/products" className="mt-4 inline-block rounded-lg bg-[#079326] px-6 py-2 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">
             Back to Shop
           </Link>
         </motion.div>
@@ -90,9 +90,9 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
       <div className="min-h-screen bg-gray-50 pt-24 pb-44 sm:pb-32">
         <div className="container mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
+            <Link href="/" className="transition-colors hover:text-[#079326]">Home</Link>
             <span>/</span>
-            <Link href="/products" className="hover:text-emerald-600 transition-colors">Products</Link>
+            <Link href={`/products?type=${product.saleType}`} className="transition-colors hover:text-[#079326]">{product.saleType === "wholesale" ? "Wholesale products" : "Retail products"}</Link>
             <span>/</span>
             <span className="text-gray-800 font-medium">{product.name}</span>
           </nav>
@@ -106,7 +106,7 @@ export default function ProductDetailPage({ slug }: { slug: string }) {
             </motion.div>
           </div>
 
-          <RelatedProducts category={product.category} currentProductId={product._id} />
+          <RelatedProducts category={product.category} currentProductId={product._id} saleType={product.saleType} />
         </div>
       </div>
     </>

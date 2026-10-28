@@ -50,6 +50,8 @@ export interface Product {
   seoDescription?: string;
   seoKeywords?: string[];
   status: "active" | "inactive" | "draft";
+  saleType: "retail" | "wholesale";
+  minimumOrderQuantity: number;
   organicCertified?: boolean;
   harvestDate?: unknown;
   seedType?: string;
@@ -176,6 +178,8 @@ export interface OrderItem {
   price: number;
   quantity: number;
   image?: string;
+  saleType?: "retail" | "wholesale";
+  minimumOrderQuantity?: number;
 }
 
 export interface OrderCustomer {

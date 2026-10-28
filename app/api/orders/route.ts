@@ -42,13 +42,16 @@ export async function POST(request: NextRequest) {
         const variant = update.variants?.find((v) => v.id === requested.variantId);
         if ((update.variants && !variant) || (!update.variants && requested.variantId)) throw new HttpError(400, `Please select an available option for ${String(data.name)}`);
         const stock = variant ? variant.stockQuantity : update.stockQuantity;
+        const saleType = data.saleType === "wholesale" ? "wholesale" : "retail";
+        const minimumOrderQuantity = saleType === "wholesale" && Number.isInteger(data.minimumOrderQuantity) && data.minimumOrderQuantity >= 2 ? data.minimumOrderQuantity : 1;
+        if (requested.quantity < minimumOrderQuantity) throw new HttpError(400, `${String(data.name)} requires a minimum order of ${minimumOrderQuantity}`);
         if ((!variant && data.inStock !== true) || !Number.isFinite(stock) || stock < requested.quantity) throw new HttpError(400, `Insufficient stock for ${String(data.name)}${variant ? ` (${variant.name})` : ""}`);
         const price = Number(variant ? variant.price : data.price);
         if (!Number.isFinite(price) || price <= 0) throw new Error("A product has an invalid price");
         if (variant) variant.stockQuantity -= requested.quantity;
         else update.stockQuantity -= requested.quantity;
         updates.set(product.id, update);
-        return { product: product.id, ...(variant ? { variantId: variant.id, variantName: variant.name } : {}), name: String(data.name ?? "Product"), price, quantity: requested.quantity, image: variant?.image || (Array.isArray(data.images) && typeof data.images[0] === "string" ? data.images[0] : "") };
+        return { product: product.id, ...(variant ? { variantId: variant.id, variantName: variant.name } : {}), name: String(data.name ?? "Product"), price, quantity: requested.quantity, image: variant?.image || (Array.isArray(data.images) && typeof data.images[0] === "string" ? data.images[0] : ""), saleType, minimumOrderQuantity };
       });
       for (const [id, update] of updates) {
         const stockQuantity = update.variants ? update.variants.reduce((sum, v) => sum + v.stockQuantity, 0) : update.stockQuantity;

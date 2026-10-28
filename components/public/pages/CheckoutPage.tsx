@@ -82,6 +82,8 @@ export default function CheckoutPage() {
     event.preventDefault();
     if (!validate()) return toast.error("Please fill in all required fields correctly");
     if (!items.length) return router.push("/cart");
+    const invalidWholesaleItem = items.find((item) => item.saleType === "wholesale" && item.quantity < Math.max(2, item.minimumOrderQuantity ?? 2));
+    if (invalidWholesaleItem) return toast.error(`${invalidWholesaleItem.name} requires at least ${invalidWholesaleItem.minimumOrderQuantity} units`);
     setSubmitting(true);
     try {
       if (saveAddress) {
