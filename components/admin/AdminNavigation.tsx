@@ -17,6 +17,7 @@ import {
   ShoppingCart,
   X,
   Settings,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -26,6 +27,7 @@ import { siteConfig } from "@/lib/site-config";
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/catalogue", label: "Catalogue", icon: BookOpen },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/chat", label: "Chat", icon: MessageCircle },
 ];
