@@ -8,7 +8,7 @@ export default function QuickActions() {
     Quick Actions
   </h2>
 
-  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+  <div className="grid grid-cols-3 gap-2 sm:gap-3">
     <Link
       href="/admin/products?action=new"
       className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-[#079326] px-1 py-3 text-center text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 hover:bg-[#008EFE] sm:flex-row sm:gap-2 sm:px-4 sm:text-sm"

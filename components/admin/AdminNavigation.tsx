@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  Bell,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -28,7 +27,6 @@ const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/updates", label: "Updates", icon: Bell },
   { href: "/admin/chat", label: "Chat", icon: MessageCircle },
 ];
 
