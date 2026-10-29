@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, Mail, PackageCheck, Truck, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Mail, Truck, UsersRound } from "lucide-react";
 import AnimatedSection from "@/components/public/AnimatedSection";
 import HomeAuthorHeroCarousel from "@/components/public/HomeAuthorHeroCarousel";
+import NewProducts from "@/components/public/products/NewProducts";
 import { decaAssets } from "@/lib/deca-assets";
 
 const highlights = [
@@ -43,6 +44,8 @@ export default function HomePage() {
           {highlights.map(({ icon: Icon, title, text }, index) => <AnimatedSection key={title} direction="jump" delay={index * 0.08} duration={0.45}><article className="flex gap-4 rounded-xl p-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-[#079326]"><Icon className="h-5 w-5" /></span><div><h2 className="font-bold text-slate-950">{title}</h2><p className="mt-1 text-sm leading-6 text-slate-600">{text}</p></div></article></AnimatedSection>)}
         </div>
       </section>
+
+      <NewProducts />
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
