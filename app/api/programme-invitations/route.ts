@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     });
     notifySafely(Promise.all([
-      notifyAdmins({ kind: "invitation", title: "New programme invitation", body: `${contactName} invited GILEAD to ${eventName} for ${organisation}.`, href: "/admin/invitations" }),
+      notifyAdmins({ kind: "invitation", title: "New programme invitation", body: `${contactName} invited GILEAD to ${eventName} for ${organisation}.` }),
       ...(identity ? [notifyUser(identity.uid, { kind: "invitation", title: "Invitation received", body: "Your programme invitation has been received by GILEAD.", href: "/invite-gilead" })] : []),
     ]), `programme invitation ${result.id}`);
     return NextResponse.json({ id: result.id, message: "Your invitation has been received." }, { status: 201 });

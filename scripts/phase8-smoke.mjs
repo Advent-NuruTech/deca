@@ -46,7 +46,6 @@ const pageRoutes = [
   "/admin/signup",
   "/admin/dashboard",
   "/admin/products",
-  "/admin/articles",
   "/admin/orders",
   "/order-confirmation/PHASE8-SMOKE",
 ];

@@ -1,11 +1,33 @@
-"use client";
+﻿"use client";
 
+import { ChevronUp, MessageCircle, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ChevronUp } from "lucide-react";
-import { whatsappContactUrl } from "@/lib/site-config";
+import { whatsappUrl } from "@/lib/chat-defaults";
+import { useChatSettings } from "@/lib/use-chat-settings";
 
 export default function FloatingActions() {
   const [showBackToTop, setShowBackToTop] = useState(false);
-  useEffect(() => { const onScroll = () => setShowBackToTop(window.scrollY > 500); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll); }, []);
-  return <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3 sm:bottom-7 sm:right-7"><a href={whatsappContactUrl} aria-label="Message Dennis on WhatsApp" className="grid h-12 w-12 place-items-center rounded-full bg-[#079326] text-white shadow-lg transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"><svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6" aria-hidden="true"><path d="M20.52 3.48A11.9 11.9 0 0 0 12.05 0C5.45 0 .08 5.37.08 11.97c0 2.11.55 4.18 1.6 6L0 24l6.2-1.63a11.9 11.9 0 0 0 5.85 1.49h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.51-8.47ZM12.06 21.84h-.01a9.93 9.93 0 0 1-5.06-1.39l-.36-.21-3.68.96.98-3.58-.23-.37a9.93 9.93 0 0 1-1.52-5.28c0-5.49 4.47-9.96 9.97-9.96a9.9 9.9 0 0 1 7.04 2.92 9.9 9.9 0 0 1 2.91 7.05c0 5.49-4.47 9.96-9.96 9.96Zm5.47-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.68-.51h-.58c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.2 5.08 4.49.71.3 1.27.49 1.71.63.72.23 1.37.2 1.88.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.28-.2-.58-.35Z" /></svg></a>{showBackToTop && <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-[#008EFE] shadow-lg transition hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"><ChevronUp className="h-5 w-5" aria-hidden="true" /></button>}</div>;
+  const [open, setOpen] = useState(false);
+  const { settings, error } = useChatSettings();
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 500);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3 sm:bottom-7 sm:right-7">
+      {open && <section id="chat-options" aria-label="WhatsApp enquiry options" className="w-[min(20rem,calc(100vw-2.5rem))] rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
+        <h2 className="font-bold text-slate-950">Chat with Deca Bookstore</h2>
+        <p className="mt-1 text-sm text-slate-600">Choose a topic to start a WhatsApp conversation.</p>
+        {!settings && <p role="status" className="mt-4 text-sm text-slate-600">{error ? "Chat is temporarily unavailable. Please use the contact page to get in touch." : "Loading chat options…"}</p>}
+        {settings && <div className="mt-4 grid max-h-[50vh] gap-2 overflow-y-auto">
+          {settings.categories.map((category) => <a key={category.id} href={whatsappUrl(category.phone, category.label)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 hover:border-[#079326] hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">{category.label}</a>)}
+          <a href={whatsappUrl(settings.directPhone)} className="rounded-lg px-3 py-2 text-sm font-semibold text-[#079326] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">Send a direct message</a>
+        </div>}
+      </section>}
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="chat-options" aria-label={open ? "Close WhatsApp chat options" : "Open WhatsApp chat options"} className="grid h-12 w-12 place-items-center rounded-full bg-[#079326] text-white shadow-lg transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">{open ? <X aria-hidden="true" /> : <MessageCircle aria-hidden="true" />}</button>
+      {showBackToTop && <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-[#008EFE] shadow-lg transition hover:text-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]"><ChevronUp className="h-5 w-5" aria-hidden="true" /></button>}
+    </div>
+  );
 }
