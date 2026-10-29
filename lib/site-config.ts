@@ -7,6 +7,8 @@ export const siteConfig = {
     "Deca Bookstore supplies KJSEA revision materials for learners, schools, and bulk buyers, with free delivery available.",
 } as const;
 
+export const whatsappContactUrl = `https://wa.me/254701836849?text=${encodeURIComponent("Hello Dennis, I'm from your website and I would like to enquire about Deca Bookstore's revision materials.")}`;
+
 /** Public contact channels approved for use across the website. */
 export const officialPhoneContacts = [
   { label: "Safaricom", number: "0742445600" },

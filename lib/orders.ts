@@ -44,6 +44,7 @@ export function validateOrderBody(value: unknown): ValidatedOrderInput {
   if (!/^[0-9+\-\s()]+$/.test(phone)) throw new HttpError(400, "phone is invalid");
   if (!isRecord(customerInput.address)) throw new HttpError(400, "address is required");
   const addressInput = customerInput.address;
+  const postalCode = optionalString(addressInput, "postalCode", 30);
 
   const customer: OrderCustomer = {
     name: requiredString(customerInput, "name", 120),
@@ -53,7 +54,7 @@ export function validateOrderBody(value: unknown): ValidatedOrderInput {
       street: requiredString(addressInput, "street", 240),
       city: requiredString(addressInput, "city", 120),
       county: requiredString(addressInput, "county", 120),
-      postalCode: optionalString(addressInput, "postalCode", 30),
+      ...(postalCode ? { postalCode } : {}),
       country: optionalString(addressInput, "country", 80) ?? "Kenya",
     },
   };

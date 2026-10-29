@@ -1,6 +1,6 @@
 import { BookOpenCheck, Mail, MessageCircle, PackageCheck, Phone, UsersRound } from "lucide-react";
 import PageHero from "@/components/public/PageHero";
-import { siteConfig } from "@/lib/site-config";
+import { siteConfig, whatsappContactUrl } from "@/lib/site-config";
 
 export default function ContactPage() {
   return (
@@ -11,7 +11,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-bold text-slate-950">Contact Dennis</h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">Choose the easiest way to get in touch.</p>
           <div className="mt-6 grid gap-5 md:grid-cols-3">
-            <a href="https://wa.me/254701836849" className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:ring-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">
+            <a href={whatsappContactUrl} className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:ring-[#079326] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE]">
               <MessageCircle className="h-7 w-7 text-[#079326]" aria-hidden="true" />
               <h3 className="mt-4 font-bold text-slate-950">WhatsApp</h3>
               <p className="mt-2 font-medium text-[#079326]">0701836849</p>
