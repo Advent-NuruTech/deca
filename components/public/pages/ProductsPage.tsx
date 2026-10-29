@@ -11,7 +11,6 @@ import SEO from "../SEO";
 import { Check, ChevronDown, Home, ImageOff, Search, ShoppingCart, X } from "lucide-react";
 import ProductsGrid from "../products/ProductsGrid";
 import ProductsPagination from "../products/ProductsPagination";
-import PageHero from "@/components/public/PageHero";
 
 type ProductsResponse = {
   products: PublicProduct[];
@@ -130,9 +129,10 @@ const ProductsPage = ({ initialCategory = "" }: { initialCategory?: string }) =>
         description="Shop Deca Bookstore revision materials for retail or wholesale orders. Wholesale listings show their minimum order quantity."
         keywords={["Revision books", "Retail books", "Wholesale books", "KJSEA materials"]}
       />
-      {!query && <PageHero eyebrow="Deca products" title={category ? categoryName : typeLabel} description={saleType === "wholesale" ? "Order books and revision materials in bulk at the minimum quantity set for each product." : "Browse revision materials for individual learners, families, schools and resellers."} primaryAction={{ href: "#product-results", label: "Browse products" }} secondaryAction={{ href: "/cart", label: "View cart" }} />}
+      <h1 className="sr-only">Products</h1>
       <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 sm:gap-2">
+          <Link href="/" aria-label="Home" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[#079326] hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-[#008EFE]"><Home size={20} aria-hidden="true" /></Link>
           <label className="flex min-w-0 flex-1 items-center gap-2 px-2 text-gray-500 sm:px-3"><Search size={20} aria-hidden="true" /><span className="sr-only">Search products</span><input type="search" value={query} onChange={(event) => { if (!query && event.target.value) window.scrollTo({ top: 0, behavior: "smooth" }); setQuery(event.target.value); if (searchParams.get("page")) { const params = new URLSearchParams(searchParams.toString()); params.delete("page"); router.replace(`/products${params.size ? `?${params}` : ""}`, { scroll: false }); } }} placeholder="Search products..." className="min-w-0 w-full py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 sm:text-base" /></label>
           <button ref={categoryButton} onClick={() => { if (window.matchMedia("(min-width: 1024px)").matches) setDesktopOpen((open) => !open); else setDrawerOpen(true); }} aria-expanded={drawerOpen || desktopOpen} aria-controls="product-categories" className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#079326] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#008EFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#008EFE] sm:px-5"><span className="max-w-[100px] truncate sm:max-w-[220px]">{category ? categoryName : "Categories"}</span><ChevronDown size={18} /></button>
           <Link href="/cart" aria-label={`Shopping cart, ${itemCount} ${itemCount === 1 ? "item" : "items"}`} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[#079326] hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-[#008EFE]"><ShoppingCart size={21} aria-hidden="true" />{itemCount > 0 && <span aria-hidden="true" className="absolute right-0 top-0 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{itemCount > 99 ? "99+" : itemCount}</span>}</Link>
