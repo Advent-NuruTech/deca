@@ -26,7 +26,7 @@ const slides = [
   },
 ] as const;
 
-export default function HomeAuthorHeroCarousel() {
+export default function HomeAuthorHeroCarousel({ preload = true }: { preload?: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -44,7 +44,7 @@ export default function HomeAuthorHeroCarousel() {
   return (
     <section
       aria-label="Meet Deca Bookstore"
-      className="relative min-h-[360px] overflow-hidden bg-slate-900 sm:min-h-[440px] lg:min-h-0"
+      className="relative h-full min-h-[360px] overflow-hidden bg-slate-900 sm:min-h-[440px] lg:min-h-0"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocusCapture={() => setIsPaused(true)}
@@ -67,15 +67,15 @@ export default function HomeAuthorHeroCarousel() {
               src={slide.mobile}
               alt={isActive ? slide.alt : ""}
               fill
-              fetchPriority={index === 0 ? "high" : "auto"}
+              fetchPriority={preload && index === 0 ? "high" : "auto"}
               sizes="(max-width: 1023px) 100vw, 1px"
               className="object-cover object-center lg:hidden"
             />
             <Image
               src={slide.desktop}
-              alt=""
+              alt={isActive ? slide.alt : ""}
               fill
-              fetchPriority={index === 0 ? "high" : "auto"}
+              fetchPriority={preload && index === 0 ? "high" : "auto"}
               sizes="(min-width: 1024px) 42vw, 1px"
               className="hidden object-cover object-center lg:block"
             />
