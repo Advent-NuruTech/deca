@@ -280,3 +280,19 @@ body {
   background-size: 200% auto;
   animation: gradient 3s ease infinite;
 }
+
+@keyframes advent-credit-typing {
+  0% { clip-path: inset(0 100% 0 0); }
+  40%, 100% { clip-path: inset(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .advent-credit-text {
+    display: inline-block;
+    animation: advent-credit-typing 8s steps(26, end) infinite;
+  }
+
+  .advent-credit:is(:hover, :focus-visible) .advent-credit-text {
+    animation: none;
+  }
+}
