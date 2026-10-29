@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Edit3, Eye, Folder, FolderPlus, ImagePlus, Plus, Search, Sparkles, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import type { Product, ProductCategory, PublicProduct } from "@/lib/types";
 import { errorMessage, formatDate, formatMoney } from "@/components/admin/admin-utils";
 import RichTextEditor from "@/components/admin/rich-text-editor";
@@ -42,7 +42,7 @@ function formFromProduct(product?: PublicProduct | null, fallbackCategory = ""):
     stockQuantity: String(product.stockQuantity ?? 0), inStock: product.inStock, featured: product.featured,
     status: product.status, images: [...(product.images ?? [])], brand: product.brand ?? "", model: product.model ?? "",
     organicCertified: product.organicCertified ?? false, seedType: product.seedType ?? "",
-    variants: (product.variants ?? []).map((v) => ({ ...v, price: String(v.price), stockQuantity: String(v.stockQuantity), image: v.image ?? "" })),
+    variants: (product.variants ?? []).map((v) => ({ ...v, price: String(v.price), stockQuantity: String(v.stockQuantity ?? 0), image: v.image ?? "" })),
   };
 }
 
@@ -184,7 +184,10 @@ export default function ProductManager() {
       await Promise.allSettled([...removed].map((publicId) => api.delete("/api/upload", { publicId })));
       setNewUploads([]); setEditorOpen(false); setEditing(null);
       toast.success(editing ? "Product updated" : "Product created"); setReloadVersion((version) => version + 1);
-    } catch (nextError) { toast.error(errorMessage(nextError, "Product could not be saved")); }
+    } catch (nextError) {
+      if (nextError instanceof ApiError && nextError.status === 409) setReloadVersion((version) => version + 1);
+      toast.error(errorMessage(nextError, "Product could not be saved"));
+    }
     finally { setSaving(false); }
   }
 

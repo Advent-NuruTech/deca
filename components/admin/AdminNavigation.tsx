@@ -147,10 +147,10 @@ export default function AdminNavigation({ children, account }: { children: React
         </nav>
 
         <div className={`border-t p-4 ${isMobile ? "border-slate-200" : "border-white/10"} ${compact ? "px-3" : ""}`}>
-          <div className={`mb-2 flex items-center ${compact ? "justify-center" : "justify-between px-1"}`}>
+          {!isMobile && <div className={`mb-2 flex items-center ${compact ? "justify-center" : "justify-between px-1"}`}>
             {!compact && <span className={`text-xs font-medium ${isMobile ? "text-slate-600" : "text-white/75"}`}>Notifications</span>}
             <NotificationBell dark={!isMobile} placement="above" />
-          </div>
+          </div>}
           <a href="/" target="_blank" rel="noreferrer" title={compact ? "View website" : undefined} className={`mb-2 flex min-h-10 items-center rounded-xl text-sm transition ${isMobile ? "text-slate-700 hover:bg-slate-100 hover:text-[#079326]" : "text-white hover:bg-white/10"} ${compact ? "justify-center px-2" : "gap-3 px-3"}`}>
             <ExternalLink size={18} />
             {!compact && <span>View website</span>}

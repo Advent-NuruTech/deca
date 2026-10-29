@@ -77,8 +77,9 @@ export async function PUT(
         const expected = input.expectedInventory as { stockQuantity?: number; variants?: Array<{ id: string; stockQuantity: number }> } | undefined;
         if (expected) {
           const currentData = current.data() ?? {};
-          const stock = (currentData.variants ?? []).map((v: { id: string; stockQuantity: number }) => ({ id: v.id, stockQuantity: v.stockQuantity }));
-          if (currentData.stockQuantity !== expected.stockQuantity || JSON.stringify(stock) !== JSON.stringify(expected.variants ?? [])) throw new HttpError(409, "Stock changed while you were editing. Reopen the product to see the latest stock.");
+          const stock = (currentData.variants ?? []).map((v: { id: string; stockQuantity?: number | null }) => ({ id: v.id, stockQuantity: v.stockQuantity ?? 0 }));
+          const expectedStock = (expected.variants ?? []).map((v) => ({ id: v.id, stockQuantity: v.stockQuantity ?? 0 }));
+          if ((currentData.stockQuantity ?? 0) !== (expected.stockQuantity ?? 0) || JSON.stringify(stock) !== JSON.stringify(expectedStock)) throw new HttpError(409, "Stock changed while you were editing. Reopen the product to see the latest stock.");
         }
         transaction.update(reference, withUpdateTimestamp(data));
       });
